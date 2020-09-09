@@ -96,31 +96,31 @@ class Entity { // this. is selectedChar
 
 }
 
-/*
-className
-range
-maxHP
-MS
-AS
-DMG
-true
-pos?
-*/
+// /*
+// className
+// range
+// maxHP
+// MS
+// AS
+// DMG
+// true
+// pos?
+// */
 
-// MS is probly wacky af rn => movement every .1 seconds
+// // MS is probly wacky af rn => movement every .1 seconds
 
-// Heroes
-// rdps
-const Warlock = new Entity('Warlock', 'infinite', 100, 10, 2000, 15, true, [100, 100]);
+// // Heroes
+// // rdps
+// const Warlock = new Entity('Warlock', 'infinite', 100, 10, 2000, 15, true, [100, 100]);
 
-// heals
-const Priest = new Entity('Priest', 'infinite', 100, 10, 1500, -10, true, [200, 200]);
+// // heals
+// const Priest = new Entity('Priest', 'infinite', 100, 10, 1500, -10, true, [200, 200]);
 
-// mdps
-const Warrior = new Entity('Warrior', 10, 100, 10, 1000, 10, true, [-50, -50]);
+// // mdps
+// const Warrior = new Entity('Warrior', 10, 100, 10, 1000, 10, true, [-50, -50]);
 
-// Enemies
+// // Enemies
 
-const SkeletonArcher = new Entity('SkeletonArcher', 'infinite', 100, 10, 3000, 30, false, [20, 20]);
+// const SkeletonArcher = new Entity('SkeletonArcher', 'infinite', 100, 10, 3000, 30, false, [20, 20]);
 
-// export default Entity;
+export default Entity;
