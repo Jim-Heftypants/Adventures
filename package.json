@@ -6,6 +6,7 @@
   "directories": {
     "lib": "lib"
   },
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack --mode=development --watch"
@@ -26,14 +27,6 @@
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-react": "^7.10.4",
     "babel-loader": "^8.1.0",
-    "react": "^16.13.1",
-    "react-actioncable-provider": "^2.0.0",
-    "react-dom": "^16.13.1",
-    "redux-logger": "^3.0.6",
-    "react-redux": "^7.2.1",
-    "react-router-dom": "^5.2.0",
-    "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   }
