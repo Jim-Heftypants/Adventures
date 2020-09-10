@@ -1,7 +1,7 @@
 
 
 class Entity { // this. is selectedChar
-    constructor(klass="", range=0, maxHP=0, ms=0, attackSpeed=0, attackDMG, allied=true, pos=[0, 0]) {
+    constructor(klass="", range=0, maxHP=0, ms=0, attackSpeed=0, attackDMG, allied=true, img="", pos=[0, 0]) {
         this.klass = klass;
         this.range = range;
         this.maxHP = maxHP;
@@ -14,23 +14,30 @@ class Entity { // this. is selectedChar
         this.as = this.baseAS;
         this.baseDMG = attackDMG;
         this.dmg = this.baseDMG;
+        this.imgName = img;
+        this.img; // base standing image
+        this.attackImages; // cycle through array of images
+        this.moveImages; // cycle through array of images
     }
 
     vectorToScalar(endPos) {
         const deltaX = this.pos[0] - endPos[0];
         const deltaY = this.pos[1] - endPos[1];
-        const xRatio = (deltaX / (Math.abs(deltaX) + Math.abs(deltaY)));
-        const yRatio = (deltaY / (Math.abs(deltaY) + Math.abs(deltaX)));
-        return ([this.ms * xRatio, this.ms * yRatio])
+        const xChange = -1*this.ms*(deltaX / (Math.abs(deltaX) + Math.abs(deltaY)));
+        const yChange = -1*this.ms*(deltaY / (Math.abs(deltaY) + Math.abs(deltaX)));
+        const numRepeats = Math.abs(Math.floor(deltaX / xChange));
+        return ([xChange, yChange, numRepeats])
     }
 
     move(endPos, attackOnFinish = false) {
-        const charImg = document.getElementsByClassName(this.klass) // add unique class names to all on screen elements -- only need 10 or so max
+        endPos[0] = Math.floor(endPos[0] - (this.img.width / 2)); endPos[1] = Math.floor(endPos[1] - (this.img.height / 2));
+        let moveImage = this.img;
         let pos = this.pos;
         let posChange = this.vectorToScalar(endPos);
-        let id = setInterval(frame, 100);
+        console.log(posChange[2]);
+        let id = setInterval(frame, 20);
         function frame() {
-            if (pos[0] === endPos[0] && pos[1] === endPos[1]) {
+            if (posChange[2] === 0) {
             // close animation
                 clearInterval(id);
                 if (attackOnFinish) {
@@ -39,8 +46,16 @@ class Entity { // this. is selectedChar
             } else { // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
             // begin some kind of animation
                 pos[0] += posChange[0]; pos[1] += posChange[1];
-                charImg.style.top = pos[1] + 'px';
-                charImg.style.left = pos[0] + 'px';
+                if (pos[0] + Math.floor(moveImage.width) > 1200) { pos[0] = 1200 - Math.floor(moveImage.width);}
+                if (pos[0] < 15) {pos[0] = 15;}
+                if (pos[1] + Math.floor(moveImage.height) > 850) { pos[1] = 850 - Math.floor(moveImage.height);}
+                if (pos[1] < 15) {pos[1] = 15;}
+                console.log('posChange: ', posChange);
+                console.log('pos: ', pos);
+                moveImage.style.top = Math.floor(pos[1]) + 'px';
+                moveImage.style.left = Math.floor(pos[0]) + 'px';
+                console.log('moveImage: ', moveImage);
+                posChange[2] -= 1;
             }
         }
     }
