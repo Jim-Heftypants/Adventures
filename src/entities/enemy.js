@@ -8,8 +8,9 @@ MS
 AS
 DMG
 false
-pos?
+pos
+defense
 */
 
-// MS is probly wacky af rn => movement every .1 seconds
-export const SkeletonArcher = new classCreator('SkeletonArcher', 'infinite', 100, 10, 3000, 30, false, "", [20, 20]);
+const skeletonArcherImg = "squilliam";
+export const SkeletonArcher = new classCreator('SkeletonArcher', 'infinite', 100, 10, 3000, 30, false, skeletonArcherImg, [500, 500], 15);

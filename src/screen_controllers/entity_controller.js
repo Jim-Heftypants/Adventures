@@ -2,17 +2,28 @@ import * as charactersObj from '../entities/character';
 import * as enemiesObj from '../entities/enemy';
 
 let characters = {};
-// function drawImage(ctx, klass) {
-//     const char = characters[klass];
-//     const img = document.getElementsByClassName(char.imgName)[0];
-//     ctx.drawImage(img, char.pos[0], char.pos[1], 300, 300);
-// }
+let enemies = {};
+
+function setInitialTargets() {
+    const chars = Object.values(charactersObj);
+    const enemies = Object.values(enemiesObj);
+    for (let i = 0; i < enemies.length; i++) {
+        const targetIndex = Math.floor(Math.random() * 3);
+        console.log("target index: ", targetIndex);
+        enemies[i].target = chars[targetIndex];
+        console.log(enemies[i].klass, "has target set to", enemies[i].target);
+    }
+}
 
 window.addEventListener("load", () => {
-    // let c = document.getElementById("canvas");
-    // let ctx = c.getContext("2d");
+    setInitialTargets();
 
     let selectedChar;
+
+    const deSelectButton = document.getElementById('reset-selected');
+    deSelectButton.addEventListener('click', () => {
+        selectedChar = null;
+    })
 
     const charactersArr = Object.values(charactersObj);
 
@@ -20,8 +31,8 @@ window.addEventListener("load", () => {
         if (charactersArr[i].imgName != "") {
             charactersArr[i].img = document.getElementsByClassName(charactersArr[i].imgName)[0];
             charactersArr[i].img.style.display = "initial";
-            charactersArr[i].img.style.left = charactersArr[i].pos[0];
-            charactersArr[i].img.style.top = charactersArr[i].pos[1];
+            charactersArr[i].img.style.left = charactersArr[i].pos[0] + "px";
+            charactersArr[i].img.style.top = charactersArr[i].pos[1] + "px";
             charactersArr[i].img.addEventListener("click", (e) => {
                 console.log('character click');
                 if (!selectedChar) {
@@ -35,10 +46,20 @@ window.addEventListener("load", () => {
     }
     console.log("heroes: ", characters);
     const enemiesArr = Object.values(enemiesObj);
-    let enemies = {};
     for (let i = 0; i < enemiesArr.length; i++) {
         if (enemiesArr[i].imgName != "") {
             enemiesArr[i].img = document.getElementsByClassName(enemiesArr[i].imgName)[0];
+            enemiesArr[i].img.style.display = "initial";
+            enemiesArr[i].img.style.left = enemiesArr[i].pos[0] + "px";
+            enemiesArr[i].img.style.top = enemiesArr[i].pos[1] + "px";
+            enemiesArr[i].autoAttack(enemiesArr[i].target);
+            enemiesArr[i].img.addEventListener("click", (e) => {
+                console.log('enemy click');
+                if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
+                    selectedChar.autoAttack(enemiesArr[i]);
+                }
+                e.stopPropagation(); // maybe move inside if
+            })
         }
         enemies[enemiesArr[i].klass] = enemiesArr[i];
     }
@@ -56,6 +77,3 @@ window.addEventListener("load", () => {
     })
 
 })
-
-
-// export default initializeGame;
