@@ -30,7 +30,10 @@ function loadGame() {
 
         for (let i = 0; i < charactersArr.length; i++) {
             if (charactersArr[i].imgName != "") {
-                charactersArr[i].img = document.getElementsByClassName(charactersArr[i].imgName)[0];
+                charactersArr[i].img = document.getElementsByClassName(charactersArr[i].imgName + "-display")[0];
+                charactersArr[i].baseImg = document.getElementsByClassName(charactersArr[i].imgName)[0]
+                charactersArr[i].img.src = charactersArr[i].baseImg.src;
+                charactersArr[i].attackImages = document.getElementsByClassName(charactersArr[i].imgName);
                 charactersArr[i].img.style.display = "initial";
                 charactersArr[i].img.style.left = charactersArr[i].pos[0] + "px";
                 charactersArr[i].img.style.top = charactersArr[i].pos[1] + "px";
@@ -52,7 +55,10 @@ function loadGame() {
         const enemiesArr = Object.values(enemiesObj);
         for (let i = 0; i < enemiesArr.length; i++) {
             if (enemiesArr[i].imgName != "") {
-                enemiesArr[i].img = document.getElementsByClassName(enemiesArr[i].imgName)[0];
+                enemiesArr[i].img = document.getElementsByClassName(enemiesArr[i].imgName + "-display")[0];
+                enemiesArr[i].baseImg = document.getElementsByClassName(enemiesArr[i].imgName)[0]
+                enemiesArr[i].img.src = enemiesArr[i].baseImg.src;
+                enemiesArr[i].attackImages = document.getElementsByClassName(enemiesArr[i].imgName);
                 enemiesArr[i].img.style.display = "initial";
                 enemiesArr[i].img.style.left = enemiesArr[i].pos[0] + "px";
                 enemiesArr[i].img.style.top = enemiesArr[i].pos[1] + "px";

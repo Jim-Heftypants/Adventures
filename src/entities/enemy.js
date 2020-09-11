@@ -12,5 +12,4 @@ pos
 defense
 */
 
-const skeletonArcherImg = "squilliam";
-export const SkeletonArcher = new classCreator('SkeletonArcher', 'infinite', 100, 10, 3000, 30, false, skeletonArcherImg, [500, 500], 15);
+export const EWizard = new classCreator('EWizard', 'infinite', 100, 10, 3000, 30, false, "ewizard", [500, 500], 15);

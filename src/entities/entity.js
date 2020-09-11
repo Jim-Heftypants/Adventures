@@ -18,8 +18,11 @@ class Entity { // this. is selectedChar
         this.img; // base standing image
         this.attackImages; // cycle through array of images
         this.moveImages; // cycle through array of images
+        this.baseImg; // standard stand image
 
         this.currentAction;
+        this.currentAnimation;
+        this.imgCycle = 0;
 
         this.target;
     }
@@ -34,6 +37,9 @@ class Entity { // this. is selectedChar
     }
 
     move(endPos, attackOnFinish = false) {
+        clearInterval(this.currentAction);
+        clearInterval(this.currentAnimation);
+        this.img.src = this.baseImg.src;
         endPos[0] = Math.floor(endPos[0] - (this.img.width / 2)); endPos[1] = Math.floor(endPos[1] - (this.img.height / 2));
         let moveImage = this.img;
         let pos = this.pos;
@@ -87,15 +93,30 @@ class Entity { // this. is selectedChar
     killEntitiy(entity) {
         console.log(entity.klass, "killed");
         clearInterval(entity.currentAction);
+        clearInterval(entity.currentAnimation);
+        entity.img.src = entity.baseImg.src;
         entity.img.style.display = "none";
+    }
+
+    animateAttack(self) {
+        if (self.attackImages) {
+            self.imgCycle += 1;
+            self.imgCycle = self.imgCycle % 4;
+            self.img.src = self.attackImages[self.imgCycle].src;
+        }
     }
 
     beginAttack(targetChar) {
         // make some kind of animation start
+        clearInterval(this.currentAction);
+        clearInterval(this.currentAnimation);
+        this.currentAnimation = setInterval(() => this.animateAttack(this), Math.floor(this.as / 4))
         this.currentAction = setInterval(() => attack(this), this.as);
         function attack(selectedChar) {
             if (targetChar.hp <= 0) {
                 clearInterval(selectedChar.currentAction);
+                clearInterval(selectedChar.currentAnimation);
+                selectedChar.img.src = selectedChar.baseImg.src;
                 if (!selectedChar.allied) {
                     // chose another hero to attack
                 }
@@ -104,6 +125,8 @@ class Entity { // this. is selectedChar
             if (!selectedChar.withinAttackRange(selectedChar, targetChar)) {
             // stop the animation
                 clearInterval(selectedChar.currentAction);
+                clearInterval(selectedChar.currentAnimation);
+                selectedChar.img.src = selectedChar.baseImg.src;
             } else {
                 targetChar.hp -= selectedChar.dmg; // this.dmg can just be negative for healers
                 console.log('target hp at: ', targetChar.hp);
@@ -117,12 +140,26 @@ class Entity { // this. is selectedChar
                 if (targetChar.hp <= 0) {
                     // stop the animation
                     clearInterval(selectedChar.currentAction);
+                    clearInterval(selectedChar.currentAnimation);
+                    selectedChar.img.src = selectedChar.baseImg.src;
                     console.log('attack interval stopped');
                     selectedChar.killEntitiy(targetChar);
                     if (!selectedChar.allied) {
                         // chose another hero to attack
+
+                        // this.allies
+                        // this.enemies
                     }
                 }
+                if (selectedChar.baseDMG > 0) {
+                    targetChar.img.style.border = "2px solid red";
+                } else {
+                    targetChar.img.style.border = "2px solid green";
+                }
+                let borderInterval = setInterval(() => {
+                    targetChar.img.style.border = "none";
+                    clearInterval(borderInterval);
+                }, 500);
             }
         }
     }
