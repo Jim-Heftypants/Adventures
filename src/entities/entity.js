@@ -94,6 +94,13 @@ class Entity { // this. is selectedChar
         // make some kind of animation start
         this.currentAction = setInterval(() => attack(this), this.as);
         function attack(selectedChar) {
+            if (targetChar.hp <= 0) {
+                clearInterval(selectedChar.currentAction);
+                if (!selectedChar.allied) {
+                    // chose another hero to attack
+                }
+                return;
+            }
             if (!selectedChar.withinAttackRange(selectedChar, targetChar)) {
             // stop the animation
                 clearInterval(selectedChar.currentAction);
@@ -112,6 +119,9 @@ class Entity { // this. is selectedChar
                     clearInterval(selectedChar.currentAction);
                     console.log('attack interval stopped');
                     selectedChar.killEntitiy(targetChar);
+                    if (!selectedChar.allied) {
+                        // chose another hero to attack
+                    }
                 }
             }
         }
