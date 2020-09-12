@@ -5,42 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel='stylesheet' href="./assets/css/css.css">
     <title>Adventures</title>
-    <!-- <h1>Adventures</h1> -->
 </head>
 <body>
-    <!-- <script src="./lib/entities/entity.js"></script>
-    <script src="./lib/screen_controllers/canvas_controller.js"></script> -->
     <script src="./dist/main.js"></script>
-    <!-- <canvas id="canvas" width="1250" height="875" style="border:1px solid #000000;"></canvas> -->
     <div id='game-container'>
 
-        <img src="" alt="" class="squilliam-display" style="display: none;" />
+        <h1 id="start-game-button">Start Game!</h1>
 
-        <img src="./assets/images/Kelpy_G.png" alt="Kelpy_G" class="kelpy" style="display: none;"/>
-        <img src="./assets/images/squilliam.jpg" alt="Squilliam" class="squilliam" style="display: none;" />
-
-        <img src="" alt="" class="wizard-display" style="display: none;" />
+        <div id="wizard-display" class='entity-container' style="position: absolute;">
+            <div id='wizard-hp-bar' class="hp-bar-container" style="display: none;">
+                <div id='wizard-hp-left' class="hp-percentage-left">
+    
+                </div>
+                <div id='wizard-hp-right' class="hp-percentage-right">
+    
+                </div>
+            </div>
+            <img src="" alt="something went wrong" class="wizard-image-display" style="display: none;" />
+        </div>
 
         <img src="./assets/images/Wizard/Wizard.png" alt="Wizard" class="wizard" style="display: none;" />
         <img src="assets/images/Wizard/Wizard-attack-1.png" alt="Wizard" class="wizard" style="display: none;" />
         <img src="assets/images/Wizard/Wizard-attack-2.png" alt="Wizard" class="wizard" style="display: none;" />
         <img src="assets/images/Wizard/Wizard-attack-3.png" alt="Wizard" class="wizard" style="display: none;" />
 
-        <img src="" alt="" class="rogue-display" style="display: none;" />
+        <div id="rogue-display" class='entity-container' style="position: absolute;">
+            <div id='rogue-hp-bar' class="hp-bar-container" style="display: none;">
+                <div id='rogue-hp-left' class="hp-percentage-left">
+        
+                </div>
+                <div id='rogue-hp-right' class="hp-percentage-right">
+        
+                </div>
+            </div>
+            <img src="" alt="something went wrong" class="rogue-image-display" style="display: none;" />
+        </div>
 
         <img src="./assets/images/Rogue/Rogue.png" alt="Rogue" class="rogue" style="display: none;" />
         <img src="./assets/images/Rogue/Rogue-attack-1.png" alt="Rogue" class="rogue" style="display: none;" />
         <img src="./assets/images/Rogue/Rogue-attack-2.png" alt="Rogue" class="rogue" style="display: none;" />
         <img src="./assets/images/Rogue/Rogue-attack-3.png" alt="Rogue" class="rogue" style="display: none;" />
 
-        <img src="" alt="" class="warrior-display" style="display: none;" />
+        <div id="warrior-display" class='entity-container' style="position: absolute;">
+            <div id='warrior-hp-bar' class="hp-bar-container" style="display: none;">
+                <div id='warrior-hp-left' class="hp-percentage-left">
+        
+                </div>
+                <div id='warrior-hp-right' class="hp-percentage-right">
+        
+                </div>
+            </div>
+            <img src="" alt="something went wrong" class="warrior-image-display" style="display: none;" />
+        </div>
 
         <img src="./assets/images/Warrior/Warrior.png" alt="Warrior" class="warrior" style="display: none;" />
         <img src="./assets/images/Warrior/Warrior-attack-1.png" alt="Warrior" class="warrior" style="display: none;" />
         <img src="./assets/images/Warrior/Warrior-attack-2.png" alt="Warrior" class="warrior" style="display: none;" />
         <img src="./assets/images/Warrior/Warrior-attack-3.png" alt="Warrior" class="warrior" style="display: none;" />
 
-        <img src="" alt="" class="cleric-display" style="display: none;" />
+        <div id="cleric-display" class='entity-container' style="position: absolute;">
+            <div id='cleric-hp-bar' class="hp-bar-container" style="display: none;">
+                <div id='cleric-hp-left' class="hp-percentage-left">
+        
+                </div>
+                <div id='cleric-hp-right' class="hp-percentage-right">
+        
+                </div>
+            </div>
+            <img src="" alt="something went wrong" class="cleric-image-display" style="display: none;" />
+        </div>
 
         <img src="./assets/images/Cleric/Cleric.png" alt="Cleric" class="cleric" style="display: none;" />
         <img src="./assets/images/Cleric/Cleric-attack-1.png" alt="Cleric" class="cleric" style="display: none;" />
@@ -49,28 +82,68 @@
 
 
 
-        <img src="" alt="" class="ewizard-display" style="display: none;" />
+        <div id="ewizard-display" class='entity-container' style="position: absolute;">
+            <div id='ewizard-hp-bar' class="hp-bar-container" style="display: none;">
+                <div id='ewizard-hp-left' class="hp-percentage-left">
+        
+                </div>
+                <div id='ewizard-hp-right' class="hp-percentage-right">
+        
+                </div>
+            </div>
+            <img src="" alt="something went wrong" class="ewizard-image-display" style="display: none;" />
+        </div>
         
         <img src="./assets/images/EWizard/Wizard.png" alt="Wizard" class="ewizard" style="display: none;" />
         <img src="assets/images/EWizard/Wizard-attack-1.png" alt="Wizard" class="ewizard" style="display: none;" />
         <img src="assets/images/EWizard/Wizard-attack-2.png" alt="Wizard" class="ewizard" style="display: none;" />
         <img src="assets/images/EWizard/Wizard-attack-3.png" alt="Wizard" class="ewizard" style="display: none;" />
         
-        <img src="" alt="" class="erogue-display" style="display: none;" />
+        <div id="erogue-display" class='entity-container' style="position: absolute;">
+            <div id='erogue-hp-bar' class="hp-bar-container" style="display: none;">
+                <div id='erogue-hp-left' class="hp-percentage-left">
+        
+                </div>
+                <div id='erogue-hp-right' class="hp-percentage-right">
+        
+                </div>
+            </div>
+            <img src="" alt="something went wrong" class="erogue-image-display" style="display: none;" />
+        </div>
         
         <img src="./assets/images/ERogue/Rogue.png" alt="Rogue" class="erogue" style="display: none;" />
         <img src="./assets/images/ERogue/Rogue-attack-1.png" alt="Rogue" class="erogue" style="display: none;" />
         <img src="./assets/images/ERogue/Rogue-attack-2.png" alt="Rogue" class="erogue" style="display: none;" />
         <img src="./assets/images/ERogue/Rogue-attack-3.png" alt="Rogue" class="erogue" style="display: none;" />
         
-        <img src="" alt="" class="ewarrior-display" style="display: none;" />
+        <div id="ewarrior-display" class='entity-container' style="position: absolute;">
+            <div id='ewarrior-hp-bar' class="hp-bar-container" style="display: none;">
+                <div id='ewarrior-hp-left' class="hp-percentage-left">
+        
+                </div>
+                <div id='ewarrior-hp-right' class="hp-percentage-right">
+        
+                </div>
+            </div>
+            <img src="" alt="something went wrong" class="ewarrior-image-display" style="display: none;" />
+        </div>
         
         <img src="./assets/images/EWarrior/Warrior.png" alt="Warrior" class="ewarrior" style="display: none;" />
         <img src="./assets/images/EWarrior/Warrior-attack-1.png" alt="Warrior" class="ewarrior" style="display: none;" />
         <img src="./assets/images/EWarrior/Warrior-attack-2.png" alt="Warrior" class="ewarrior" style="display: none;" />
         <img src="./assets/images/EWarrior/Warrior-attack-3.png" alt="Warrior" class="ewarrior" style="display: none;" />
         
-        <img src="" alt="" class="ecleric-display" style="display: none;" />
+        <div id="ecleric-display" class='entity-container' style="position: absolute;">
+            <div id='ecleric-hp-bar' class="hp-bar-container" style="display: none;">
+                <div id='ecleric-hp-left' class="hp-percentage-left">
+        
+                </div>
+                <div id='ecleric-hp-right' class="hp-percentage-right">
+        
+                </div>
+            </div>
+            <img src="" alt="something went wrong" class="ecleric-image-display" style="display: none;" />
+        </div>
         
         <img src="./assets/images/ECleric/Cleric.png" alt="Cleric" class="ecleric" style="display: none;" />
         <img src="./assets/images/ECleric/Cleric-attack-1.png" alt="Cleric" class="ecleric" style="display: none;" />

@@ -19,37 +19,56 @@ class Entity { // this. is selectedChar
         this.attackImages; // cycle through array of images
         this.moveImages; // cycle through array of images
         this.baseImg; // standard stand image
+        this.container;
 
         this.currentAction;
         this.currentAnimation;
         this.imgCycle = 0;
 
         this.target;
+
+        this.allies;
+        this.enemies;
+
+        this.movingOutTheWay = false;
     }
 
     vectorToScalar(endPos) {
         const deltaX = this.pos[0] - endPos[0];
         const deltaY = this.pos[1] - endPos[1];
-        const xChange = -1*this.ms*(deltaX / (Math.abs(deltaX) + Math.abs(deltaY)));
-        const yChange = -1*this.ms*(deltaY / (Math.abs(deltaY) + Math.abs(deltaX)));
+        if (Math.abs(deltaX) + Math.abs(deltaY) === 0) {
+            return ([0, 0, 0]);
+        }
+        let xChange = -1 * this.ms * (deltaX / (Math.abs(deltaX) + Math.abs(deltaY)));
+        let yChange = -1 * this.ms * (deltaY / (Math.abs(deltaY) + Math.abs(deltaX)));
+        if (xChange === 0 || xChange === -0) {
+            xChange = 0;
+            const numRepeats = Math.abs(Math.floor(deltaY / yChange));
+            return ([xChange, yChange, numRepeats])
+        }
+        if (yChange === -0) {
+            yChange = 0;
+        }
+        
         const numRepeats = Math.abs(Math.floor(deltaX / xChange));
         return ([xChange, yChange, numRepeats])
     }
 
     move(endPos, attackOnFinish = false) {
+        this.movingOutTheWay = true;
         clearInterval(this.currentAction);
         clearInterval(this.currentAnimation);
         this.img.src = this.baseImg.src;
         endPos[0] = Math.floor(endPos[0] - (this.img.width / 2)); endPos[1] = Math.floor(endPos[1] - (this.img.height / 2));
-        let moveImage = this.img;
         let pos = this.pos;
         let posChange = this.vectorToScalar(endPos);
-        console.log(posChange[2]);
+        console.log("pos change on move", posChange);
         this.currentAction = setInterval(() => frame(this), 20);
         function frame(self) {
             if (posChange[2] === 0) {
             // close animation
                 clearInterval(self.currentAction);
+                self.movingOutTheWay = false;
                 pos[0] = Math.floor(pos[0]); pos[1] = Math.floor(pos[1]);
                 if (attackOnFinish) {
                     // console.log('self in move end: ', self);
@@ -58,15 +77,14 @@ class Entity { // this. is selectedChar
             } else { // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
             // begin some kind of animation
                 pos[0] += posChange[0]; pos[1] += posChange[1];
-                if (pos[0] + Math.floor(moveImage.width) > 1200) { pos[0] = 1200 - Math.floor(moveImage.width);}
+                if (pos[0] + Math.floor(self.img.width) > 1400) { pos[0] = 1400 - Math.floor(self.img.width);}
                 if (pos[0] < 15) {pos[0] = 15;}
-                if (pos[1] + Math.floor(moveImage.height) > 850) { pos[1] = 850 - Math.floor(moveImage.height);}
+                if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height);}
                 if (pos[1] < 15) {pos[1] = 15;}
                 // console.log('posChange: ', posChange);
                 // console.log('pos: ', pos);
-                moveImage.style.top = Math.floor(pos[1]) + 'px';
-                moveImage.style.left = Math.floor(pos[0]) + 'px';
-                // console.log('moveImage: ', moveImage);
+                self.container.style.top = Math.floor(pos[1]) + 'px';
+                self.container.style.left = Math.floor(pos[0]) + 'px';
                 posChange[2] -= 1;
             }
         }
@@ -74,7 +92,7 @@ class Entity { // this. is selectedChar
 
     withinAttackRange(self, target) {
         // console.log('self in withinAttackRange: ', self);
-        if (self.range === 'infinite') { console.log('within infinite range'); return true; }
+        if (self.range === 'infinite') { return true; }
         // rectangle box for melee
         const widthAddition = Math.floor((self.img.width / 2) + (target.img.width / 2));
         if (self.pos[0] > target.pos[0] - widthAddition - self.range && self.pos[0] < target.pos[0] + widthAddition + self.range) {
@@ -82,11 +100,11 @@ class Entity { // this. is selectedChar
             // console.log("self pos: ", self.pos);
             // console.log("target pos: ", target.pos);
             if (self.pos[1] > target.pos[1] - heightAddition && self.pos[1] < target.pos[1] + heightAddition) {
-                console.log('within melee range');
+                // console.log('within melee range');
                 return true;
             }
         }
-        console.log('outside of range');
+        // console.log('outside of range');
         return false;
     }
 
@@ -95,7 +113,8 @@ class Entity { // this. is selectedChar
         clearInterval(entity.currentAction);
         clearInterval(entity.currentAnimation);
         entity.img.src = entity.baseImg.src;
-        entity.img.style.display = "none";
+        entity.hp = -100;
+        entity.container.style.display = "none";
     }
 
     animateAttack(self) {
@@ -104,6 +123,57 @@ class Entity { // this. is selectedChar
             self.imgCycle = self.imgCycle % 4;
             self.img.src = self.attackImages[self.imgCycle].src;
         }
+    }
+
+    setHpBars(targetChar) {
+        const leftBar = document.getElementById(`${targetChar.imgName}-hp-left`);
+        const rightBar = document.getElementById(`${targetChar.imgName}-hp-right`);
+        let leftWidth = Math.floor((targetChar.hp / targetChar.maxHP) * 100);
+        let rightWidth = 100 - leftWidth;
+        if (leftWidth < 0) leftWidth = 0;
+        if (rightWidth < 0) rightWidth = 0;
+        leftBar.style.width = leftWidth + '%';
+        rightBar.style.width = rightWidth + '%';
+    }
+
+    setTargetAndAttack() {
+        console.log(this.klass, "has finished attacking", this.target.klass);
+
+        if (this.baseDMG > 0) {
+            this.enemies = shuffle(this.enemies);
+            for (let i = 0; i < this.enemies.length; i++) {
+                if (this.enemies[i].hp > 0) {
+                    this.target = this.enemies[i];
+                }
+            }
+            if (this.target.hp < 0) { return; }
+        } else {
+            this.allies = shuffle(this.allies);
+            for (let i = 0; i < this.allies.length; i++) {
+                if (this.allies[i].hp > 0) {
+                    this.target = this.allies[i];
+                }
+            }
+            if (this.target.hp < 0) { return; }
+        }
+        console.log(this.klass, "is now attacking", this.target.klass);
+        this.autoAttack(this.target);
+    }
+
+    charactersStacked() {
+        for (let i = 0; i < this.allies.length; i++) {
+            if (!this.allies[i].movingOutTheWay) {                
+                const widthAddition = Math.floor(this.img.width / 2);
+                if (this.pos[0] > this.allies[i].pos[0] - widthAddition - this.range && this.pos[0] < this.allies[i].pos[0] + widthAddition + this.range) {
+                    const heightAddition = Math.floor(((this.img.height / 2) + (this.allies[i].img.height / 2)) / 2);
+                    if (this.pos[1] > this.allies[i].pos[1] - heightAddition && this.pos[1] < this.allies[i].pos[1] + heightAddition) {
+                        console.log(this.klass, "is moving to avoid", this.allies[i].klass);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     beginAttack(targetChar) {
@@ -119,6 +189,7 @@ class Entity { // this. is selectedChar
                 selectedChar.img.src = selectedChar.baseImg.src;
                 if (!selectedChar.allied) {
                     // chose another hero to attack
+                    selectedChar.setTargetAndAttack();
                 }
                 return;
             }
@@ -127,16 +198,33 @@ class Entity { // this. is selectedChar
                 clearInterval(selectedChar.currentAction);
                 clearInterval(selectedChar.currentAnimation);
                 selectedChar.img.src = selectedChar.baseImg.src;
+                console.log('melee too far from target during attack - interval stopped');
+                // move to enemy's new location
+            } else if (selectedChar.charactersStacked()) {
+                selectedChar.movingOutTheWay = true;
+                const addition = Math.floor(((selectedChar.img.width / 2) + (targetChar.img.width / 2)) / 2);
+                if (selectedChar.img.style.transform === "scaleX(-1)") {
+                    // move to left side of target
+                    selectedChar.img.style.transform = "scaleX(1)";
+                    selectedChar.move([targetChar.pos[0] - addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
+                } else {
+                    // move to right side of target;
+                    selectedChar.img.style.transform = "scaleX(-1)";
+                    selectedChar.move([targetChar.pos[0] + (3 * addition), targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
+                }
             } else {
-                targetChar.hp -= selectedChar.dmg; // this.dmg can just be negative for healers
-                console.log('target hp at: ', targetChar.hp);
+                targetChar.hp -= selectedChar.dmg;
+                if (targetChar.hp > targetChar.maxHP) { targetChar.hp = targetChar.maxHP; }
                 if (!targetChar.allied && selectedChar.allied && targetChar.baseDMG > 0 && selectedChar.defense > targetChar.target.defense) {
                     targetChar.target = selectedChar;
                     clearInterval(targetChar.currentAction);
                     targetChar.autoAttack(targetChar.target);
                     console.log('enemy is now targetting: ', selectedChar);
                 }
-                if (targetChar.hp > targetChar.maxHP) { targetChar.hp = targetChar.maxHP; }
+                // hp finalized
+                selectedChar.setHpBars(targetChar);
+                
+                // console.log('target hp at: ', targetChar.hp);
                 if (targetChar.hp <= 0) {
                     // stop the animation
                     clearInterval(selectedChar.currentAction);
@@ -146,9 +234,7 @@ class Entity { // this. is selectedChar
                     selectedChar.killEntitiy(targetChar);
                     if (!selectedChar.allied) {
                         // chose another hero to attack
-
-                        // this.allies
-                        // this.enemies
+                        selectedChar.setTargetAndAttack();
                     }
                 }
                 if (selectedChar.baseDMG > 0) {
@@ -165,16 +251,23 @@ class Entity { // this. is selectedChar
     }
 
     autoAttack(targetChar) {
-        // console.log("this in auto attack: ", this);
+        // console.log('auto attack target: ', targetChar);
         if (this.allied) { this.target = targetChar; } // can refactor out targets
         if (this.withinAttackRange(this, targetChar)) {
+            if (this.pos[0] < targetChar.pos[0]) {
+                this.img.style.transform = "scaleX(1)";
+            } else {
+                this.img.style.transform = "scaleX(-1)";
+            }
             this.beginAttack(targetChar);
         } else {
             const addition = Math.floor(((this.img.width / 2) + (targetChar.img.width / 2)) / 2);
             if (this.pos[0] < targetChar.pos[0]) {
+                this.img.style.transform = "scaleX(1)";
                 this.move([targetChar.pos[0] - addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
             } else {
-                this.move([targetChar.pos[0] + addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
+                this.img.style.transform = "scaleX(-1)";
+                this.move([targetChar.pos[0] + (3*addition), targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
             }
         }
     }
@@ -183,6 +276,14 @@ class Entity { // this. is selectedChar
 
     }
 
+}
+
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
 }
 
 export default Entity;
