@@ -46,7 +46,7 @@ function loadGame() {
             c[i].container.style.top = c[i].pos[1] + "px";
             c[i].container.addEventListener("click", (e) => {
                 console.log('character click');
-                if (!selectedChar) {
+                if (!selectedChar || selectedChar.hp < 0) {
                     selectedChar = c[i];
                     console.log('selected char: ', selectedChar.klass);
                 } else if (selectedChar.baseDMG < 0) {
@@ -75,6 +75,10 @@ function loadGame() {
             e[i].container.style.left = e[i].pos[0] + "px";
             e[i].container.style.top = e[i].pos[1] + "px";
             e[i].container.addEventListener("click", (e) => {
+                if (selectedChar.hp < 0) {
+                    selectedChar = null;
+                    return;
+                }
                 console.log('enemy click');
                 if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
                     selectedChar.autoAttack(enemiesArr[i]);
@@ -95,6 +99,10 @@ function loadGame() {
     gameContainer.addEventListener("click", (e) => {
         console.log(e);
         if (selectedChar) {
+            if (selectedChar.hp < 0) {
+                selectedChar = null;
+                return;
+            }
             selectedChar.move([e.x, e.y]);
             selectedChar = null;
         }

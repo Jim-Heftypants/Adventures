@@ -90,16 +90,16 @@ class Entity { // this. is selectedChar
         }
     }
 
-    withinAttackRange(self, target) {
-        // console.log('self in withinAttackRange: ', self);
-        if (self.range === 'infinite') { return true; }
+    withinAttackRange(target) {
+        // console.log('this in withinAttackRange: ', this);
+        if (this.range === 'infinite') { return true; }
         // rectangle box for melee
-        const widthAddition = Math.floor((self.img.width / 2) + (target.img.width / 2));
-        if (self.pos[0] > target.pos[0] - widthAddition - self.range && self.pos[0] < target.pos[0] + widthAddition + self.range) {
-            const heightAddition = Math.floor(((self.img.height / 2) + (target.img.height / 2)) / 2);
-            // console.log("self pos: ", self.pos);
+        const widthAddition = Math.floor((this.img.width / 2) + (target.img.width / 2));
+        if (this.pos[0] > target.pos[0] - widthAddition - this.range && this.pos[0] < target.pos[0] + widthAddition + this.range) {
+            const heightAddition = Math.floor(this.img.height / 4);
+            // console.log("this pos: ", this.pos);
             // console.log("target pos: ", target.pos);
-            if (self.pos[1] > target.pos[1] - heightAddition && self.pos[1] < target.pos[1] + heightAddition) {
+            if (this.pos[1] > target.pos[1] - heightAddition && this.pos[1] < target.pos[1] + heightAddition) {
                 // console.log('within melee range');
                 return true;
             }
@@ -176,30 +176,48 @@ class Entity { // this. is selectedChar
         return false;
     }
 
+    trackTarget() { // hot code
+        let interval = setInterval(() => move(this), 20);
+        function move(self) {
+            if (self.withinAttackRange(self.target)) {
+                clearInterval(interval);
+                self.autoAttack(self.target);
+            } else {
+                const pos = self.pos;
+                const posChange = self.vectorToScalar(self.target.pos);
+                pos[0] += posChange[0]; pos[1] += posChange[1];
+                if (pos[0] + Math.floor(self.img.width) > 1400) { pos[0] = 1400 - Math.floor(self.img.width); }
+                if (pos[0] < 15) { pos[0] = 15; }
+                if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height); }
+                if (pos[1] < 15) { pos[1] = 15; }
+                self.container.style.top = Math.floor(pos[1]) + 'px';
+                self.container.style.left = Math.floor(pos[0]) + 'px';
+            }
+        }
+    }
+
     beginAttack(targetChar) {
         // make some kind of animation start
-        clearInterval(this.currentAction);
-        clearInterval(this.currentAnimation);
+        this.clearIntervals();
         this.currentAnimation = setInterval(() => this.animateAttack(this), Math.floor(this.as / 4))
         this.currentAction = setInterval(() => attack(this), this.as);
         function attack(selectedChar) {
             if (targetChar.hp <= 0) {
-                clearInterval(selectedChar.currentAction);
-                clearInterval(selectedChar.currentAnimation);
-                selectedChar.img.src = selectedChar.baseImg.src;
+                selectedChar.clearIntervals();
                 if (!selectedChar.allied) {
                     // chose another hero to attack
                     selectedChar.setTargetAndAttack();
+                    // maybe add something in for player to auto target upon deaths ?
                 }
                 return;
             }
-            if (!selectedChar.withinAttackRange(selectedChar, targetChar)) {
+            if (!selectedChar.withinAttackRange(targetChar)) {
             // stop the animation
-                clearInterval(selectedChar.currentAction);
-                clearInterval(selectedChar.currentAnimation);
-                selectedChar.img.src = selectedChar.baseImg.src;
-                console.log('melee too far from target during attack - interval stopped');
-                // move to enemy's new location
+                selectedChar.clearIntervals();
+                console.log(selectedChar.klass, 'too far from', targetChar.klass, 'during attack - moving to new location');
+                selectedChar.trackTarget();
+                return;
+                // move to enemy's new location -- needs to track current position
             } else if (selectedChar.charactersStacked()) {
                 selectedChar.movingOutTheWay = true;
                 const addition = Math.floor(((selectedChar.img.width / 2) + (targetChar.img.width / 2)) / 2);
@@ -217,7 +235,7 @@ class Entity { // this. is selectedChar
                 if (targetChar.hp > targetChar.maxHP) { targetChar.hp = targetChar.maxHP; }
                 if (!targetChar.allied && selectedChar.allied && targetChar.baseDMG > 0 && selectedChar.defense > targetChar.target.defense) {
                     targetChar.target = selectedChar;
-                    clearInterval(targetChar.currentAction);
+                    targetChar.clearIntervals();
                     targetChar.autoAttack(targetChar.target);
                     console.log('enemy is now targetting: ', selectedChar);
                 }
@@ -227,9 +245,7 @@ class Entity { // this. is selectedChar
                 // console.log('target hp at: ', targetChar.hp);
                 if (targetChar.hp <= 0) {
                     // stop the animation
-                    clearInterval(selectedChar.currentAction);
-                    clearInterval(selectedChar.currentAnimation);
-                    selectedChar.img.src = selectedChar.baseImg.src;
+                    selectedChar.clearIntervals();
                     console.log('attack interval stopped');
                     selectedChar.killEntitiy(targetChar);
                     if (!selectedChar.allied) {
@@ -253,7 +269,7 @@ class Entity { // this. is selectedChar
     autoAttack(targetChar) {
         // console.log('auto attack target: ', targetChar);
         if (this.allied) { this.target = targetChar; } // can refactor out targets
-        if (this.withinAttackRange(this, targetChar)) {
+        if (this.withinAttackRange(targetChar)) {
             if (this.pos[0] < targetChar.pos[0]) {
                 this.img.style.transform = "scaleX(1)";
             } else {
@@ -270,6 +286,12 @@ class Entity { // this. is selectedChar
                 this.move([targetChar.pos[0] + (3*addition), targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
             }
         }
+    }
+
+    clearIntervals() {
+        clearInterval(this.currentAction);
+        clearInterval(this.currentAnimation);
+        this.img.src = this.baseImg.src;
     }
 
     useAbility(ability) {
