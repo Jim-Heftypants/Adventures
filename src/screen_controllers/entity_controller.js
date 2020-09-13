@@ -1,9 +1,57 @@
-import * as charactersObj from '../entities/character';
-import * as enemiesObj from '../entities/enemy';
+import * as levelsObj from '../levels/level';
 
-function setInitialTargets() {
-    const chars = Object.values(charactersObj);
-    const enemies = Object.values(enemiesObj);
+let selectedChar;
+
+function spawnEntity(entity, allies, enemies) {
+    if (entity.imgName != "") {
+        addInlineStyle(entity);
+        const action = () => {
+            if (entity.allied) {
+                entity.container.addEventListener("click", (e) => {
+                    console.log('character click');
+                    if (!selectedChar || selectedChar.hp < 0) {
+                        selectedChar = entity;
+                        console.log('selected char: ', selectedChar.klass);
+                    } else if (selectedChar.baseDMG < 0) {
+                        selectedChar.autoAttack(entity);
+                        selectedChar = null;
+                    }
+                    e.stopPropagation();
+                })
+            } else {
+                entity.container.addEventListener("click", (e) => {
+                    if (selectedChar.hp < 0) {
+                        selectedChar = null;
+                        return;
+                    }
+                    console.log('enemy click');
+                    if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
+                        selectedChar.autoAttack(entity);
+                        selectedChar = null;
+                    }
+                    e.stopPropagation(); // maybe move inside if
+                })
+            }
+            entity.enemies = enemies;
+            const cloneArr = allies.slice();
+            let selfIndex;
+            for (let i = 0; i < cloneArr.length; i++) {
+                if (cloneArr[i].klass === entity.klass) { selfIndex = i; }
+            }
+            // remove self from allies list to prevent moving out of self image (healers excluded)
+            if (entity.baseDMG > 0) { cloneArr.splice(selfIndex, 1); }
+            entity.allies = cloneArr;
+            if (!entity.allied) {
+                entity.autoAttack(entity.target);
+            }
+        };
+        fadeIn(entity.container, action);
+    } else {
+        console.log('broken image passed in for', entity.klass);
+    }
+}
+
+function setInitialTargets(chars, enemies) {
     for (let i = 0; i < enemies.length; i++) {
         if (enemies[i].baseDMG > 0) {
             const targetIndex = Math.floor(Math.random() * chars.length);
@@ -16,83 +64,80 @@ function setInitialTargets() {
     }
 }
 
-function loadGame() {
-    console.log('load game called');
-    setInitialTargets();
+function addInlineStyle(entity) {
+    entity.img = document.getElementsByClassName(entity.imgName + "-image-display")[0];
+    entity.baseImg = document.getElementsByClassName(entity.imgName)[0]
+    entity.img.src = entity.baseImg.src;
+    entity.attackImages = document.getElementsByClassName(entity.imgName);
+    const hpBar = document.getElementById(`${entity.imgName}-hp-bar`);
+    entity.container = document.getElementById(`${entity.imgName}-display`);
+    entity.container.style.opacity = 0; // fading in so started at op 0
+    entity.img.style.display = "initial";
+    hpBar.style.display = "flex";
+    entity.container.style.left = entity.pos[0] + "px";
+    entity.container.style.top = entity.pos[1] + "px";
+}
 
-    let selectedChar;
+function setupEntities(charactersArr, enemiesArr) {
+    for (let i = 0; i < charactersArr.length; i++) {
+        spawnEntity(charactersArr[i], charactersArr, enemiesArr);
+    }
+    for (let i = 0; i < enemiesArr.length; i++) {
+        spawnEntity(enemiesArr[i], enemiesArr, charactersArr);
+    }
+}
+
+const levels = Object.values(levelsObj);
+let currentLevel = levels[0];
+
+function initializeGameOpening() {
+    loadLevel(currentLevel);
+}
+
+function fadeOut(element, level) {
+    let op = 20;
+    let timerDown = setInterval(function () {
+        if (op <= 0) {
+            clearInterval(timerDown);
+            element.style.display = 'none';
+            beginLevel(level.characterList, level.enemyList);
+        }
+        element.style.opacity = op / 20;
+        op -= 1;
+    }, 100);
+}
+
+function fadeIn(element, action=null) {
+    let op = 0;
+    let timerUp = setInterval(function () {
+        if (op >= 20) {
+            clearInterval(timerUp);
+            if (action) { action() }
+        }
+        element.style.opacity = op / 20;
+        op += 1;
+    }, 100);
+}
+
+function loadLevel(level) {
+    const levelNameDisp = document.getElementById(`level-${level.name}-name`);
+    levelNameDisp.style.opacity = 0;
+    levelNameDisp.style.display = 'initial';
+    const action = () => fadeOut(levelNameDisp, level);
+    fadeIn(levelNameDisp, action);
+    // need some way to check win/loss by characters alive w/o timers
+}
+
+function beginLevel(charactersArr, enemiesArr) {
+    console.log('load game called');
+    setInitialTargets(charactersArr, enemiesArr);
 
     const deSelectButton = document.getElementById('reset-selected');
     deSelectButton.addEventListener('click', () => {
         selectedChar = null;
     })
 
-    const charactersArr = Object.values(charactersObj);
-    const enemiesArr = Object.values(enemiesObj);
-
-    for (let i = 0; i < charactersArr.length; i++) {
-        if (charactersArr[i].imgName != "") {
-            const c = charactersArr;
-            c[i].img = document.getElementsByClassName(c[i].imgName + "-image-display")[0];
-            c[i].baseImg = document.getElementsByClassName(c[i].imgName)[0]
-            c[i].img.src = c[i].baseImg.src;
-            c[i].attackImages = document.getElementsByClassName(c[i].imgName);
-            const hpBar = document.getElementById(`${c[i].imgName}-hp-bar`);
-            c[i].container = document.getElementById(`${c[i].imgName}-display`);
-
-            c[i].img.style.display = "initial";
-            hpBar.style.display = "flex";
-            c[i].container.style.left = c[i].pos[0] + "px";
-            c[i].container.style.top = c[i].pos[1] + "px";
-            c[i].container.addEventListener("click", (e) => {
-                console.log('character click');
-                if (!selectedChar || selectedChar.hp < 0) {
-                    selectedChar = c[i];
-                    console.log('selected char: ', selectedChar.klass);
-                } else if (selectedChar.baseDMG < 0) {
-                    selectedChar.autoAttack(c[i]);
-                    selectedChar = null;
-                }
-                e.stopPropagation();
-            })
-            c[i].enemies = enemiesArr;
-            const cloneArr = c.slice();
-            c[i].allies = cloneArr.splice(i, 1);
-        }
-    }
-    for (let i = 0; i < enemiesArr.length; i++) {
-        if (enemiesArr[i].imgName != "") {
-            const e = enemiesArr;
-            e[i].img = document.getElementsByClassName(e[i].imgName + "-image-display")[0];
-            e[i].baseImg = document.getElementsByClassName(e[i].imgName)[0]
-            e[i].img.src = e[i].baseImg.src;
-            e[i].attackImages = document.getElementsByClassName(e[i].imgName);
-            const hpBar = document.getElementById(`${e[i].imgName}-hp-bar`);
-            e[i].container = document.getElementById(`${e[i].imgName}-display`);
-
-            e[i].img.style.display = "initial";
-            hpBar.style.display = "flex";
-            e[i].container.style.left = e[i].pos[0] + "px";
-            e[i].container.style.top = e[i].pos[1] + "px";
-            e[i].container.addEventListener("click", (e) => {
-                if (selectedChar.hp < 0) {
-                    selectedChar = null;
-                    return;
-                }
-                console.log('enemy click');
-                if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
-                    selectedChar.autoAttack(enemiesArr[i]);
-                    selectedChar = null;
-                }
-                e.stopPropagation(); // maybe move inside if
-            })
-            e[i].enemies = charactersArr;
-            const cloneArr = e.slice();
-            if (e[i].baseDMG > 0) { cloneArr.splice(i, 1); }
-            e[i].allies = cloneArr
-            e[i].autoAttack(e[i].target);
-        }
-    }
+    setupEntities(charactersArr, enemiesArr);
 
     // end click position
     const gameContainer = document.getElementById('game-container');
@@ -109,4 +154,4 @@ function loadGame() {
     })
 }
 
-export default loadGame;
+export default initializeGameOpening;
