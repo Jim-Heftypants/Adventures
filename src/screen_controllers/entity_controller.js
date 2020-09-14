@@ -1,12 +1,70 @@
 import * as levelsObj from '../levels/level';
 
+const levels = Object.values(levelsObj);
+let currentLevel = levels[0];
+
 let selectedChar;
+
+let livingEnemies = {};
+let livingChars = {};
+
+function addDeathListener(entity) {
+    let observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutationRecord) {
+            // console.log(entity.klass, 'style changed');
+            // console.log(mutationRecord);
+            if (mutationRecord.target.style.display === 'none') {
+                console.log(entity.klass, 'style === none');
+                if (entity.allied) {
+                    delete livingChars[entity.klass];
+                } else {
+                    delete livingEnemies[entity.klass];
+                }
+                const c  = Object.values(livingChars);
+                const en = Object.values(livingEnemies);
+                if (c.length === 0 || en.length === 0) {
+                    endGame(c, en);
+                }
+            }
+        });
+    })
+
+    const element = entity.container;
+    observer.observe(element, { attributes : true, attributeFilter : ['style'] });
+}
+
+function endGame(charsList, enemyList) {
+    for (let i = 0; i < charsList.length; i++) {
+        // fade out no action
+        fadeOut(charsList[i].container);
+    }
+    for (let i = 0; i < enemyList.length; i++) {
+        // fade out no action
+        fadeOut(enemyList[i].container);
+    } 
+    
+    let gameFadeTimer = setInterval(() => {
+        console.log('fade called');
+        let disp;
+        if (charsList.length === 0) {
+            disp = document.getElementById('game-over-display');
+        } else {
+            disp = document.getElementById('game-won-display');
+        }
+        disp.style.opacity = 0;
+        disp.style.display = 'initial';
+        const action = () => fadeOut(disp);
+        fadeIn(disp, action);
+        clearInterval(gameFadeTimer);
+    }, 2000);
+}
 
 function spawnEntity(entity, allies, enemies) {
     if (entity.imgName != "") {
         addInlineStyle(entity);
         const action = () => {
             if (entity.allied) {
+                addDeathListener(entity);
                 entity.container.addEventListener("click", (e) => {
                     console.log('character click');
                     if (!selectedChar || selectedChar.hp < 0) {
@@ -80,27 +138,28 @@ function addInlineStyle(entity) {
 
 function setupEntities(charactersArr, enemiesArr) {
     for (let i = 0; i < charactersArr.length; i++) {
+        livingChars[charactersArr[i].klass] = charactersArr[i];
         spawnEntity(charactersArr[i], charactersArr, enemiesArr);
     }
     for (let i = 0; i < enemiesArr.length; i++) {
+        livingEnemies[enemiesArr[i].klass] = enemiesArr[i];
         spawnEntity(enemiesArr[i], enemiesArr, charactersArr);
     }
 }
-
-const levels = Object.values(levelsObj);
-let currentLevel = levels[0];
 
 function initializeGameOpening() {
     loadLevel(currentLevel);
 }
 
-function fadeOut(element, level) {
+function fadeOut(element, level=null) {
     let op = 20;
     let timerDown = setInterval(function () {
         if (op <= 0) {
             clearInterval(timerDown);
             element.style.display = 'none';
-            beginLevel(level.characterList, level.enemyList);
+            if (level) {
+                beginLevel(level.characterList, level.enemyList);
+            }
         }
         element.style.opacity = op / 20;
         op -= 1;
@@ -126,6 +185,10 @@ function loadLevel(level) {
     const action = () => fadeOut(levelNameDisp, level);
     fadeIn(levelNameDisp, action);
     // need some way to check win/loss by characters alive w/o timers
+    // can check chars/enemies enemy array values for empty to see clear/loss
+
+    // addEventListener for display = "none"; in-line style and then remove from global array state?
+    // could also add/splice allies/enemies arrays upon trigger as well
 }
 
 function beginLevel(charactersArr, enemiesArr) {

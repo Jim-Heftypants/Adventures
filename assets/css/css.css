@@ -40,9 +40,13 @@ img {
     background-color: red;
 }
 
-.level-name {
+.level-name, #game-over-display, #game-won-display {
     position: relative;
     left: 600px;
     top: 200px;
     font-size: 50px;
+}
+
+#game-over-display, #game-won-display {
+    color: red;
 }
