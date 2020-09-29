@@ -52,7 +52,7 @@ function endGame(charsList, enemyList) {
             disp = document.getElementById('game-won-display');
         }
         disp.style.opacity = 0;
-        disp.style.display = 'initial';
+        disp.style.display = '';
         const action = () => fadeOut(disp);
         fadeIn(disp, action);
         clearInterval(gameFadeTimer);
@@ -130,7 +130,7 @@ function addInlineStyle(entity) {
     const hpBar = document.getElementById(`${entity.imgName}-hp-bar`);
     entity.container = document.getElementById(`${entity.imgName}-display`);
     entity.container.style.opacity = 0; // fading in so started at op 0
-    entity.img.style.display = "initial";
+    entity.img.style.display = "";
     hpBar.style.display = "flex";
     entity.container.style.left = entity.pos[0] + "px";
     entity.container.style.top = entity.pos[1] + "px";
@@ -148,6 +148,8 @@ function setupEntities(charactersArr, enemiesArr) {
 }
 
 function initializeGameOpening() {
+    const deSelectButton = document.getElementById('reset-selected');
+    deSelectButton.style.display = '';
     loadLevel(currentLevel);
 }
 
@@ -181,14 +183,9 @@ function fadeIn(element, action=null) {
 function loadLevel(level) {
     const levelNameDisp = document.getElementById(`level-${level.name}-name`);
     levelNameDisp.style.opacity = 0;
-    levelNameDisp.style.display = 'initial';
+    levelNameDisp.style.display = '';
     const action = () => fadeOut(levelNameDisp, level);
     fadeIn(levelNameDisp, action);
-    // need some way to check win/loss by characters alive w/o timers
-    // can check chars/enemies enemy array values for empty to see clear/loss
-
-    // addEventListener for display = "none"; in-line style and then remove from global array state?
-    // could also add/splice allies/enemies arrays upon trigger as well
 }
 
 function beginLevel(charactersArr, enemiesArr) {

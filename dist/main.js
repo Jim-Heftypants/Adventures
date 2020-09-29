@@ -266,11 +266,14 @@ var Entity = /*#__PURE__*/function () {
       clearInterval(this.currentAction);
       clearInterval(this.currentAnimation);
       this.img.src = this.baseImg.src;
-      endPos[0] = Math.floor(endPos[0] - this.img.width / 2);
-      endPos[1] = Math.floor(endPos[1] - this.img.height / 2);
+      endPos[0] = Math.floor(endPos[0] - this.img.width);
+      endPos[1] = Math.floor(endPos[1] - this.img.height * (3 / 4));
       var pos = this.pos;
       var posChange = this.vectorToScalar(endPos);
       console.log("pos change on move", posChange);
+      var bigDiv = document.getElementById('game-container');
+      var difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
+      var checker = difference + Math.floor(bigDiv.offsetWidth);
       this.currentAction = setInterval(function () {
         return frame(_this);
       }, 20);
@@ -293,16 +296,16 @@ var Entity = /*#__PURE__*/function () {
           pos[0] += posChange[0];
           pos[1] += posChange[1];
 
-          if (pos[0] + Math.floor(self.img.width) > 1400) {
-            pos[0] = 1400 - Math.floor(self.img.width);
+          if (pos[0] + Math.floor(3 * self.img.width / 2) + 50 > checker) {
+            pos[0] = checker - (Math.floor(3 * self.img.width / 2) + 50);
           }
 
           if (pos[0] < 15) {
             pos[0] = 15;
           }
 
-          if (pos[1] + Math.floor(self.img.height) > 850) {
-            pos[1] = 850 - Math.floor(self.img.height);
+          if (pos[1] + Math.floor(self.img.height) > 800) {
+            pos[1] = 800 - Math.floor(self.img.height);
           }
 
           if (pos[1] < 15) {
@@ -432,6 +435,9 @@ var Entity = /*#__PURE__*/function () {
       var _this2 = this;
 
       // hot code
+      var bigDiv = document.getElementById('game-container');
+      var difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
+      var checker = difference + Math.floor(bigDiv.offsetWidth);
       var interval = setInterval(function () {
         return move(_this2);
       }, 20);
@@ -440,14 +446,16 @@ var Entity = /*#__PURE__*/function () {
         if (self.withinAttackRange(self.target)) {
           clearInterval(interval);
           self.autoAttack(self.target);
+          console.log('auto attack called from track');
         } else {
           var pos = self.pos;
-          var posChange = self.vectorToScalar(self.target.pos);
+          var movePos = self.target.pos.slice();
+          var posChange = self.vectorToScalar(movePos);
           pos[0] += posChange[0];
           pos[1] += posChange[1];
 
-          if (pos[0] + Math.floor(self.img.width) > 1400) {
-            pos[0] = 1400 - Math.floor(self.img.width);
+          if (pos[0] + Math.floor(self.img.width) > checker) {
+            pos[0] = checker - Math.floor(self.img.width);
           }
 
           if (pos[0] < 15) {
@@ -572,15 +580,7 @@ var Entity = /*#__PURE__*/function () {
 
         this.beginAttack(targetChar);
       } else {
-        var addition = Math.floor((this.img.width / 2 + targetChar.img.width / 2) / 2);
-
-        if (this.pos[0] < targetChar.pos[0]) {
-          this.img.style.transform = "scaleX(1)";
-          this.move([targetChar.pos[0] - addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar);
-        } else {
-          this.img.style.transform = "scaleX(-1)";
-          this.move([targetChar.pos[0] + 3 * addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar);
-        }
+        this.trackTarget();
       }
     }
   }, {
@@ -623,14 +623,24 @@ function shuffle(a) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./screen_controllers/entity_controller */ "./src/screen_controllers/entity_controller.js");
+/* harmony import */ var _screen_controllers_controls__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./screen_controllers/controls */ "./src/screen_controllers/controls.js");
+/* harmony import */ var _screen_controllers_controls__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_screen_controllers_controls__WEBPACK_IMPORTED_MODULE_1__);
 // import * as characters from './entities/character';
 // import * as enemies from './entities/enemy';
 
+
 window.addEventListener('load', function () {
   var startGameButton = document.getElementById('start-game-button');
+  var controlsButton = document.getElementById('game-controls-button');
   startGameButton.addEventListener('click', function () {
     startGameButton.style.display = "none";
+    controlsButton.style.display = 'none';
     Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])();
+  });
+  controlsButton.addEventListener('click', function () {
+    startGameButton.style.display = "none";
+    controlsButton.style.display = 'none';
+    _screen_controllers_controls__WEBPACK_IMPORTED_MODULE_1___default()();
   });
 });
 
@@ -666,6 +676,17 @@ var Level = function Level(name, characterList, enemyList) {
 
 var levelOne = new Level('one', charactersArr, enemiesArr);
 var levelTwo = new Level('two', charactersArr, enemiesArr);
+
+/***/ }),
+
+/***/ "./src/screen_controllers/controls.js":
+/*!********************************************!*\
+  !*** ./src/screen_controllers/controls.js ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
 
 /***/ }),
 
@@ -738,7 +759,7 @@ function endGame(charsList, enemyList) {
     }
 
     disp.style.opacity = 0;
-    disp.style.display = 'initial';
+    disp.style.display = '';
 
     var action = function action() {
       return fadeOut(disp);
@@ -839,7 +860,7 @@ function addInlineStyle(entity) {
   entity.container = document.getElementById("".concat(entity.imgName, "-display"));
   entity.container.style.opacity = 0; // fading in so started at op 0
 
-  entity.img.style.display = "initial";
+  entity.img.style.display = "";
   hpBar.style.display = "flex";
   entity.container.style.left = entity.pos[0] + "px";
   entity.container.style.top = entity.pos[1] + "px";
@@ -858,6 +879,8 @@ function setupEntities(charactersArr, enemiesArr) {
 }
 
 function initializeGameOpening() {
+  var deSelectButton = document.getElementById('reset-selected');
+  deSelectButton.style.display = '';
   loadLevel(currentLevel);
 }
 
@@ -899,16 +922,13 @@ function fadeIn(element) {
 function loadLevel(level) {
   var levelNameDisp = document.getElementById("level-".concat(level.name, "-name"));
   levelNameDisp.style.opacity = 0;
-  levelNameDisp.style.display = 'initial';
+  levelNameDisp.style.display = '';
 
   var action = function action() {
     return fadeOut(levelNameDisp, level);
   };
 
-  fadeIn(levelNameDisp, action); // need some way to check win/loss by characters alive w/o timers
-  // can check chars/enemies enemy array values for empty to see clear/loss
-  // addEventListener for display = "none"; in-line style and then remove from global array state?
-  // could also add/splice allies/enemies arrays upon trigger as well
+  fadeIn(levelNameDisp, action);
 }
 
 function beginLevel(charactersArr, enemiesArr) {

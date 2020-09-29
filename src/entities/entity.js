@@ -59,10 +59,14 @@ class Entity { // this. is selectedChar
         clearInterval(this.currentAction);
         clearInterval(this.currentAnimation);
         this.img.src = this.baseImg.src;
-        endPos[0] = Math.floor(endPos[0] - (this.img.width / 2)); endPos[1] = Math.floor(endPos[1] - (this.img.height / 2));
+        endPos[0] = Math.floor(endPos[0] - (this.img.width));
+        endPos[1] = Math.floor(endPos[1] - (this.img.height * (3/4)));
         let pos = this.pos;
         let posChange = this.vectorToScalar(endPos);
         console.log("pos change on move", posChange);
+        const bigDiv = document.getElementById('game-container');
+        const difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
+        const checker = difference + Math.floor(bigDiv.offsetWidth);
         this.currentAction = setInterval(() => frame(this), 20);
         function frame(self) {
             if (posChange[2] === 0) {
@@ -77,9 +81,9 @@ class Entity { // this. is selectedChar
             } else { // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
             // begin some kind of animation
                 pos[0] += posChange[0]; pos[1] += posChange[1];
-                if (pos[0] + Math.floor(self.img.width) > 1400) { pos[0] = 1400 - Math.floor(self.img.width);}
+                if (pos[0] + Math.floor((3 * self.img.width) / 2) + 50 > checker) { pos[0] = checker - (Math.floor((3 * self.img.width) / 2) + 50);}
                 if (pos[0] < 15) {pos[0] = 15;}
-                if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height);}
+                if (pos[1] + Math.floor(self.img.height) > 800) { pos[1] = 800 - Math.floor(self.img.height);}
                 if (pos[1] < 15) {pos[1] = 15;}
                 // console.log('posChange: ', posChange);
                 // console.log('pos: ', pos);
@@ -177,16 +181,21 @@ class Entity { // this. is selectedChar
     }
 
     trackTarget() { // hot code
+        const bigDiv = document.getElementById('game-container');
+        const difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
+        const checker = difference + Math.floor(bigDiv.offsetWidth);
         let interval = setInterval(() => move(this), 20);
         function move(self) {
             if (self.withinAttackRange(self.target)) {
                 clearInterval(interval);
                 self.autoAttack(self.target);
+                console.log('auto attack called from track');
             } else {
                 const pos = self.pos;
-                const posChange = self.vectorToScalar(self.target.pos);
+                let movePos = self.target.pos.slice();
+                let posChange = self.vectorToScalar(movePos);
                 pos[0] += posChange[0]; pos[1] += posChange[1];
-                if (pos[0] + Math.floor(self.img.width) > 1400) { pos[0] = 1400 - Math.floor(self.img.width); }
+                if (pos[0] + Math.floor(self.img.width) > checker) { pos[0] = checker - Math.floor(self.img.width); }
                 if (pos[0] < 15) { pos[0] = 15; }
                 if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height); }
                 if (pos[1] < 15) { pos[1] = 15; }
@@ -277,14 +286,7 @@ class Entity { // this. is selectedChar
             }
             this.beginAttack(targetChar);
         } else {
-            const addition = Math.floor(((this.img.width / 2) + (targetChar.img.width / 2)) / 2);
-            if (this.pos[0] < targetChar.pos[0]) {
-                this.img.style.transform = "scaleX(1)";
-                this.move([targetChar.pos[0] - addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
-            } else {
-                this.img.style.transform = "scaleX(-1)";
-                this.move([targetChar.pos[0] + (3*addition), targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
-            }
+            this.trackTarget();
         }
     }
 

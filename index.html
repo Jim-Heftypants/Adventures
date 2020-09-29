@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel='stylesheet' href="./assets/css/css.css">
+    <link rel='shortcut icon' href="./assets/images/favicon.ico" >
     <title>Adventures</title>
 </head>
 <body>
     <script src="./dist/main.js"></script>
     <div id='game-container'>
 
-        <h1 id="start-game-button">Start Game!</h1>
+        <p id="reset-selected" style="display: none;">de-select hero</p>
 
-        <h1 id='game-over-display' style="display: none;">Game Over!</h1>
-        <h1 id='game-won-display' style="display: none;">You Win!</h1>
+        <h1 class="level-name" id="start-game-button">Start Game!</h1>
+        <h1 class='level-name' id="game-controls-button">Controls</h1>
+
+        <h1 class='level-name' id='game-over-display' style="display: none;">Game Over!</h1>
+        <h1 class="level-name" id='game-won-display' style="display: none;">You Win!</h1>
 
         <h1 id='level-one-name' class="level-name" style="display: none;">Level One</h1>
+
 
         <div id="wizard-display" class='entity-container' style="position: absolute;">
             <div id='wizard-hp-bar' class="hp-bar-container">
@@ -156,6 +161,7 @@
         <img src="./assets/images/ECleric/Cleric-attack-3.png" alt="Cleric" class="ecleric" style="display: none;" />
 
     </div>
-    <p id="reset-selected">de-select hero</p>
+    <a class='links' id='github' rel='hub' target='_blank' href='https://github.com/Jim-Heftypants/Adventures' >Github</a>
+    <a class='links' id='linkedin' rel='in' target='_blank' href='https://www.linkedin.com/in/nick-sercel-4402261a0/' >LinkedIn</a>
 </body>
 </html>
