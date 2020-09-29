@@ -69,9 +69,11 @@ function spawnEntity(entity, allies, enemies) {
                     console.log('character click');
                     if (!selectedChar || selectedChar.hp < 0) {
                         selectedChar = entity;
+                        entity.img.style.border = '2px solid gold';
                         console.log('selected char: ', selectedChar.klass);
                     } else if (selectedChar.baseDMG < 0) {
                         selectedChar.autoAttack(entity);
+                        selectedChar.img.style.border = 'none';
                         selectedChar = null;
                     }
                     e.stopPropagation();
@@ -79,12 +81,14 @@ function spawnEntity(entity, allies, enemies) {
             } else {
                 entity.container.addEventListener("click", (e) => {
                     if (selectedChar.hp < 0) {
+                        selectedChar.img.style.border = 'none';
                         selectedChar = null;
                         return;
                     }
                     console.log('enemy click');
                     if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
                         selectedChar.autoAttack(entity);
+                        selectedChar.img.style.border = 'none';
                         selectedChar = null;
                     }
                     e.stopPropagation(); // maybe move inside if
@@ -194,6 +198,7 @@ function beginLevel(charactersArr, enemiesArr) {
 
     const deSelectButton = document.getElementById('reset-selected');
     deSelectButton.addEventListener('click', () => {
+        selectedChar.img.style.border = 'none';
         selectedChar = null;
     })
 
@@ -208,6 +213,7 @@ function beginLevel(charactersArr, enemiesArr) {
                 selectedChar = null;
                 return;
             }
+            selectedChar.img.style.border = 'none';
             selectedChar.move([e.x, e.y]);
             selectedChar = null;
         }

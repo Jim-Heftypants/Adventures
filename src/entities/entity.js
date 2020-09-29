@@ -262,15 +262,18 @@ class Entity { // this. is selectedChar
                         selectedChar.setTargetAndAttack();
                     }
                 }
-                if (selectedChar.baseDMG > 0) {
-                    targetChar.img.style.border = "2px solid red";
-                } else {
-                    targetChar.img.style.border = "2px solid green";
+                // console.log("border style: ", targetChar.img.style.border);
+                if (targetChar.img.style.border === "none" || targetChar.img.style.border === "") {
+                    if (selectedChar.baseDMG > 0) {
+                        targetChar.img.style.border = "2px solid red";
+                    } else {
+                        targetChar.img.style.border = "2px solid green";
+                    }
+                    let borderInterval = setInterval(() => {
+                        targetChar.img.style.border = "none";
+                        clearInterval(borderInterval);
+                    }, 500);
                 }
-                let borderInterval = setInterval(() => {
-                    targetChar.img.style.border = "none";
-                    clearInterval(borderInterval);
-                }, 500);
             }
         }
     }

@@ -547,18 +547,21 @@ var Entity = /*#__PURE__*/function () {
               // chose another hero to attack
               selectedChar.setTargetAndAttack();
             }
-          }
+          } // console.log("border style: ", targetChar.img.style.border);
 
-          if (selectedChar.baseDMG > 0) {
-            targetChar.img.style.border = "2px solid red";
-          } else {
-            targetChar.img.style.border = "2px solid green";
-          }
 
-          var borderInterval = setInterval(function () {
-            targetChar.img.style.border = "none";
-            clearInterval(borderInterval);
-          }, 500);
+          if (targetChar.img.style.border === "none" || targetChar.img.style.border === "") {
+            if (selectedChar.baseDMG > 0) {
+              targetChar.img.style.border = "2px solid red";
+            } else {
+              targetChar.img.style.border = "2px solid green";
+            }
+
+            var borderInterval = setInterval(function () {
+              targetChar.img.style.border = "none";
+              clearInterval(borderInterval);
+            }, 500);
+          }
         }
       }
     }
@@ -623,11 +626,9 @@ function shuffle(a) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./screen_controllers/entity_controller */ "./src/screen_controllers/entity_controller.js");
-/* harmony import */ var _screen_controllers_controls__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./screen_controllers/controls */ "./src/screen_controllers/controls.js");
-/* harmony import */ var _screen_controllers_controls__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_screen_controllers_controls__WEBPACK_IMPORTED_MODULE_1__);
 // import * as characters from './entities/character';
 // import * as enemies from './entities/enemy';
-
+ // import showControls from './screen_controllers/controls';
 
 window.addEventListener('load', function () {
   var startGameButton = document.getElementById('start-game-button');
@@ -640,7 +641,14 @@ window.addEventListener('load', function () {
   controlsButton.addEventListener('click', function () {
     startGameButton.style.display = "none";
     controlsButton.style.display = 'none';
-    _screen_controllers_controls__WEBPACK_IMPORTED_MODULE_1___default()();
+    var controlsContainer = document.getElementsByClassName('controls-display')[0];
+    var closeButton = document.getElementsByClassName('close')[0];
+    closeButton.addEventListener('click', function () {
+      controlsContainer.style.display = 'none';
+      startGameButton.style.display = '';
+      controlsButton.style.display = '';
+    });
+    controlsContainer.style.display = '';
   });
 });
 
@@ -676,17 +684,6 @@ var Level = function Level(name, characterList, enemyList) {
 
 var levelOne = new Level('one', charactersArr, enemiesArr);
 var levelTwo = new Level('two', charactersArr, enemiesArr);
-
-/***/ }),
-
-/***/ "./src/screen_controllers/controls.js":
-/*!********************************************!*\
-  !*** ./src/screen_controllers/controls.js ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-
 
 /***/ }),
 
@@ -782,9 +779,11 @@ function spawnEntity(entity, allies, enemies) {
 
           if (!selectedChar || selectedChar.hp < 0) {
             selectedChar = entity;
+            entity.img.style.border = '2px solid gold';
             console.log('selected char: ', selectedChar.klass);
           } else if (selectedChar.baseDMG < 0) {
             selectedChar.autoAttack(entity);
+            selectedChar.img.style.border = 'none';
             selectedChar = null;
           }
 
@@ -793,6 +792,7 @@ function spawnEntity(entity, allies, enemies) {
       } else {
         entity.container.addEventListener("click", function (e) {
           if (selectedChar.hp < 0) {
+            selectedChar.img.style.border = 'none';
             selectedChar = null;
             return;
           }
@@ -801,6 +801,7 @@ function spawnEntity(entity, allies, enemies) {
 
           if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
             selectedChar.autoAttack(entity);
+            selectedChar.img.style.border = 'none';
             selectedChar = null;
           }
 
@@ -936,6 +937,7 @@ function beginLevel(charactersArr, enemiesArr) {
   setInitialTargets(charactersArr, enemiesArr);
   var deSelectButton = document.getElementById('reset-selected');
   deSelectButton.addEventListener('click', function () {
+    selectedChar.img.style.border = 'none';
     selectedChar = null;
   });
   setupEntities(charactersArr, enemiesArr); // end click position
@@ -950,6 +952,7 @@ function beginLevel(charactersArr, enemiesArr) {
         return;
       }
 
+      selectedChar.img.style.border = 'none';
       selectedChar.move([e.x, e.y]);
       selectedChar = null;
     }

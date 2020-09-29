@@ -13,14 +13,25 @@
 
         <p id="reset-selected" style="display: none;">de-select hero</p>
 
-        <h1 class="level-name" id="start-game-button">Start Game!</h1>
-        <h1 class='level-name' id="game-controls-button">Controls</h1>
+        <h1 class="h-button" id="start-game-button">Start Game!</h1>
+        <h1 class='h-button' id="game-controls-button">Controls</h1>
 
         <h1 class='level-name' id='game-over-display' style="display: none;">Game Over!</h1>
         <h1 class="level-name" id='game-won-display' style="display: none;">You Win!</h1>
 
         <h1 id='level-one-name' class="level-name" style="display: none;">Level One</h1>
 
+        <div class='controls-display' style="display: none;">
+            <a href="#" class="close"></a>
+            <h1>Click on a character to select it</h1>
+            <h1>Once selected, click anywhere to move the character to that location,
+                 click on an enemy to begin attacking them,
+                 or click on an ally to begin healing them.
+            </h1>
+            <h1>A selected character will be outlined in gold</h1>
+            <h1>Enemy characters are red</h1>
+            <h1>Defeat waves of enemies to complete a level</h1>
+        </div>
 
         <div id="wizard-display" class='entity-container' style="position: absolute;">
             <div id='wizard-hp-bar' class="hp-bar-container">
