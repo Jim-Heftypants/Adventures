@@ -1,14 +1,15 @@
 import * as levelsObj from '../levels/level';
+import {fadeIn, fadeOut} from './fades';
 
 const levels = Object.values(levelsObj);
-let currentLevel = levels[0];
+let currentLevelNumber = 0;
 
 let selectedChar;
 
 let livingEnemies = {};
 let livingChars = {};
 
-function addDeathListener(entity) {
+function addDeathListener(entity, level) {
     let observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutationRecord) {
             // console.log(entity.klass, 'style changed');
@@ -23,7 +24,7 @@ function addDeathListener(entity) {
                 const c  = Object.values(livingChars);
                 const en = Object.values(livingEnemies);
                 if (c.length === 0 || en.length === 0) {
-                    endGame(c, en);
+                    endGame(c, en, level);
                 }
             }
         });
@@ -33,7 +34,7 @@ function addDeathListener(entity) {
     observer.observe(element, { attributes : true, attributeFilter : ['style'] });
 }
 
-function endGame(charsList, enemyList) {
+function endGame(charsList, enemyList, level) {
     for (let i = 0; i < charsList.length; i++) {
         // fade out no action
         fadeOut(charsList[i].container);
@@ -46,25 +47,43 @@ function endGame(charsList, enemyList) {
     let gameFadeTimer = setInterval(() => {
         console.log('fade called');
         let disp;
+        let secondAction;
         if (charsList.length === 0) {
             disp = document.getElementById('game-over-display');
+            secondAction = () => resetGame();
         } else {
             disp = document.getElementById('game-won-display');
+            secondAction = () => resetGame(level);
         }
         disp.style.opacity = 0;
         disp.style.display = '';
-        const action = () => fadeOut(disp);
+        const action = () => fadeOut(disp, secondAction);
         fadeIn(disp, action);
         clearInterval(gameFadeTimer);
     }, 2000);
 }
 
-function spawnEntity(entity, allies, enemies) {
+function resetGame(level) {
+    livingChars = {};
+    livingEnemies = {};
+    const deSelectButton = document.getElementById('reset-selected');
+    deSelectButton.style.display = 'none';
+    const levelButtonContainer = document.getElementById('level-button-container');
+    levelButtonContainer.style.display = '';
+    if (level && currentLevelNumber === level) {
+        currentLevelNumber++;
+        const levelButtons = document.getElementsByClassName('level-button');
+        levelButtons[currentLevelNumber].style.opacity = 100 + '%';
+        levelButtons[currentLevelNumber].style.cursor = 'pointer';
+    }
+}
+
+function spawnEntity(entity, allies, enemies, level) {
     if (entity.imgName != "") {
         addInlineStyle(entity);
         const action = () => {
             if (entity.allied) {
-                addDeathListener(entity);
+                addDeathListener(entity, level);
                 entity.container.addEventListener("click", (e) => {
                     console.log('character click');
                     if (!selectedChar || selectedChar.hp < 0) {
@@ -140,60 +159,42 @@ function addInlineStyle(entity) {
     entity.container.style.top = entity.pos[1] + "px";
 }
 
-function setupEntities(charactersArr, enemiesArr) {
+function setupEntities(charactersArr, enemiesArr, level) {
     for (let i = 0; i < charactersArr.length; i++) {
         livingChars[charactersArr[i].klass] = charactersArr[i];
-        spawnEntity(charactersArr[i], charactersArr, enemiesArr);
+        spawnEntity(charactersArr[i], charactersArr, enemiesArr, level);
     }
     for (let i = 0; i < enemiesArr.length; i++) {
         livingEnemies[enemiesArr[i].klass] = enemiesArr[i];
-        spawnEntity(enemiesArr[i], enemiesArr, charactersArr);
+        spawnEntity(enemiesArr[i], enemiesArr, charactersArr, level);
     }
 }
 
-function initializeGameOpening() {
+function initializeGameOpening(levelNumber) {
+    console.log('level selected: ', levelNumber);
+    console.log('highest level available: ', currentLevelNumber);
+    if (levelNumber > currentLevelNumber) {
+        return;
+    }
     const deSelectButton = document.getElementById('reset-selected');
     deSelectButton.style.display = '';
-    loadLevel(currentLevel);
+    const levelButtonContainer = document.getElementById('level-button-container');
+    levelButtonContainer.style.display = 'none';
+    console.log('levels array: ', levels);
+    loadLevel(levels[levelNumber], levelNumber);
 }
 
-function fadeOut(element, level=null) {
-    let op = 20;
-    let timerDown = setInterval(function () {
-        if (op <= 0) {
-            clearInterval(timerDown);
-            element.style.display = 'none';
-            if (level) {
-                beginLevel(level.characterList, level.enemyList);
-            }
-        }
-        element.style.opacity = op / 20;
-        op -= 1;
-    }, 100);
-}
-
-function fadeIn(element, action=null) {
-    let op = 0;
-    let timerUp = setInterval(function () {
-        if (op >= 20) {
-            clearInterval(timerUp);
-            if (action) { action() }
-        }
-        element.style.opacity = op / 20;
-        op += 1;
-    }, 100);
-}
-
-function loadLevel(level) {
-    const levelNameDisp = document.getElementById(`level-${level.name}-name`);
+function loadLevel(level, levelNumber) {
+    const levelNameDisp = document.getElementById(`level-${levelNumber + 1}-name`);
     levelNameDisp.style.opacity = 0;
     levelNameDisp.style.display = '';
-    const action = () => fadeOut(levelNameDisp, level);
+    const secondAction = () => beginLevel(level.characterList, level.enemyList, levelNumber);
+    const action = () => fadeOut(levelNameDisp, secondAction);
     fadeIn(levelNameDisp, action);
 }
 
-function beginLevel(charactersArr, enemiesArr) {
-    console.log('load game called');
+function beginLevel(charactersArr, enemiesArr, level) {
+    console.log('begin level called');
     setInitialTargets(charactersArr, enemiesArr);
 
     const deSelectButton = document.getElementById('reset-selected');
@@ -202,7 +203,7 @@ function beginLevel(charactersArr, enemiesArr) {
         selectedChar = null;
     })
 
-    setupEntities(charactersArr, enemiesArr);
+    setupEntities(charactersArr, enemiesArr, level);
 
     // end click position
     const gameContainer = document.getElementById('game-container');

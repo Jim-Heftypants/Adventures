@@ -105,3 +105,16 @@ img {
 .close:after {
   transform: rotate(-45deg);
 }
+
+.level-button-container {
+    margin: auto;
+}
+
+.level-button {
+    border: 3px solid blue;
+    color: black;
+    cursor: default;
+    width: 200px;
+    height: 200px;
+    opacity: 60%;
+}

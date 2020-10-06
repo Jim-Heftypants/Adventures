@@ -631,24 +631,44 @@ __webpack_require__.r(__webpack_exports__);
  // import showControls from './screen_controllers/controls';
 
 window.addEventListener('load', function () {
+  var controlsContainer = document.getElementsByClassName('controls-display')[0];
+  var closeButton = document.getElementsByClassName('close')[0];
   var startGameButton = document.getElementById('start-game-button');
   var controlsButton = document.getElementById('game-controls-button');
+  var levelButtonContainer = document.getElementById('level-button-container');
+  var levelButtons = document.getElementsByClassName('level-button');
+
+  var _loop = function _loop(i) {
+    levelButtons[i].addEventListener('click', function () {
+      closeButton.style.display = 'none';
+      Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(i);
+    });
+  };
+
+  for (var i = 0; i < levelButtons.length; i++) {
+    _loop(i);
+  }
+
+  levelButtons[0].style.opacity = 100;
+  levelButtons[0].style.cursor = 'pointer';
+  closeButton.addEventListener('click', function () {
+    controlsContainer.style.display = 'none';
+    startGameButton.style.display = '';
+    controlsButton.style.display = '';
+    levelButtonContainer.style.display = 'none';
+    closeButton.style.display = 'none';
+  });
   startGameButton.addEventListener('click', function () {
     startGameButton.style.display = "none";
     controlsButton.style.display = 'none';
-    Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])();
+    levelButtonContainer.style.display = '';
+    closeButton.style.display = '';
   });
   controlsButton.addEventListener('click', function () {
     startGameButton.style.display = "none";
     controlsButton.style.display = 'none';
-    var controlsContainer = document.getElementsByClassName('controls-display')[0];
-    var closeButton = document.getElementsByClassName('close')[0];
-    closeButton.addEventListener('click', function () {
-      controlsContainer.style.display = 'none';
-      startGameButton.style.display = '';
-      controlsButton.style.display = '';
-    });
     controlsContainer.style.display = '';
+    closeButton.style.display = '';
   });
 });
 
@@ -697,14 +717,16 @@ var levelTwo = new Level('two', charactersArr, enemiesArr);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _levels_level__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../levels/level */ "./src/levels/level.js");
+/* harmony import */ var _fades__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./fades */ "./src/screen_controllers/fades.js");
+
 
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
-var currentLevel = levels[0];
+var currentLevelNumber = 0;
 var selectedChar;
 var livingEnemies = {};
 var livingChars = {};
 
-function addDeathListener(entity) {
+function addDeathListener(entity, level) {
   var observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutationRecord) {
       // console.log(entity.klass, 'style changed');
@@ -722,7 +744,7 @@ function addDeathListener(entity) {
         var en = Object.values(livingEnemies);
 
         if (c.length === 0 || en.length === 0) {
-          endGame(c, en);
+          endGame(c, en, level);
         }
       }
     });
@@ -734,46 +756,71 @@ function addDeathListener(entity) {
   });
 }
 
-function endGame(charsList, enemyList) {
+function endGame(charsList, enemyList, level) {
   for (var i = 0; i < charsList.length; i++) {
     // fade out no action
-    fadeOut(charsList[i].container);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(charsList[i].container);
   }
 
   for (var _i = 0; _i < enemyList.length; _i++) {
     // fade out no action
-    fadeOut(enemyList[_i].container);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i].container);
   }
 
   var gameFadeTimer = setInterval(function () {
     console.log('fade called');
     var disp;
+    var secondAction;
 
     if (charsList.length === 0) {
       disp = document.getElementById('game-over-display');
+
+      secondAction = function secondAction() {
+        return resetGame();
+      };
     } else {
       disp = document.getElementById('game-won-display');
+
+      secondAction = function secondAction() {
+        return resetGame(level);
+      };
     }
 
     disp.style.opacity = 0;
     disp.style.display = '';
 
     var action = function action() {
-      return fadeOut(disp);
+      return Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(disp, secondAction);
     };
 
-    fadeIn(disp, action);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(disp, action);
     clearInterval(gameFadeTimer);
   }, 2000);
 }
 
-function spawnEntity(entity, allies, enemies) {
+function resetGame(level) {
+  livingChars = {};
+  livingEnemies = {};
+  var deSelectButton = document.getElementById('reset-selected');
+  deSelectButton.style.display = 'none';
+  var levelButtonContainer = document.getElementById('level-button-container');
+  levelButtonContainer.style.display = '';
+
+  if (level && currentLevelNumber === level) {
+    currentLevelNumber++;
+    var levelButtons = document.getElementsByClassName('level-button');
+    levelButtons[currentLevelNumber].style.opacity = 100 + '%';
+    levelButtons[currentLevelNumber].style.cursor = 'pointer';
+  }
+}
+
+function spawnEntity(entity, allies, enemies, level) {
   if (entity.imgName != "") {
     addInlineStyle(entity);
 
     var action = function action() {
       if (entity.allied) {
-        addDeathListener(entity);
+        addDeathListener(entity, level);
         entity.container.addEventListener("click", function (e) {
           console.log('character click');
 
@@ -831,7 +878,7 @@ function spawnEntity(entity, allies, enemies) {
       }
     };
 
-    fadeIn(entity.container, action);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(entity.container, action);
   } else {
     console.log('broken image passed in for', entity.klass);
   }
@@ -867,80 +914,59 @@ function addInlineStyle(entity) {
   entity.container.style.top = entity.pos[1] + "px";
 }
 
-function setupEntities(charactersArr, enemiesArr) {
+function setupEntities(charactersArr, enemiesArr, level) {
   for (var i = 0; i < charactersArr.length; i++) {
     livingChars[charactersArr[i].klass] = charactersArr[i];
-    spawnEntity(charactersArr[i], charactersArr, enemiesArr);
+    spawnEntity(charactersArr[i], charactersArr, enemiesArr, level);
   }
 
   for (var _i2 = 0; _i2 < enemiesArr.length; _i2++) {
     livingEnemies[enemiesArr[_i2].klass] = enemiesArr[_i2];
-    spawnEntity(enemiesArr[_i2], enemiesArr, charactersArr);
+    spawnEntity(enemiesArr[_i2], enemiesArr, charactersArr, level);
   }
 }
 
-function initializeGameOpening() {
+function initializeGameOpening(levelNumber) {
+  console.log('level selected: ', levelNumber);
+  console.log('highest level available: ', currentLevelNumber);
+
+  if (levelNumber > currentLevelNumber) {
+    return;
+  }
+
   var deSelectButton = document.getElementById('reset-selected');
   deSelectButton.style.display = '';
-  loadLevel(currentLevel);
+  var levelButtonContainer = document.getElementById('level-button-container');
+  levelButtonContainer.style.display = 'none';
+  console.log('levels array: ', levels);
+  loadLevel(levels[levelNumber], levelNumber);
 }
 
-function fadeOut(element) {
-  var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var op = 20;
-  var timerDown = setInterval(function () {
-    if (op <= 0) {
-      clearInterval(timerDown);
-      element.style.display = 'none';
-
-      if (level) {
-        beginLevel(level.characterList, level.enemyList);
-      }
-    }
-
-    element.style.opacity = op / 20;
-    op -= 1;
-  }, 100);
-}
-
-function fadeIn(element) {
-  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var op = 0;
-  var timerUp = setInterval(function () {
-    if (op >= 20) {
-      clearInterval(timerUp);
-
-      if (action) {
-        action();
-      }
-    }
-
-    element.style.opacity = op / 20;
-    op += 1;
-  }, 100);
-}
-
-function loadLevel(level) {
-  var levelNameDisp = document.getElementById("level-".concat(level.name, "-name"));
+function loadLevel(level, levelNumber) {
+  var levelNameDisp = document.getElementById("level-".concat(levelNumber + 1, "-name"));
   levelNameDisp.style.opacity = 0;
   levelNameDisp.style.display = '';
 
-  var action = function action() {
-    return fadeOut(levelNameDisp, level);
+  var secondAction = function secondAction() {
+    return beginLevel(level.characterList, level.enemyList, levelNumber);
   };
 
-  fadeIn(levelNameDisp, action);
+  var action = function action() {
+    return Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(levelNameDisp, secondAction);
+  };
+
+  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(levelNameDisp, action);
 }
 
-function beginLevel(charactersArr, enemiesArr) {
-  console.log('load game called');
+function beginLevel(charactersArr, enemiesArr, level) {
+  console.log('begin level called');
   setInitialTargets(charactersArr, enemiesArr);
   var deSelectButton = document.getElementById('reset-selected');
   deSelectButton.addEventListener('click', function () {
     selectedChar.img.style.border = 'none';
     selectedChar = null;
   });
-  setupEntities(charactersArr, enemiesArr); // end click position
+  setupEntities(charactersArr, enemiesArr, level); // end click position
 
   var gameContainer = document.getElementById('game-container');
   gameContainer.addEventListener("click", function (e) {
@@ -960,6 +986,53 @@ function beginLevel(charactersArr, enemiesArr) {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (initializeGameOpening);
+
+/***/ }),
+
+/***/ "./src/screen_controllers/fades.js":
+/*!*****************************************!*\
+  !*** ./src/screen_controllers/fades.js ***!
+  \*****************************************/
+/*! exports provided: fadeOut, fadeIn */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fadeOut", function() { return fadeOut; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fadeIn", function() { return fadeIn; });
+function fadeOut(element) {
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var op = 20;
+  var timerDown = setInterval(function () {
+    if (op <= 0) {
+      clearInterval(timerDown);
+      element.style.display = 'none';
+
+      if (action) {
+        action();
+      }
+    }
+
+    element.style.opacity = op / 20;
+    op -= 1;
+  }, 100);
+}
+function fadeIn(element) {
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var op = 0;
+  var timerUp = setInterval(function () {
+    if (op >= 20) {
+      clearInterval(timerUp);
+
+      if (action) {
+        action();
+      }
+    }
+
+    element.style.opacity = op / 20;
+    op += 1;
+  }, 100);
+}
 
 /***/ })
 
