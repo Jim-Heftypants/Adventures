@@ -111,7 +111,9 @@ img {
 }
 
 .level-button {
-    border: 3px solid blue;
+    margin-top: 5px;
+    margin-left: 5px;
+    border: 5px solid blue;
     color: black;
     cursor: default;
     width: 200px;

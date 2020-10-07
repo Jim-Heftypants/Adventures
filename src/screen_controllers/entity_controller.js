@@ -1,6 +1,9 @@
 import * as levelsObj from '../levels/level';
 import {fadeIn, fadeOut} from './fades';
 
+let hasBeenLoaded = false;
+let levelHasEnded = false;
+
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
 
@@ -10,8 +13,8 @@ let livingEnemies = {};
 let livingChars = {};
 
 function addDeathListener(entity, level) {
-    let observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutationRecord) {
+    entity.observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutationRecord) {
             // console.log(entity.klass, 'style changed');
             // console.log(mutationRecord);
             if (mutationRecord.target.style.display === 'none') {
@@ -21,127 +24,66 @@ function addDeathListener(entity, level) {
                 } else {
                     delete livingEnemies[entity.klass];
                 }
-                const c  = Object.values(livingChars);
+                const c = Object.values(livingChars);
                 const en = Object.values(livingEnemies);
+                console.log('living allies: ', livingChars);
+                console.log('living enemies: ', livingEnemies);
                 if (c.length === 0 || en.length === 0) {
-                    endGame(c, en, level);
+                    if (!levelHasEnded) {
+                        endGame(c, en, level);
+                    }
+                    levelHasEnded = true;
                 }
             }
         });
     })
-
-    const element = entity.container;
-    observer.observe(element, { attributes : true, attributeFilter : ['style'] });
 }
 
-function endGame(charsList, enemyList, level) {
-    for (let i = 0; i < charsList.length; i++) {
-        // fade out no action
-        fadeOut(charsList[i].container);
-    }
-    for (let i = 0; i < enemyList.length; i++) {
-        // fade out no action
-        fadeOut(enemyList[i].container);
-    } 
-    
-    let gameFadeTimer = setInterval(() => {
-        console.log('fade called');
-        let disp;
-        let secondAction;
-        if (charsList.length === 0) {
-            disp = document.getElementById('game-over-display');
-            secondAction = () => resetGame();
-        } else {
-            disp = document.getElementById('game-won-display');
-            secondAction = () => resetGame(level);
-        }
-        disp.style.opacity = 0;
-        disp.style.display = '';
-        const action = () => fadeOut(disp, secondAction);
-        fadeIn(disp, action);
-        clearInterval(gameFadeTimer);
-    }, 2000);
-}
-
-function resetGame(level) {
-    livingChars = {};
-    livingEnemies = {};
-    const deSelectButton = document.getElementById('reset-selected');
-    deSelectButton.style.display = 'none';
-    const levelButtonContainer = document.getElementById('level-button-container');
-    levelButtonContainer.style.display = '';
-    if (level && currentLevelNumber === level) {
-        currentLevelNumber++;
-        const levelButtons = document.getElementsByClassName('level-button');
-        levelButtons[currentLevelNumber].style.opacity = 100 + '%';
-        levelButtons[currentLevelNumber].style.cursor = 'pointer';
-    }
-}
-
-function spawnEntity(entity, allies, enemies, level) {
+function addEntityEvents(entity, allies, enemies, level) {
     if (entity.imgName != "") {
         addInlineStyle(entity);
-        const action = () => {
-            if (entity.allied) {
-                addDeathListener(entity, level);
-                entity.container.addEventListener("click", (e) => {
-                    console.log('character click');
-                    if (!selectedChar || selectedChar.hp < 0) {
-                        selectedChar = entity;
-                        entity.img.style.border = '2px solid gold';
-                        console.log('selected char: ', selectedChar.klass);
-                    } else if (selectedChar.baseDMG < 0) {
-                        selectedChar.autoAttack(entity);
-                        selectedChar.img.style.border = 'none';
-                        selectedChar = null;
-                    }
-                    e.stopPropagation();
-                })
-            } else {
-                entity.container.addEventListener("click", (e) => {
-                    if (selectedChar.hp < 0) {
-                        selectedChar.img.style.border = 'none';
-                        selectedChar = null;
-                        return;
-                    }
-                    console.log('enemy click');
-                    if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
-                        selectedChar.autoAttack(entity);
-                        selectedChar.img.style.border = 'none';
-                        selectedChar = null;
-                    }
-                    e.stopPropagation(); // maybe move inside if
-                })
-            }
-            entity.enemies = enemies;
-            const cloneArr = allies.slice();
-            let selfIndex;
-            for (let i = 0; i < cloneArr.length; i++) {
-                if (cloneArr[i].klass === entity.klass) { selfIndex = i; }
-            }
-            // remove self from allies list to prevent moving out of self image (healers excluded)
-            if (entity.baseDMG > 0) { cloneArr.splice(selfIndex, 1); }
-            entity.allies = cloneArr;
-            if (!entity.allied) {
-                entity.autoAttack(entity.target);
-            }
-        };
-        fadeIn(entity.container, action);
+        addDeathListener(entity, level);
+        if (entity.allied) {
+            entity.container.addEventListener("click", (e) => {
+                console.log('character click');
+                if (!selectedChar || selectedChar.hp < 0) {
+                    selectedChar = entity;
+                    entity.img.style.border = '2px solid gold';
+                    console.log('selected char: ', selectedChar.klass);
+                } else if (selectedChar.baseDMG < 0) {
+                    selectedChar.autoAttack(entity);
+                    selectedChar.img.style.border = 'none';
+                    selectedChar = null;
+                }
+                e.stopPropagation();
+            })
+        } else {
+            entity.container.addEventListener("click", (e) => {
+                if (selectedChar.hp < 0) {
+                    selectedChar.img.style.border = 'none';
+                    selectedChar = null;
+                    return;
+                }
+                console.log('enemy click');
+                if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
+                    selectedChar.autoAttack(entity);
+                    selectedChar.img.style.border = 'none';
+                    selectedChar = null;
+                }
+                e.stopPropagation(); // maybe move inside if
+            })
+        }
+        entity.enemies = enemies;
+        const cloneArr = allies.slice();
+        let selfIndex;
+        for (let i = 0; i < cloneArr.length; i++) {
+            if (cloneArr[i].klass === entity.klass) { selfIndex = i; }
+        }
+        // remove self from allies list to prevent moving out of self image (healers excluded)
+        if (entity.baseDMG > 0) { cloneArr.splice(selfIndex, 1); }
+        entity.allies = cloneArr;
     } else {
         console.log('broken image passed in for', entity.klass);
-    }
-}
-
-function setInitialTargets(chars, enemies) {
-    for (let i = 0; i < enemies.length; i++) {
-        if (enemies[i].baseDMG > 0) {
-            const targetIndex = Math.floor(Math.random() * chars.length);
-            enemies[i].target = chars[targetIndex];
-        } else {
-            const targetIndex = Math.floor(Math.random() * enemies.length);
-            enemies[i].target = enemies[targetIndex];
-        }
-        console.log(enemies[i].klass, "has target set to", enemies[i].target);
     }
 }
 
@@ -150,60 +92,32 @@ function addInlineStyle(entity) {
     entity.baseImg = document.getElementsByClassName(entity.imgName)[0]
     entity.img.src = entity.baseImg.src;
     entity.attackImages = document.getElementsByClassName(entity.imgName);
-    const hpBar = document.getElementById(`${entity.imgName}-hp-bar`);
     entity.container = document.getElementById(`${entity.imgName}-display`);
     entity.container.style.opacity = 0; // fading in so started at op 0
     entity.img.style.display = "";
-    hpBar.style.display = "flex";
     entity.container.style.left = entity.pos[0] + "px";
     entity.container.style.top = entity.pos[1] + "px";
 }
 
 function setupEntities(charactersArr, enemiesArr, level) {
     for (let i = 0; i < charactersArr.length; i++) {
-        livingChars[charactersArr[i].klass] = charactersArr[i];
-        spawnEntity(charactersArr[i], charactersArr, enemiesArr, level);
+        // livingChars[charactersArr[i].klass] = charactersArr[i];
+        addEntityEvents(charactersArr[i], charactersArr, enemiesArr, level);
     }
     for (let i = 0; i < enemiesArr.length; i++) {
-        livingEnemies[enemiesArr[i].klass] = enemiesArr[i];
-        spawnEntity(enemiesArr[i], enemiesArr, charactersArr, level);
+        // livingEnemies[enemiesArr[i].klass] = enemiesArr[i];
+        addEntityEvents(enemiesArr[i], enemiesArr, charactersArr, level);
     }
 }
 
 function initializeGameOpening(levelNumber) {
-    console.log('level selected: ', levelNumber);
-    console.log('highest level available: ', currentLevelNumber);
-    if (levelNumber > currentLevelNumber) {
-        return;
-    }
-    const deSelectButton = document.getElementById('reset-selected');
-    deSelectButton.style.display = '';
-    const levelButtonContainer = document.getElementById('level-button-container');
-    levelButtonContainer.style.display = 'none';
-    console.log('levels array: ', levels);
-    loadLevel(levels[levelNumber], levelNumber);
-}
-
-function loadLevel(level, levelNumber) {
-    const levelNameDisp = document.getElementById(`level-${levelNumber + 1}-name`);
-    levelNameDisp.style.opacity = 0;
-    levelNameDisp.style.display = '';
-    const secondAction = () => beginLevel(level.characterList, level.enemyList, levelNumber);
-    const action = () => fadeOut(levelNameDisp, secondAction);
-    fadeIn(levelNameDisp, action);
-}
-
-function beginLevel(charactersArr, enemiesArr, level) {
-    console.log('begin level called');
-    setInitialTargets(charactersArr, enemiesArr);
-
     const deSelectButton = document.getElementById('reset-selected');
     deSelectButton.addEventListener('click', () => {
         selectedChar.img.style.border = 'none';
         selectedChar = null;
     })
 
-    setupEntities(charactersArr, enemiesArr, level);
+    setupEntities(levels[levelNumber].characterList, levels[levelNumber].enemyList, levelNumber); // modify to be all the img elements
 
     // end click position
     const gameContainer = document.getElementById('game-container');
@@ -219,6 +133,154 @@ function beginLevel(charactersArr, enemiesArr, level) {
             selectedChar = null;
         }
     })
+
+    hasBeenLoaded = true;
 }
 
-export default initializeGameOpening;
+
+
+function loadLevel(levelNumber) {
+    if (!hasBeenLoaded) {
+        initializeGameOpening(levelNumber);
+    }
+    if (levelNumber > currentLevelNumber) {
+        return;
+    }
+    levelHasEnded = false;
+    console.log('level selected: ', levelNumber);
+    const deSelectButton = document.getElementById('reset-selected');
+    deSelectButton.style.display = '';
+    const levelButtonContainer = document.getElementById('level-button-container');
+    levelButtonContainer.style.display = 'none';
+    const levelNameDisp = document.getElementById(`level-${levelNumber + 1}-name`);
+    levelNameDisp.style.opacity = 0;
+    levelNameDisp.style.display = '';
+    const level = levels[levelNumber];
+    const secondAction = () => beginLevel(level.characterList, level.enemyList, levelNumber);
+    const action = () => fadeOut(levelNameDisp, secondAction);
+    fadeIn(levelNameDisp, action);
+}
+
+function beginLevel(charactersArr, enemiesArr, levelNumber) {
+    console.log('begin level called');
+    setInitialTargets(charactersArr, enemiesArr);
+    loadInCharacters(charactersArr, enemiesArr, levelNumber);
+}
+
+function setInitialTargets(chars, enemies) {
+    for (let i = 0; i < enemies.length; i++) {
+        if (enemies[i].baseDMG > 0) {
+            const targetIndex = Math.floor(Math.random() * chars.length);
+            enemies[i].target = chars[targetIndex];
+        } else {
+            const targetIndex = Math.floor(Math.random() * enemies.length);
+            enemies[i].target = enemies[targetIndex];
+        }
+        console.log(enemies[i].klass, "has target set to", enemies[i].target);
+    }
+}
+
+function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
+    for (let i = 0; i < charactersArr.length; i++) {
+        livingChars[charactersArr[i].klass] = charactersArr[i];
+        charactersArr[i].container.style.opacity = 0;
+        charactersArr[i].container.style.display = '';
+        const hpBar = document.getElementById(`${charactersArr[i].imgName}-hp-bar`);
+        hpBar.style.display = "flex";
+        fadeIn(charactersArr[i].container);
+        observerObserve(charactersArr[i]);
+    }
+    for (let i = 0; i < enemiesArr.length; i++) {
+        livingEnemies[enemiesArr[i].klass] = enemiesArr[i];
+        enemiesArr[i].container.style.opacity = 0;
+        enemiesArr[i].container.style.display = '';
+        const hpBar = document.getElementById(`${enemiesArr[i].imgName}-hp-bar`);
+        hpBar.style.display = "flex";
+        const action = () => enemiesArr[i].autoAttack(enemiesArr[i].target);
+        fadeIn(enemiesArr[i].container, action); // begin attacking target
+        observerObserve(enemiesArr[i]);
+    }
+    
+}
+
+function observerObserve(entity) {
+    const element = entity.container;
+    entity.observer.observe(element, { attributes: true, attributeFilter: ['style'] });
+}
+
+
+
+
+function endGame(charsList, enemyList, level) {
+    const allCharsList = levels[level].characterList;
+    const allEnemyList = levels[level].enemyList;
+    for (let i = 0; i < allCharsList.length; i++) { allCharsList[i].observer.disconnect(); }
+    for (let i = 0; i < allEnemyList.length; i++) { allEnemyList[i].observer.disconnect(); }
+
+    for (let i = 0; i < charsList.length; i++) {
+        clearInterval(charsList[i].currentAction);
+        clearInterval(charsList[i].currentAnimation);
+        charsList[i].img.src = charsList[i].baseImg.src;
+        fadeOut(charsList[i].container);
+    }
+    for (let i = 0; i < enemyList.length; i++) {
+        clearInterval(enemyList[i].currentAction);
+        clearInterval(enemyList[i].currentAnimation);
+        enemyList[i].img.src = enemyList[i].baseImg.src;
+        fadeOut(enemyList[i].container);
+    }
+    
+    let gameFadeTimer = setInterval(() => {
+        console.log('fade called');
+        let disp;
+        let secondAction;
+        if (charsList.length === 0) {
+            disp = document.getElementById('game-over-display');
+            secondAction = () => resetGame(level, false);
+        } else {
+            disp = document.getElementById('game-won-display');
+            secondAction = () => resetGame(level, true);
+        }
+        disp.style.opacity = 0;
+        disp.style.display = '';
+        const action = () => fadeOut(disp, secondAction);
+        fadeIn(disp, action);
+        clearInterval(gameFadeTimer);
+    }, 2000);
+}
+
+function resetGame(level, won) {
+    livingChars = {};
+    livingEnemies = {};
+    const deSelectButton = document.getElementById('reset-selected');
+    deSelectButton.style.display = 'none';
+    const levelButtonContainer = document.getElementById('level-button-container');
+    levelButtonContainer.style.display = '';
+    if (won && currentLevelNumber === level) {
+        currentLevelNumber++;
+        const levelButtons = document.getElementsByClassName('level-button');
+        levelButtons[currentLevelNumber].style.opacity = 100 + '%';
+        levelButtons[currentLevelNumber].style.cursor = 'pointer';
+    }
+    // level.characterList, level.enemyList
+    console.log('levels arr: ', levels);
+    console.log('level ', level, ': ', levels[level]);
+    const levChars = levels[level].characterList;
+    const levEnems = levels[level].enemyList;
+    for (let i = 0; i < levChars.length; i++) {
+        levChars[i].hp = levChars[i].baseHP;
+        levChars[i].pos[0] = levChars[i].basePos[0]; levChars[i].pos[1] = levChars[i].basePos[1];
+        levChars[i].container.style.top = levChars[i].pos[1] + 'px';
+        levChars[i].container.style.left = levChars[i].pos[0] + 'px';
+        levChars[i].setHpBars();
+    }
+    for (let i = 0; i < levEnems.length; i++) {
+        levEnems[i].hp = levEnems[i].baseHP;
+        levEnems[i].pos[0] = levEnems[i].basePos[0]; levEnems[i].pos[1] = levEnems[i].basePos[1];
+        levEnems[i].container.style.top = levEnems[i].pos[1] + 'px';
+        levEnems[i].container.style.left = levEnems[i].pos[0] + 'px';
+        levEnems[i].setHpBars();
+    }
+}
+
+export default loadLevel;

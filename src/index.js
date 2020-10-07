@@ -1,6 +1,6 @@
 // import * as characters from './entities/character';
 // import * as enemies from './entities/enemy';
-import initializeGameOpening from './screen_controllers/entity_controller';
+import loadLevel from './screen_controllers/entity_controller';
 // import showControls from './screen_controllers/controls';
 
 window.addEventListener('load', () => {
@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
     for (let i = 0; i < levelButtons.length; i++) {
         levelButtons[i].addEventListener('click', () => {
             closeButton.style.display = 'none';
-            initializeGameOpening(i);
+            loadLevel(i);
         })
     }
     levelButtons[0].style.opacity = 100;

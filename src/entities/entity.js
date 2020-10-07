@@ -1,13 +1,14 @@
 class Entity { // this. is selectedChar
-    constructor(klass="", range=0, maxHP=0, ms=0, attackSpeed=0, attackDMG, allied=true, img="", pos=[0, 0], defense) {
+    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied=true, img="", pos=[0, 0], defense) {
         this.klass = klass;
         this.range = range;
-        this.maxHP = maxHP;
-        this.hp = this.maxHP;
+        this.baseHP = baseHP;
+        this.hp = this.baseHP;
         this.baseMS = ms; // speed / time
         this.ms = this.baseMS;
         this.allied = allied; // true === player character
         this.pos = pos;
+        this.basePos = []; this.basePos[0] = pos[0]; this.basePos[1] = pos[1];
         this.baseAS = attackSpeed;
         this.as = this.baseAS;
         this.baseDMG = attackDMG;
@@ -31,6 +32,8 @@ class Entity { // this. is selectedChar
         this.enemies;
 
         this.movingOutTheWay = false;
+
+        this.observer;
     }
 
     vectorToScalar(endPos) {
@@ -129,10 +132,10 @@ class Entity { // this. is selectedChar
         }
     }
 
-    setHpBars(targetChar) {
-        const leftBar = document.getElementById(`${targetChar.imgName}-hp-left`);
-        const rightBar = document.getElementById(`${targetChar.imgName}-hp-right`);
-        let leftWidth = Math.floor((targetChar.hp / targetChar.maxHP) * 100);
+    setHpBars() {
+        const leftBar = document.getElementById(`${this.imgName}-hp-left`);
+        const rightBar = document.getElementById(`${this.imgName}-hp-right`);
+        let leftWidth = Math.floor((this.hp / this.baseHP) * 100);
         let rightWidth = 100 - leftWidth;
         if (leftWidth < 0) leftWidth = 0;
         if (rightWidth < 0) rightWidth = 0;
@@ -241,7 +244,7 @@ class Entity { // this. is selectedChar
                 }
             } else {
                 targetChar.hp -= selectedChar.dmg;
-                if (targetChar.hp > targetChar.maxHP) { targetChar.hp = targetChar.maxHP; }
+                if (targetChar.hp > targetChar.baseHP) { targetChar.hp = targetChar.baseHP; }
                 if (!targetChar.allied && selectedChar.allied && targetChar.baseDMG > 0 && selectedChar.defense > targetChar.target.defense) {
                     targetChar.target = selectedChar;
                     targetChar.clearIntervals();
@@ -249,7 +252,7 @@ class Entity { // this. is selectedChar
                     console.log('enemy is now targetting: ', selectedChar);
                 }
                 // hp finalized
-                selectedChar.setHpBars(targetChar);
+                targetChar.setHpBars();
                 
                 // console.log('target hp at: ', targetChar.hp);
                 if (targetChar.hp <= 0) {
