@@ -1,6 +1,7 @@
 class Entity { // this. is selectedChar
-    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied=true, img="", pos=[0, 0], defense) {
+    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0) {
         this.klass = klass;
+
         this.range = range;
         this.baseHP = baseHP;
         this.hp = this.baseHP;
@@ -34,6 +35,23 @@ class Entity { // this. is selectedChar
         this.movingOutTheWay = false;
 
         this.observer;
+
+        window.addEventListener('load', () => {
+            this.addInlineStyle();
+        });
+    }
+
+    addInlineStyle() {
+        this.img = document.getElementsByClassName(this.imgName + "-image-display")[0];
+        this.baseImg = document.getElementsByClassName(this.klass)[0];
+        this.img.src = this.baseImg.src;
+        this.attackImages = document.getElementsByClassName(this.klass);
+        this.container = document.getElementById(`${this.imgName}-display`);
+        this.container.style.opacity = 0; // fading in so started at op 0
+        this.container.style.display = 'none';
+        this.img.style.display = "";
+        this.container.style.left = this.pos[0] + "px";
+        this.container.style.top = this.pos[1] + "px";
     }
 
     vectorToScalar(endPos) {
@@ -66,7 +84,7 @@ class Entity { // this. is selectedChar
         endPos[1] = Math.floor(endPos[1] - (this.img.height * (3/4)));
         let pos = this.pos;
         let posChange = this.vectorToScalar(endPos);
-        console.log("pos change on move", posChange);
+        // console.log("pos change on move", posChange);
         const bigDiv = document.getElementById('game-container');
         const difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
         const checker = difference + Math.floor(bigDiv.offsetWidth);
@@ -124,11 +142,11 @@ class Entity { // this. is selectedChar
         entity.container.style.display = "none";
     }
 
-    animateAttack(self) {
-        if (self.attackImages) {
-            self.imgCycle += 1;
-            self.imgCycle = self.imgCycle % 4;
-            self.img.src = self.attackImages[self.imgCycle].src;
+    animateAttack() {
+        if (this.attackImages) {
+            this.imgCycle += 1;
+            this.imgCycle = this.imgCycle % 4;
+            this.img.src = this.attackImages[this.imgCycle].src;
         }
     }
 
@@ -163,7 +181,7 @@ class Entity { // this. is selectedChar
             }
             if (this.target.hp < 0) { return; }
         }
-        console.log(this.klass, "is now attacking", this.target.klass);
+        // console.log(this.klass, "is now attacking", this.target.klass);
         this.autoAttack(this.target);
     }
 
@@ -172,7 +190,7 @@ class Entity { // this. is selectedChar
             if (!this.allies[i].movingOutTheWay) {                
                 const widthAddition = Math.floor(this.img.width / 2);
                 if (this.pos[0] > this.allies[i].pos[0] - widthAddition - this.range && this.pos[0] < this.allies[i].pos[0] + widthAddition + this.range) {
-                    const heightAddition = Math.floor(((this.img.height / 2) + (this.allies[i].img.height / 2)) / 2);
+                    const heightAddition = Math.floor(this.img.height / 2);
                     if (this.pos[1] > this.allies[i].pos[1] - heightAddition && this.pos[1] < this.allies[i].pos[1] + heightAddition) {
                         console.log(this.klass, "is moving to avoid", this.allies[i].klass);
                         return true;
@@ -187,12 +205,12 @@ class Entity { // this. is selectedChar
         const bigDiv = document.getElementById('game-container');
         const difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
         const checker = difference + Math.floor(bigDiv.offsetWidth);
-        let interval = setInterval(() => move(this), 20);
+        this.currentAction = setInterval(() => move(this), 20);
         function move(self) {
             if (self.withinAttackRange(self.target)) {
-                clearInterval(interval);
+                clearInterval(self.currentAction);
                 self.autoAttack(self.target);
-                console.log('auto attack called from track');
+                // console.log('auto attack called from track');
             } else {
                 const pos = self.pos;
                 let movePos = self.target.pos.slice();
@@ -232,11 +250,11 @@ class Entity { // this. is selectedChar
                 // move to enemy's new location -- needs to track current position
             } else if (selectedChar.charactersStacked()) {
                 selectedChar.movingOutTheWay = true;
-                const addition = Math.floor(((selectedChar.img.width / 2) + (targetChar.img.width / 2)) / 2);
+                const addition = Math.floor(selectedChar.img.width / 2);
                 if (selectedChar.img.style.transform === "scaleX(-1)") {
                     // move to left side of target
                     selectedChar.img.style.transform = "scaleX(1)";
-                    selectedChar.move([targetChar.pos[0] - addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
+                    selectedChar.move([targetChar.pos[0] - (addition / 2), targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
                 } else {
                     // move to right side of target;
                     selectedChar.img.style.transform = "scaleX(-1)";
@@ -249,7 +267,7 @@ class Entity { // this. is selectedChar
                     targetChar.target = selectedChar;
                     targetChar.clearIntervals();
                     targetChar.autoAttack(targetChar.target);
-                    console.log('enemy is now targetting: ', selectedChar);
+                    // console.log('enemy is now targetting: ', selectedChar);
                 }
                 // hp finalized
                 targetChar.setHpBars();
@@ -258,7 +276,7 @@ class Entity { // this. is selectedChar
                 if (targetChar.hp <= 0) {
                     // stop the animation
                     selectedChar.clearIntervals();
-                    console.log('attack interval stopped');
+                    console.log(targetChar, ' hp ', targetChar.hp);
                     selectedChar.killEntitiy(targetChar);
                     if (!selectedChar.allied) {
                         // chose another hero to attack

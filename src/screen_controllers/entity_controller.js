@@ -13,16 +13,16 @@ let livingEnemies = {};
 let livingChars = {};
 
 function addDeathListener(entity, level) {
-    entity.observer = new MutationObserver(function (mutations) {
+    entity.observer = new MutationObserver(function(mutations) {
         mutations.forEach(function (mutationRecord) {
-            // console.log(entity.klass, 'style changed');
+            // console.log(entity.imgName, 'style changed');
             // console.log(mutationRecord);
             if (mutationRecord.target.style.display === 'none') {
-                console.log(entity.klass, 'style === none');
+                console.log(entity.imgName, 'style === none');
                 if (entity.allied) {
-                    delete livingChars[entity.klass];
+                    delete livingChars[entity.imgName];
                 } else {
-                    delete livingEnemies[entity.klass];
+                    delete livingEnemies[entity.imgName];
                 }
                 const c = Object.values(livingChars);
                 const en = Object.values(livingEnemies);
@@ -30,8 +30,10 @@ function addDeathListener(entity, level) {
                 console.log('living enemies: ', livingEnemies);
                 if (c.length === 0 || en.length === 0) {
                     if (!levelHasEnded) {
+                        console.log('end game called');
                         endGame(c, en, level);
                     }
+                    console.log('game should have ended');
                     levelHasEnded = true;
                 }
             }
@@ -41,71 +43,69 @@ function addDeathListener(entity, level) {
 
 function addEntityEvents(entity, allies, enemies, level) {
     if (entity.imgName != "") {
-        addInlineStyle(entity);
         addDeathListener(entity, level);
-        if (entity.allied) {
-            entity.container.addEventListener("click", (e) => {
-                console.log('character click');
-                if (!selectedChar || selectedChar.hp < 0) {
-                    selectedChar = entity;
-                    entity.img.style.border = '2px solid gold';
-                    console.log('selected char: ', selectedChar.klass);
-                } else if (selectedChar.baseDMG < 0) {
-                    selectedChar.autoAttack(entity);
-                    selectedChar.img.style.border = 'none';
-                    selectedChar = null;
-                }
-                e.stopPropagation();
-            })
-        } else {
-            entity.container.addEventListener("click", (e) => {
-                if (selectedChar.hp < 0) {
-                    selectedChar.img.style.border = 'none';
-                    selectedChar = null;
-                    return;
-                }
-                console.log('enemy click');
-                if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
-                    selectedChar.autoAttack(entity);
-                    selectedChar.img.style.border = 'none';
-                    selectedChar = null;
-                }
-                e.stopPropagation(); // maybe move inside if
-            })
-        }
         entity.enemies = enemies;
         const cloneArr = allies.slice();
         let selfIndex;
         for (let i = 0; i < cloneArr.length; i++) {
-            if (cloneArr[i].klass === entity.klass) { selfIndex = i; }
+            if (cloneArr[i].imgName === entity.imgName) { selfIndex = i; }
         }
         // remove self from allies list to prevent moving out of self image (healers excluded)
         if (entity.baseDMG > 0) { cloneArr.splice(selfIndex, 1); }
         entity.allies = cloneArr;
     } else {
-        console.log('broken image passed in for', entity.klass);
+        console.log('broken image passed in for', entity.imgName);
     }
 }
 
-function addInlineStyle(entity) {
-    entity.img = document.getElementsByClassName(entity.imgName + "-image-display")[0];
-    entity.baseImg = document.getElementsByClassName(entity.imgName)[0]
-    entity.img.src = entity.baseImg.src;
-    entity.attackImages = document.getElementsByClassName(entity.imgName);
-    entity.container = document.getElementById(`${entity.imgName}-display`);
-    entity.container.style.opacity = 0; // fading in so started at op 0
-    entity.img.style.display = "";
-    entity.container.style.left = entity.pos[0] + "px";
-    entity.container.style.top = entity.pos[1] + "px";
+const enemyClickEvents = (e) => {
+    const entityName = e.target.className.slice(0, 2);
+    // console.log('entity name', entityName);
+    const entity = livingEnemies[entityName];
+    // console.log('entity', entity);
+    if (selectedChar.hp < 0) {
+        selectedChar.img.style.border = 'none';
+        selectedChar = null;
+        return;
+    }
+    console.log('enemy click');
+    if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
+        selectedChar.autoAttack(entity);
+        selectedChar.img.style.border = 'none';
+        selectedChar = null;
+    }
+    e.stopPropagation(); // maybe move inside if
+}
+
+function addClickEvents(entity) {
+    if (entity.allied) {
+        entity.container.addEventListener("click", (e) => {
+            console.log('character click');
+            if (!selectedChar || selectedChar.hp < 0) {
+                selectedChar = entity;
+                entity.img.style.border = '2px solid gold';
+                console.log('selected char: ', selectedChar.imgName);
+            } else if (selectedChar.baseDMG < 0) {
+                selectedChar.autoAttack(entity);
+                selectedChar.img.style.border = 'none';
+                selectedChar = null;
+            }
+            e.stopPropagation();
+        });
+    } else {
+        entity.container.addEventListener("click", enemyClickEvents);
+    }
 }
 
 function setupEntities(charactersArr, enemiesArr, level) {
     for (let i = 0; i < charactersArr.length; i++) {
-        // livingChars[charactersArr[i].klass] = charactersArr[i];
+        // livingChars[charactersArr[i].imgName] = charactersArr[i];
+        addClickEvents(charactersArr[i]);
         addEntityEvents(charactersArr[i], charactersArr, enemiesArr, level);
     }
     for (let i = 0; i < enemiesArr.length; i++) {
-        // livingEnemies[enemiesArr[i].klass] = enemiesArr[i];
+        // livingEnemies[enemiesArr[i].imgName] = enemiesArr[i];
+        // addClickEvents(enemiesArr[i]);
         addEntityEvents(enemiesArr[i], enemiesArr, charactersArr, level);
     }
 }
@@ -176,35 +176,42 @@ function setInitialTargets(chars, enemies) {
             const targetIndex = Math.floor(Math.random() * enemies.length);
             enemies[i].target = enemies[targetIndex];
         }
-        console.log(enemies[i].klass, "has target set to", enemies[i].target);
+        console.log(enemies[i].imgName, "has target set to", enemies[i].target);
     }
 }
 
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     for (let i = 0; i < charactersArr.length; i++) {
-        livingChars[charactersArr[i].klass] = charactersArr[i];
+        livingChars[charactersArr[i].imgName] = charactersArr[i];
         charactersArr[i].container.style.opacity = 0;
         charactersArr[i].container.style.display = '';
         const hpBar = document.getElementById(`${charactersArr[i].imgName}-hp-bar`);
         hpBar.style.display = "flex";
         fadeIn(charactersArr[i].container);
-        observerObserve(charactersArr[i]);
+        observerObserve(charactersArr[i], levelNumber);
     }
     for (let i = 0; i < enemiesArr.length; i++) {
-        livingEnemies[enemiesArr[i].klass] = enemiesArr[i];
+        if (!enemiesArr[i].observer) {
+            addEntityEvents(enemiesArr[i], enemiesArr, charactersArr, levelNumber);
+        }
+        livingEnemies[enemiesArr[i].imgName] = enemiesArr[i];
         enemiesArr[i].container.style.opacity = 0;
         enemiesArr[i].container.style.display = '';
         const hpBar = document.getElementById(`${enemiesArr[i].imgName}-hp-bar`);
         hpBar.style.display = "flex";
+        enemiesArr[i].container.addEventListener('click', enemyClickEvents);
         const action = () => enemiesArr[i].autoAttack(enemiesArr[i].target);
         fadeIn(enemiesArr[i].container, action); // begin attacking target
-        observerObserve(enemiesArr[i]);
+        observerObserve(enemiesArr[i], levelNumber);
     }
     
 }
 
-function observerObserve(entity) {
+function observerObserve(entity, levelNumber) {
     const element = entity.container;
+    // if (!entity.observer) {
+    //     addDeathListener(entity, levelNumber);
+    // }
     entity.observer.observe(element, { attributes: true, attributeFilter: ['style'] });
 }
 
@@ -214,19 +221,24 @@ function observerObserve(entity) {
 function endGame(charsList, enemyList, level) {
     const allCharsList = levels[level].characterList;
     const allEnemyList = levels[level].enemyList;
-    for (let i = 0; i < allCharsList.length; i++) { allCharsList[i].observer.disconnect(); }
-    for (let i = 0; i < allEnemyList.length; i++) { allEnemyList[i].observer.disconnect(); }
+    for (let i = 0; i < allCharsList.length; i++) {
+        allCharsList[i].observer.disconnect();
+        if (allCharsList[i.currentAction]) { clearInterval(allCharsList[i].currentAction); }
+        if (allCharsList[i].currentAnimation) { clearInterval(allCharsList[i].currentAnimation); }
+        allCharsList[i].img.src = allCharsList[i].baseImg.src;
+    }
+    for (let i = 0; i < allEnemyList.length; i++) {
+        allEnemyList[i].observer.disconnect();
+        if (allEnemyList[i].currentAction) { clearInterval(allEnemyList[i].currentAction); }
+        if (allEnemyList[i].currentAnimation) { clearInterval(allEnemyList[i].currentAnimation); }
+        allEnemyList[i].container.removeEventListener('click', enemyClickEvents);
+        allEnemyList[i].img.src = allEnemyList[i].baseImg.src;
+    }
 
     for (let i = 0; i < charsList.length; i++) {
-        clearInterval(charsList[i].currentAction);
-        clearInterval(charsList[i].currentAnimation);
-        charsList[i].img.src = charsList[i].baseImg.src;
         fadeOut(charsList[i].container);
     }
     for (let i = 0; i < enemyList.length; i++) {
-        clearInterval(enemyList[i].currentAction);
-        clearInterval(enemyList[i].currentAnimation);
-        enemyList[i].img.src = enemyList[i].baseImg.src;
         fadeOut(enemyList[i].container);
     }
     

@@ -129,15 +129,13 @@ var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10,
 /*!*******************************!*\
   !*** ./src/entities/enemy.js ***!
   \*******************************/
-/*! exports provided: EWizard, EPriest, ERogue, EWarrior */
+/*! exports provided: ezMode, doppelganger */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EWizard", function() { return EWizard; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EPriest", function() { return EPriest; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ERogue", function() { return ERogue; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EWarrior", function() { return EWarrior; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ezMode", function() { return ezMode; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "doppelganger", function() { return doppelganger; });
 /* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity.js */ "./src/entities/entity.js");
 
 /*
@@ -148,18 +146,28 @@ MS
 AS
 DMG
 false
+img
 pos
 defense
 */
+// 
 // rdps
 
-var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "ewizard", [500, 500], 15); // heals
+var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 1, 10, 1500, 12, false, 'e1', [500, 500], 8);
+var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e1", [500, 500], 15); // heals
 
-var EPriest = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -10, false, "ecleric", [1000, 100], 10); // mdps
+var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 1, 10, 2000, -10, false, "e4", [1000, 100], 8);
+var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -10, false, "e4", [1000, 100], 10); // mdps
 
-var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "erogue", [700, 200], 18); // tank
+var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 1, 10, 1200, 9, false, "e2", [700, 200], 14);
+var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "e2", [700, 200], 18); // tank
 
-var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 100, 10, 1000, 10, false, "ewarrior", [300, 400], 20);
+var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 1, 10, 1000, 8, false, "e3", [300, 400], 20);
+var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 10, false, "e3", [300, 400], 20); // level 1
+
+var ezMode = [ghettoWizard, loserRogue, weakWarrior, dumbCleric]; // level 4
+
+var doppelganger = [EWizard, ERogue, EWarrior, ECleric];
 
 /***/ }),
 
@@ -181,16 +189,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var Entity = /*#__PURE__*/function () {
   // this. is selectedChar
   function Entity() {
+    var _this = this;
+
     var klass = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
     var range = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
     var baseHP = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     var ms = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
     var attackSpeed = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
     var attackDMG = arguments.length > 5 ? arguments[5] : undefined;
-    var allied = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : true;
+    var allied = arguments.length > 6 ? arguments[6] : undefined;
     var img = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : "";
     var pos = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : [0, 0];
-    var defense = arguments.length > 9 ? arguments[9] : undefined;
+    var defense = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0;
 
     _classCallCheck(this, Entity);
 
@@ -230,9 +240,27 @@ var Entity = /*#__PURE__*/function () {
     this.enemies;
     this.movingOutTheWay = false;
     this.observer;
+    window.addEventListener('load', function () {
+      _this.addInlineStyle();
+    });
   }
 
   _createClass(Entity, [{
+    key: "addInlineStyle",
+    value: function addInlineStyle() {
+      this.img = document.getElementsByClassName(this.imgName + "-image-display")[0];
+      this.baseImg = document.getElementsByClassName(this.klass)[0];
+      this.img.src = this.baseImg.src;
+      this.attackImages = document.getElementsByClassName(this.klass);
+      this.container = document.getElementById("".concat(this.imgName, "-display"));
+      this.container.style.opacity = 0; // fading in so started at op 0
+
+      this.container.style.display = 'none';
+      this.img.style.display = "";
+      this.container.style.left = this.pos[0] + "px";
+      this.container.style.top = this.pos[1] + "px";
+    }
+  }, {
     key: "vectorToScalar",
     value: function vectorToScalar(endPos) {
       var deltaX = this.pos[0] - endPos[0];
@@ -263,7 +291,7 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "move",
     value: function move(endPos) {
-      var _this = this;
+      var _this2 = this;
 
       var attackOnFinish = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       this.movingOutTheWay = true;
@@ -273,13 +301,13 @@ var Entity = /*#__PURE__*/function () {
       endPos[0] = Math.floor(endPos[0] - this.img.width);
       endPos[1] = Math.floor(endPos[1] - this.img.height * (3 / 4));
       var pos = this.pos;
-      var posChange = this.vectorToScalar(endPos);
-      console.log("pos change on move", posChange);
+      var posChange = this.vectorToScalar(endPos); // console.log("pos change on move", posChange);
+
       var bigDiv = document.getElementById('game-container');
       var difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
       var checker = difference + Math.floor(bigDiv.offsetWidth);
       this.currentAction = setInterval(function () {
-        return frame(_this);
+        return frame(_this2);
       }, 20);
 
       function frame(self) {
@@ -360,11 +388,11 @@ var Entity = /*#__PURE__*/function () {
     }
   }, {
     key: "animateAttack",
-    value: function animateAttack(self) {
-      if (self.attackImages) {
-        self.imgCycle += 1;
-        self.imgCycle = self.imgCycle % 4;
-        self.img.src = self.attackImages[self.imgCycle].src;
+    value: function animateAttack() {
+      if (this.attackImages) {
+        this.imgCycle += 1;
+        this.imgCycle = this.imgCycle % 4;
+        this.img.src = this.attackImages[this.imgCycle].src;
       }
     }
   }, {
@@ -408,9 +436,9 @@ var Entity = /*#__PURE__*/function () {
         if (this.target.hp < 0) {
           return;
         }
-      }
+      } // console.log(this.klass, "is now attacking", this.target.klass);
 
-      console.log(this.klass, "is now attacking", this.target.klass);
+
       this.autoAttack(this.target);
     }
   }, {
@@ -421,7 +449,7 @@ var Entity = /*#__PURE__*/function () {
           var widthAddition = Math.floor(this.img.width / 2);
 
           if (this.pos[0] > this.allies[i].pos[0] - widthAddition - this.range && this.pos[0] < this.allies[i].pos[0] + widthAddition + this.range) {
-            var heightAddition = Math.floor((this.img.height / 2 + this.allies[i].img.height / 2) / 2);
+            var heightAddition = Math.floor(this.img.height / 2);
 
             if (this.pos[1] > this.allies[i].pos[1] - heightAddition && this.pos[1] < this.allies[i].pos[1] + heightAddition) {
               console.log(this.klass, "is moving to avoid", this.allies[i].klass);
@@ -436,21 +464,20 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "trackTarget",
     value: function trackTarget() {
-      var _this2 = this;
+      var _this3 = this;
 
       // hot code
       var bigDiv = document.getElementById('game-container');
       var difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
       var checker = difference + Math.floor(bigDiv.offsetWidth);
-      var interval = setInterval(function () {
-        return move(_this2);
+      this.currentAction = setInterval(function () {
+        return move(_this3);
       }, 20);
 
       function move(self) {
         if (self.withinAttackRange(self.target)) {
-          clearInterval(interval);
-          self.autoAttack(self.target);
-          console.log('auto attack called from track');
+          clearInterval(self.currentAction);
+          self.autoAttack(self.target); // console.log('auto attack called from track');
         } else {
           var pos = self.pos;
           var movePos = self.target.pos.slice();
@@ -482,15 +509,15 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "beginAttack",
     value: function beginAttack(targetChar) {
-      var _this3 = this;
+      var _this4 = this;
 
       // make some kind of animation start
       this.clearIntervals();
       this.currentAnimation = setInterval(function () {
-        return _this3.animateAttack(_this3);
+        return _this4.animateAttack(_this4);
       }, Math.floor(this.as / 4));
       this.currentAction = setInterval(function () {
-        return attack(_this3);
+        return attack(_this4);
       }, this.as);
 
       function attack(selectedChar) {
@@ -513,12 +540,12 @@ var Entity = /*#__PURE__*/function () {
           return; // move to enemy's new location -- needs to track current position
         } else if (selectedChar.charactersStacked()) {
           selectedChar.movingOutTheWay = true;
-          var addition = Math.floor((selectedChar.img.width / 2 + targetChar.img.width / 2) / 2);
+          var addition = Math.floor(selectedChar.img.width / 2);
 
           if (selectedChar.img.style.transform === "scaleX(-1)") {
             // move to left side of target
             selectedChar.img.style.transform = "scaleX(1)";
-            selectedChar.move([targetChar.pos[0] - addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar);
+            selectedChar.move([targetChar.pos[0] - addition / 2, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar);
           } else {
             // move to right side of target;
             selectedChar.img.style.transform = "scaleX(-1)";
@@ -534,8 +561,7 @@ var Entity = /*#__PURE__*/function () {
           if (!targetChar.allied && selectedChar.allied && targetChar.baseDMG > 0 && selectedChar.defense > targetChar.target.defense) {
             targetChar.target = selectedChar;
             targetChar.clearIntervals();
-            targetChar.autoAttack(targetChar.target);
-            console.log('enemy is now targetting: ', selectedChar);
+            targetChar.autoAttack(targetChar.target); // console.log('enemy is now targetting: ', selectedChar);
           } // hp finalized
 
 
@@ -544,7 +570,7 @@ var Entity = /*#__PURE__*/function () {
           if (targetChar.hp <= 0) {
             // stop the animation
             selectedChar.clearIntervals();
-            console.log('attack interval stopped');
+            console.log(targetChar, ' hp ', targetChar.hp);
             selectedChar.killEntitiy(targetChar);
 
             if (!selectedChar.allied) {
@@ -698,16 +724,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var charactersArr = Object.values(_entities_character__WEBPACK_IMPORTED_MODULE_0__);
 var enemiesArr = Object.values(_entities_enemy__WEBPACK_IMPORTED_MODULE_1__);
 
-var Level = function Level(name, characterList, enemyList) {
+var Level = function Level(name, enemyList) {
+  var characterList = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : charactersArr;
+
   _classCallCheck(this, Level);
 
   this.name = name;
-  this.characterList = characterList;
   this.enemyList = enemyList;
+  this.characterList = characterList;
 };
 
-var levelOne = new Level('one', charactersArr, enemiesArr);
-var levelTwo = new Level('two', charactersArr, enemiesArr);
+var levelOne = new Level('one', enemiesArr[0]);
+var levelTwo = new Level('two', enemiesArr[1]); // export const levelThree = new Level('three', enemiesArr[2]);
+// export const levelFour = new Level('four', enemiesArr[3]);
 
 /***/ }),
 
@@ -735,15 +764,15 @@ var livingChars = {};
 function addDeathListener(entity, level) {
   entity.observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutationRecord) {
-      // console.log(entity.klass, 'style changed');
+      // console.log(entity.imgName, 'style changed');
       // console.log(mutationRecord);
       if (mutationRecord.target.style.display === 'none') {
-        console.log(entity.klass, 'style === none');
+        console.log(entity.imgName, 'style === none');
 
         if (entity.allied) {
-          delete livingChars[entity.klass];
+          delete livingChars[entity.imgName];
         } else {
-          delete livingEnemies[entity.klass];
+          delete livingEnemies[entity.imgName];
         }
 
         var c = Object.values(livingChars);
@@ -753,9 +782,11 @@ function addDeathListener(entity, level) {
 
         if (c.length === 0 || en.length === 0) {
           if (!levelHasEnded) {
+            console.log('end game called');
             endGame(c, en, level);
           }
 
+          console.log('game should have ended');
           levelHasEnded = true;
         }
       }
@@ -765,51 +796,13 @@ function addDeathListener(entity, level) {
 
 function addEntityEvents(entity, allies, enemies, level) {
   if (entity.imgName != "") {
-    addInlineStyle(entity);
     addDeathListener(entity, level);
-
-    if (entity.allied) {
-      entity.container.addEventListener("click", function (e) {
-        console.log('character click');
-
-        if (!selectedChar || selectedChar.hp < 0) {
-          selectedChar = entity;
-          entity.img.style.border = '2px solid gold';
-          console.log('selected char: ', selectedChar.klass);
-        } else if (selectedChar.baseDMG < 0) {
-          selectedChar.autoAttack(entity);
-          selectedChar.img.style.border = 'none';
-          selectedChar = null;
-        }
-
-        e.stopPropagation();
-      });
-    } else {
-      entity.container.addEventListener("click", function (e) {
-        if (selectedChar.hp < 0) {
-          selectedChar.img.style.border = 'none';
-          selectedChar = null;
-          return;
-        }
-
-        console.log('enemy click');
-
-        if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
-          selectedChar.autoAttack(entity);
-          selectedChar.img.style.border = 'none';
-          selectedChar = null;
-        }
-
-        e.stopPropagation(); // maybe move inside if
-      });
-    }
-
     entity.enemies = enemies;
     var cloneArr = allies.slice();
     var selfIndex;
 
     for (var i = 0; i < cloneArr.length; i++) {
-      if (cloneArr[i].klass === entity.klass) {
+      if (cloneArr[i].imgName === entity.imgName) {
         selfIndex = i;
       }
     } // remove self from allies list to prevent moving out of self image (healers excluded)
@@ -821,31 +814,64 @@ function addEntityEvents(entity, allies, enemies, level) {
 
     entity.allies = cloneArr;
   } else {
-    console.log('broken image passed in for', entity.klass);
+    console.log('broken image passed in for', entity.imgName);
   }
 }
 
-function addInlineStyle(entity) {
-  entity.img = document.getElementsByClassName(entity.imgName + "-image-display")[0];
-  entity.baseImg = document.getElementsByClassName(entity.imgName)[0];
-  entity.img.src = entity.baseImg.src;
-  entity.attackImages = document.getElementsByClassName(entity.imgName);
-  entity.container = document.getElementById("".concat(entity.imgName, "-display"));
-  entity.container.style.opacity = 0; // fading in so started at op 0
+var enemyClickEvents = function enemyClickEvents(e) {
+  var entityName = e.target.className.slice(0, 2); // console.log('entity name', entityName);
 
-  entity.img.style.display = "";
-  entity.container.style.left = entity.pos[0] + "px";
-  entity.container.style.top = entity.pos[1] + "px";
+  var entity = livingEnemies[entityName]; // console.log('entity', entity);
+
+  if (selectedChar.hp < 0) {
+    selectedChar.img.style.border = 'none';
+    selectedChar = null;
+    return;
+  }
+
+  console.log('enemy click');
+
+  if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
+    selectedChar.autoAttack(entity);
+    selectedChar.img.style.border = 'none';
+    selectedChar = null;
+  }
+
+  e.stopPropagation(); // maybe move inside if
+};
+
+function addClickEvents(entity) {
+  if (entity.allied) {
+    entity.container.addEventListener("click", function (e) {
+      console.log('character click');
+
+      if (!selectedChar || selectedChar.hp < 0) {
+        selectedChar = entity;
+        entity.img.style.border = '2px solid gold';
+        console.log('selected char: ', selectedChar.imgName);
+      } else if (selectedChar.baseDMG < 0) {
+        selectedChar.autoAttack(entity);
+        selectedChar.img.style.border = 'none';
+        selectedChar = null;
+      }
+
+      e.stopPropagation();
+    });
+  } else {
+    entity.container.addEventListener("click", enemyClickEvents);
+  }
 }
 
 function setupEntities(charactersArr, enemiesArr, level) {
   for (var i = 0; i < charactersArr.length; i++) {
-    // livingChars[charactersArr[i].klass] = charactersArr[i];
+    // livingChars[charactersArr[i].imgName] = charactersArr[i];
+    addClickEvents(charactersArr[i]);
     addEntityEvents(charactersArr[i], charactersArr, enemiesArr, level);
   }
 
   for (var _i = 0; _i < enemiesArr.length; _i++) {
-    // livingEnemies[enemiesArr[i].klass] = enemiesArr[i];
+    // livingEnemies[enemiesArr[i].imgName] = enemiesArr[i];
+    // addClickEvents(enemiesArr[i]);
     addEntityEvents(enemiesArr[_i], enemiesArr, charactersArr, level);
   }
 }
@@ -925,27 +951,33 @@ function setInitialTargets(chars, enemies) {
       enemies[i].target = enemies[_targetIndex];
     }
 
-    console.log(enemies[i].klass, "has target set to", enemies[i].target);
+    console.log(enemies[i].imgName, "has target set to", enemies[i].target);
   }
 }
 
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   for (var i = 0; i < charactersArr.length; i++) {
-    livingChars[charactersArr[i].klass] = charactersArr[i];
+    livingChars[charactersArr[i].imgName] = charactersArr[i];
     charactersArr[i].container.style.opacity = 0;
     charactersArr[i].container.style.display = '';
     var hpBar = document.getElementById("".concat(charactersArr[i].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[i].container);
-    observerObserve(charactersArr[i]);
+    observerObserve(charactersArr[i], levelNumber);
   }
 
   var _loop = function _loop(_i2) {
-    livingEnemies[enemiesArr[_i2].klass] = enemiesArr[_i2];
+    if (!enemiesArr[_i2].observer) {
+      addEntityEvents(enemiesArr[_i2], enemiesArr, charactersArr, levelNumber);
+    }
+
+    livingEnemies[enemiesArr[_i2].imgName] = enemiesArr[_i2];
     enemiesArr[_i2].container.style.opacity = 0;
     enemiesArr[_i2].container.style.display = '';
     var hpBar = document.getElementById("".concat(enemiesArr[_i2].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
+
+    enemiesArr[_i2].container.addEventListener('click', enemyClickEvents);
 
     var action = function action() {
       return enemiesArr[_i2].autoAttack(enemiesArr[_i2].target);
@@ -953,7 +985,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
 
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i2].container, action); // begin attacking target
 
-    observerObserve(enemiesArr[_i2]);
+    observerObserve(enemiesArr[_i2], levelNumber);
   };
 
   for (var _i2 = 0; _i2 < enemiesArr.length; _i2++) {
@@ -961,8 +993,11 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   }
 }
 
-function observerObserve(entity) {
-  var element = entity.container;
+function observerObserve(entity, levelNumber) {
+  var element = entity.container; // if (!entity.observer) {
+  //     addDeathListener(entity, levelNumber);
+  // }
+
   entity.observer.observe(element, {
     attributes: true,
     attributeFilter: ['style']
@@ -975,23 +1010,39 @@ function endGame(charsList, enemyList, level) {
 
   for (var i = 0; i < allCharsList.length; i++) {
     allCharsList[i].observer.disconnect();
+
+    if (allCharsList[i.currentAction]) {
+      clearInterval(allCharsList[i].currentAction);
+    }
+
+    if (allCharsList[i].currentAnimation) {
+      clearInterval(allCharsList[i].currentAnimation);
+    }
+
+    allCharsList[i].img.src = allCharsList[i].baseImg.src;
   }
 
   for (var _i3 = 0; _i3 < allEnemyList.length; _i3++) {
     allEnemyList[_i3].observer.disconnect();
+
+    if (allEnemyList[_i3].currentAction) {
+      clearInterval(allEnemyList[_i3].currentAction);
+    }
+
+    if (allEnemyList[_i3].currentAnimation) {
+      clearInterval(allEnemyList[_i3].currentAnimation);
+    }
+
+    allEnemyList[_i3].container.removeEventListener('click', enemyClickEvents);
+
+    allEnemyList[_i3].img.src = allEnemyList[_i3].baseImg.src;
   }
 
   for (var _i4 = 0; _i4 < charsList.length; _i4++) {
-    clearInterval(charsList[_i4].currentAction);
-    clearInterval(charsList[_i4].currentAnimation);
-    charsList[_i4].img.src = charsList[_i4].baseImg.src;
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(charsList[_i4].container);
   }
 
   for (var _i5 = 0; _i5 < enemyList.length; _i5++) {
-    clearInterval(enemyList[_i5].currentAction);
-    clearInterval(enemyList[_i5].currentAnimation);
-    enemyList[_i5].img.src = enemyList[_i5].baseImg.src;
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i5].container);
   }
 
