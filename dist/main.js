@@ -115,13 +115,13 @@ defense
 */
 // rdps
 
-var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "wizard", [100, 100], 12); // heals
+var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a1", [100, 100], 12); // heals
 
-var Priest = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "cleric", [400, 100], 10); // mdps
+var Priest = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "a4", [400, 100], 10); // mdps
 
-var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "rogue", [900, 500], 16); // tank
+var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a2", [900, 500], 16); // tank
 
-var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "warrior", [100, 400], 20);
+var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a3", [100, 400], 20);
 
 /***/ }),
 
@@ -129,12 +129,14 @@ var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10,
 /*!*******************************!*\
   !*** ./src/entities/enemy.js ***!
   \*******************************/
-/*! exports provided: ezMode, doppelganger */
+/*! exports provided: ezMode, level2, level3, doppelganger */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ezMode", function() { return ezMode; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "level2", function() { return level2; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "level3", function() { return level3; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "doppelganger", function() { return doppelganger; });
 /* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity.js */ "./src/entities/entity.js");
 
@@ -153,19 +155,31 @@ defense
 // 
 // rdps
 
-var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 1, 10, 1500, 12, false, 'e1', [500, 500], 8);
+var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e1', [500, 500], 8);
+var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [500, 500], 8);
+var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e2', [700, 200], 8);
 var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e1", [500, 500], 15); // heals
 
-var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 1, 10, 2000, -10, false, "e4", [1000, 100], 8);
+var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -10, false, "e4", [1000, 100], 8);
+var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e4", [1000, 100], 8);
+var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e3", [300, 400], 8);
 var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -10, false, "e4", [1000, 100], 10); // mdps
 
-var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 1, 10, 1200, 9, false, "e2", [700, 200], 14);
+var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e2", [700, 200], 14);
+var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e2", [700, 200], 14);
+var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e1", [500, 500], 14);
 var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "e2", [700, 200], 18); // tank
 
-var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 1, 10, 1000, 8, false, "e3", [300, 400], 20);
+var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [300, 400], 20);
+var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [300, 400], 20);
+var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e4", [1000, 100], 20);
 var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 10, false, "e3", [300, 400], 20); // level 1
 
-var ezMode = [ghettoWizard, loserRogue, weakWarrior, dumbCleric]; // level 4
+var ezMode = [ghettoWizard, loserRogue, weakWarrior, dumbCleric]; // level 2
+
+var level2 = [rogue2, rogue3, warrior2, warrior3]; // level 3
+
+var level3 = [wizard2, wizard3, cleric2, cleric3]; // level 4
 
 var doppelganger = [EWizard, ERogue, EWarrior, ECleric];
 
@@ -379,7 +393,7 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "killEntitiy",
     value: function killEntitiy(entity) {
-      console.log(entity.klass, "killed");
+      // console.log(entity.klass, "killed");
       clearInterval(entity.currentAction);
       clearInterval(entity.currentAnimation);
       entity.img.src = entity.baseImg.src;
@@ -410,8 +424,7 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "setTargetAndAttack",
     value: function setTargetAndAttack() {
-      console.log(this.klass, "has finished attacking", this.target.klass);
-
+      // console.log(this.klass, "has finished attacking", this.target.klass);
       if (this.baseDMG > 0) {
         this.enemies = shuffle(this.enemies);
 
@@ -452,7 +465,7 @@ var Entity = /*#__PURE__*/function () {
             var heightAddition = Math.floor(this.img.height / 2);
 
             if (this.pos[1] > this.allies[i].pos[1] - heightAddition && this.pos[1] < this.allies[i].pos[1] + heightAddition) {
-              console.log(this.klass, "is moving to avoid", this.allies[i].klass);
+              // console.log(this.klass, "is moving to avoid", this.allies[i].klass);
               return true;
             }
           }
@@ -534,8 +547,8 @@ var Entity = /*#__PURE__*/function () {
 
         if (!selectedChar.withinAttackRange(targetChar)) {
           // stop the animation
-          selectedChar.clearIntervals();
-          console.log(selectedChar.klass, 'too far from', targetChar.klass, 'during attack - moving to new location');
+          selectedChar.clearIntervals(); // console.log(selectedChar.klass, 'too far from', targetChar.klass, 'during attack - moving to new location');
+
           selectedChar.trackTarget();
           return; // move to enemy's new location -- needs to track current position
         } else if (selectedChar.charactersStacked()) {
@@ -544,12 +557,13 @@ var Entity = /*#__PURE__*/function () {
 
           if (selectedChar.img.style.transform === "scaleX(-1)") {
             // move to left side of target
-            selectedChar.img.style.transform = "scaleX(1)";
-            selectedChar.move([targetChar.pos[0] - addition / 2, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar);
+            selectedChar.img.style.transform = "scaleX(1)"; // - (addition / 4)
+
+            selectedChar.move([targetChar.pos[0], targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
           } else {
             // move to right side of target;
             selectedChar.img.style.transform = "scaleX(-1)";
-            selectedChar.move([targetChar.pos[0] + 3 * addition, targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar);
+            selectedChar.move([targetChar.pos[0] + 4 * addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
           }
         } else {
           targetChar.hp -= selectedChar.dmg;
@@ -569,8 +583,8 @@ var Entity = /*#__PURE__*/function () {
 
           if (targetChar.hp <= 0) {
             // stop the animation
-            selectedChar.clearIntervals();
-            console.log(targetChar, ' hp ', targetChar.hp);
+            selectedChar.clearIntervals(); // console.log(targetChar, ' hp ', targetChar.hp);
+
             selectedChar.killEntitiy(targetChar);
 
             if (!selectedChar.allied) {
@@ -708,13 +722,15 @@ window.addEventListener('load', function () {
 /*!*****************************!*\
   !*** ./src/levels/level.js ***!
   \*****************************/
-/*! exports provided: levelOne, levelTwo */
+/*! exports provided: levelOne, levelTwo, levelThree, levelFour */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "levelOne", function() { return levelOne; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "levelTwo", function() { return levelTwo; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "levelThree", function() { return levelThree; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "levelFour", function() { return levelFour; });
 /* harmony import */ var _entities_character__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../entities/character */ "./src/entities/character.js");
 /* harmony import */ var _entities_enemy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../entities/enemy */ "./src/entities/enemy.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -735,8 +751,9 @@ var Level = function Level(name, enemyList) {
 };
 
 var levelOne = new Level('one', enemiesArr[0]);
-var levelTwo = new Level('two', enemiesArr[1]); // export const levelThree = new Level('three', enemiesArr[2]);
-// export const levelFour = new Level('four', enemiesArr[3]);
+var levelTwo = new Level('two', enemiesArr[1]);
+var levelThree = new Level('three', enemiesArr[2]);
+var levelFour = new Level('four', enemiesArr[3]);
 
 /***/ }),
 
@@ -757,18 +774,18 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
+var maxLevelNumber = 0;
 var selectedChar;
 var livingEnemies = {};
 var livingChars = {};
 
-function addDeathListener(entity, level) {
+function addDeathListener(entity) {
   entity.observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutationRecord) {
       // console.log(entity.imgName, 'style changed');
       // console.log(mutationRecord);
       if (mutationRecord.target.style.display === 'none') {
-        console.log(entity.imgName, 'style === none');
-
+        // console.log(entity.imgName, 'style === none');
         if (entity.allied) {
           delete livingChars[entity.imgName];
         } else {
@@ -776,17 +793,16 @@ function addDeathListener(entity, level) {
         }
 
         var c = Object.values(livingChars);
-        var en = Object.values(livingEnemies);
-        console.log('living allies: ', livingChars);
-        console.log('living enemies: ', livingEnemies);
+        var en = Object.values(livingEnemies); // console.log('living allies: ', livingChars);
+        // console.log('living enemies: ', livingEnemies);
 
         if (c.length === 0 || en.length === 0) {
           if (!levelHasEnded) {
-            console.log('end game called');
-            endGame(c, en, level);
-          }
+            // console.log('end game called');
+            endGame(c, en, currentLevelNumber);
+          } // console.log('game should have ended');
 
-          console.log('game should have ended');
+
           levelHasEnded = true;
         }
       }
@@ -794,9 +810,9 @@ function addDeathListener(entity, level) {
   });
 }
 
-function addEntityEvents(entity, allies, enemies, level) {
+function addEntityEvents(entity, allies, enemies) {
   if (entity.imgName != "") {
-    addDeathListener(entity, level);
+    addDeathListener(entity);
     entity.enemies = enemies;
     var cloneArr = allies.slice();
     var selfIndex;
@@ -813,10 +829,26 @@ function addEntityEvents(entity, allies, enemies, level) {
     }
 
     entity.allies = cloneArr;
-  } else {
-    console.log('broken image passed in for', entity.imgName);
+  } else {// console.log('broken image passed in for', entity.imgName);
   }
 }
+
+var allyClickEvents = function allyClickEvents(e) {
+  // console.log('character click');
+  var entityName = e.target.className.slice(0, 2);
+  var entity = livingChars[entityName];
+
+  if (!selectedChar || selectedChar.hp < 0) {
+    selectedChar = entity;
+    entity.img.style.border = '2px solid gold'; // console.log('selected char: ', selectedChar.imgName);
+  } else if (selectedChar.baseDMG < 0) {
+    selectedChar.autoAttack(entity);
+    selectedChar.img.style.border = 'none';
+    selectedChar = null;
+  }
+
+  e.stopPropagation();
+};
 
 var enemyClickEvents = function enemyClickEvents(e) {
   var entityName = e.target.className.slice(0, 2); // console.log('entity name', entityName);
@@ -827,11 +859,12 @@ var enemyClickEvents = function enemyClickEvents(e) {
     selectedChar.img.style.border = 'none';
     selectedChar = null;
     return;
-  }
+  } // console.log('enemy click');
 
-  console.log('enemy click');
 
   if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
+    clearInterval(selectedChar.currentAction);
+    clearInterval(selectedChar.currentAnimation);
     selectedChar.autoAttack(entity);
     selectedChar.img.style.border = 'none';
     selectedChar = null;
@@ -840,61 +873,40 @@ var enemyClickEvents = function enemyClickEvents(e) {
   e.stopPropagation(); // maybe move inside if
 };
 
-function addClickEvents(entity) {
-  if (entity.allied) {
-    entity.container.addEventListener("click", function (e) {
-      console.log('character click');
-
-      if (!selectedChar || selectedChar.hp < 0) {
-        selectedChar = entity;
-        entity.img.style.border = '2px solid gold';
-        console.log('selected char: ', selectedChar.imgName);
-      } else if (selectedChar.baseDMG < 0) {
-        selectedChar.autoAttack(entity);
-        selectedChar.img.style.border = 'none';
-        selectedChar = null;
-      }
-
-      e.stopPropagation();
-    });
-  } else {
-    entity.container.addEventListener("click", enemyClickEvents);
-  }
-}
-
-function setupEntities(charactersArr, enemiesArr, level) {
+function setupEntities(charactersArr, enemiesArr) {
   for (var i = 0; i < charactersArr.length; i++) {
-    // livingChars[charactersArr[i].imgName] = charactersArr[i];
-    addClickEvents(charactersArr[i]);
-    addEntityEvents(charactersArr[i], charactersArr, enemiesArr, level);
+    addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
   }
 
   for (var _i = 0; _i < enemiesArr.length; _i++) {
-    // livingEnemies[enemiesArr[i].imgName] = enemiesArr[i];
-    // addClickEvents(enemiesArr[i]);
-    addEntityEvents(enemiesArr[_i], enemiesArr, charactersArr, level);
+    addEntityEvents(enemiesArr[_i], enemiesArr, charactersArr);
+  }
+}
+
+function deSelect() {
+  if (selectedChar) {
+    selectedChar.img.style.border = 'none';
+    selectedChar = null;
   }
 }
 
 function initializeGameOpening(levelNumber) {
   var deSelectButton = document.getElementById('reset-selected');
-  deSelectButton.addEventListener('click', function () {
-    selectedChar.img.style.border = 'none';
-    selectedChar = null;
-  });
-  setupEntities(levels[levelNumber].characterList, levels[levelNumber].enemyList, levelNumber); // modify to be all the img elements
+  deSelectButton.addEventListener('click', deSelect);
+  setupEntities(levels[levelNumber].characterList, levels[levelNumber].enemyList); // modify to be all the img elements
   // end click position
 
   var gameContainer = document.getElementById('game-container');
   gameContainer.addEventListener("click", function (e) {
-    console.log(e);
-
+    // console.log(e);
     if (selectedChar) {
       if (selectedChar.hp < 0) {
         selectedChar = null;
         return;
       }
 
+      clearInterval(selectedChar.currentAction);
+      clearInterval(selectedChar.currentAnimation);
       selectedChar.img.style.border = 'none';
       selectedChar.move([e.x, e.y]);
       selectedChar = null;
@@ -908,12 +920,13 @@ function loadLevel(levelNumber) {
     initializeGameOpening(levelNumber);
   }
 
-  if (levelNumber > currentLevelNumber) {
+  if (levelNumber > maxLevelNumber) {
     return;
   }
 
   levelHasEnded = false;
-  console.log('level selected: ', levelNumber);
+  currentLevelNumber = levelNumber; // console.log('level selected: ', levelNumber);
+
   var deSelectButton = document.getElementById('reset-selected');
   deSelectButton.style.display = '';
   var levelButtonContainer = document.getElementById('level-button-container');
@@ -924,7 +937,7 @@ function loadLevel(levelNumber) {
   var level = levels[levelNumber];
 
   var secondAction = function secondAction() {
-    return beginLevel(level.characterList, level.enemyList, levelNumber);
+    return beginLevel(level.characterList, level.enemyList);
   };
 
   var action = function action() {
@@ -934,10 +947,10 @@ function loadLevel(levelNumber) {
   Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(levelNameDisp, action);
 }
 
-function beginLevel(charactersArr, enemiesArr, levelNumber) {
-  console.log('begin level called');
+function beginLevel(charactersArr, enemiesArr) {
+  // console.log('begin level called');
   setInitialTargets(charactersArr, enemiesArr);
-  loadInCharacters(charactersArr, enemiesArr, levelNumber);
+  loadInCharacters(charactersArr, enemiesArr);
 }
 
 function setInitialTargets(chars, enemies) {
@@ -949,26 +962,27 @@ function setInitialTargets(chars, enemies) {
       var _targetIndex = Math.floor(Math.random() * enemies.length);
 
       enemies[i].target = enemies[_targetIndex];
-    }
+    } // console.log(enemies[i].imgName, "has target set to", enemies[i].target);
 
-    console.log(enemies[i].imgName, "has target set to", enemies[i].target);
   }
 }
 
-function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
+function loadInCharacters(charactersArr, enemiesArr) {
   for (var i = 0; i < charactersArr.length; i++) {
     livingChars[charactersArr[i].imgName] = charactersArr[i];
     charactersArr[i].container.style.opacity = 0;
     charactersArr[i].container.style.display = '';
     var hpBar = document.getElementById("".concat(charactersArr[i].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
+    charactersArr[i].container.addEventListener('click', allyClickEvents);
+    charactersArr[i].img.src = charactersArr[i].baseImg.src;
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[i].container);
-    observerObserve(charactersArr[i], levelNumber);
+    observerObserve(charactersArr[i]);
   }
 
   var _loop = function _loop(_i2) {
     if (!enemiesArr[_i2].observer) {
-      addEntityEvents(enemiesArr[_i2], enemiesArr, charactersArr, levelNumber);
+      addEntityEvents(enemiesArr[_i2], enemiesArr, charactersArr);
     }
 
     livingEnemies[enemiesArr[_i2].imgName] = enemiesArr[_i2];
@@ -979,13 +993,15 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
 
     enemiesArr[_i2].container.addEventListener('click', enemyClickEvents);
 
+    enemiesArr[_i2].img.src = enemiesArr[_i2].baseImg.src;
+
     var action = function action() {
       return enemiesArr[_i2].autoAttack(enemiesArr[_i2].target);
     };
 
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i2].container, action); // begin attacking target
 
-    observerObserve(enemiesArr[_i2], levelNumber);
+    observerObserve(enemiesArr[_i2]);
   };
 
   for (var _i2 = 0; _i2 < enemiesArr.length; _i2++) {
@@ -993,20 +1009,18 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   }
 }
 
-function observerObserve(entity, levelNumber) {
-  var element = entity.container; // if (!entity.observer) {
-  //     addDeathListener(entity, levelNumber);
-  // }
-
+function observerObserve(entity) {
+  var element = entity.container;
   entity.observer.observe(element, {
     attributes: true,
     attributeFilter: ['style']
   });
 }
 
-function endGame(charsList, enemyList, level) {
-  var allCharsList = levels[level].characterList;
-  var allEnemyList = levels[level].enemyList;
+function endGame(charsList, enemyList) {
+  deSelect();
+  var allCharsList = levels[currentLevelNumber].characterList;
+  var allEnemyList = levels[currentLevelNumber].enemyList;
 
   for (var i = 0; i < allCharsList.length; i++) {
     allCharsList[i].observer.disconnect();
@@ -1019,6 +1033,7 @@ function endGame(charsList, enemyList, level) {
       clearInterval(allCharsList[i].currentAnimation);
     }
 
+    allCharsList[i].container.removeEventListener('click', allyClickEvents);
     allCharsList[i].img.src = allCharsList[i].baseImg.src;
   }
 
@@ -1047,7 +1062,7 @@ function endGame(charsList, enemyList, level) {
   }
 
   var gameFadeTimer = setInterval(function () {
-    console.log('fade called');
+    // console.log('fade called');
     var disp;
     var secondAction;
 
@@ -1055,13 +1070,13 @@ function endGame(charsList, enemyList, level) {
       disp = document.getElementById('game-over-display');
 
       secondAction = function secondAction() {
-        return resetGame(level, false);
+        return resetGame(false);
       };
     } else {
       disp = document.getElementById('game-won-display');
 
       secondAction = function secondAction() {
-        return resetGame(level, true);
+        return resetGame(true);
       };
     }
 
@@ -1077,7 +1092,7 @@ function endGame(charsList, enemyList, level) {
   }, 2000);
 }
 
-function resetGame(level, won) {
+function resetGame(won) {
   livingChars = {};
   livingEnemies = {};
   var deSelectButton = document.getElementById('reset-selected');
@@ -1085,18 +1100,18 @@ function resetGame(level, won) {
   var levelButtonContainer = document.getElementById('level-button-container');
   levelButtonContainer.style.display = '';
 
-  if (won && currentLevelNumber === level) {
-    currentLevelNumber++;
+  if (won && maxLevelNumber === currentLevelNumber && currentLevelNumber < 3) {
+    maxLevelNumber++;
     var levelButtons = document.getElementsByClassName('level-button');
-    levelButtons[currentLevelNumber].style.opacity = 100 + '%';
-    levelButtons[currentLevelNumber].style.cursor = 'pointer';
+    levelButtons[maxLevelNumber].style.opacity = 100 + '%';
+    levelButtons[maxLevelNumber].style.cursor = 'pointer';
   } // level.characterList, level.enemyList
+  // console.log('levels arr: ', levels);
+  // console.log('level ', currentLevelNumber, ': ', levels[currentLevelNumber]);
 
 
-  console.log('levels arr: ', levels);
-  console.log('level ', level, ': ', levels[level]);
-  var levChars = levels[level].characterList;
-  var levEnems = levels[level].enemyList;
+  var levChars = levels[currentLevelNumber].characterList;
+  var levEnems = levels[currentLevelNumber].enemyList;
 
   for (var i = 0; i < levChars.length; i++) {
     levChars[i].hp = levChars[i].baseHP;

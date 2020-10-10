@@ -66,11 +66,11 @@ img {
     cursor: pointer;
 }
 
-#warrior-display, #rogue-display, #cleric-display, #wizard-display {
+#a1-display, #a2-display, #a3-display, #a4-display {
     z-index: 5;
 }
 
-#ewarrior-display, #erogue-display, #ecleric-display, #ewizard-display {
+#e1-display, #e2-display, #e3-display, #e4-display {
     z-index: 2;
 }
 
@@ -111,12 +111,12 @@ img {
 }
 
 .level-button {
-    margin-top: 5px;
-    margin-left: 5px;
+    margin-top: 10px;
+    margin-left: 10px;
     border: 5px solid blue;
     color: black;
     cursor: default;
-    width: 200px;
-    height: 200px;
+    width: 250px;
+    height: 250px;
     opacity: 60%;
 }

@@ -14,5 +14,5 @@ class Level {
 
 export const levelOne = new Level('one', enemiesArr[0]);
 export const levelTwo = new Level('two', enemiesArr[1]);
-// export const levelThree = new Level('three', enemiesArr[2]);
-// export const levelFour = new Level('four', enemiesArr[3]);
+export const levelThree = new Level('three', enemiesArr[2]);
+export const levelFour = new Level('four', enemiesArr[3]);

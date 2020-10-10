@@ -134,7 +134,7 @@ class Entity { // this. is selectedChar
     }
 
     killEntitiy(entity) {
-        console.log(entity.klass, "killed");
+        // console.log(entity.klass, "killed");
         clearInterval(entity.currentAction);
         clearInterval(entity.currentAnimation);
         entity.img.src = entity.baseImg.src;
@@ -162,7 +162,7 @@ class Entity { // this. is selectedChar
     }
 
     setTargetAndAttack() {
-        console.log(this.klass, "has finished attacking", this.target.klass);
+        // console.log(this.klass, "has finished attacking", this.target.klass);
 
         if (this.baseDMG > 0) {
             this.enemies = shuffle(this.enemies);
@@ -192,7 +192,7 @@ class Entity { // this. is selectedChar
                 if (this.pos[0] > this.allies[i].pos[0] - widthAddition - this.range && this.pos[0] < this.allies[i].pos[0] + widthAddition + this.range) {
                     const heightAddition = Math.floor(this.img.height / 2);
                     if (this.pos[1] > this.allies[i].pos[1] - heightAddition && this.pos[1] < this.allies[i].pos[1] + heightAddition) {
-                        console.log(this.klass, "is moving to avoid", this.allies[i].klass);
+                        // console.log(this.klass, "is moving to avoid", this.allies[i].klass);
                         return true;
                     }
                 }
@@ -244,7 +244,7 @@ class Entity { // this. is selectedChar
             if (!selectedChar.withinAttackRange(targetChar)) {
             // stop the animation
                 selectedChar.clearIntervals();
-                console.log(selectedChar.klass, 'too far from', targetChar.klass, 'during attack - moving to new location');
+                // console.log(selectedChar.klass, 'too far from', targetChar.klass, 'during attack - moving to new location');
                 selectedChar.trackTarget();
                 return;
                 // move to enemy's new location -- needs to track current position
@@ -253,12 +253,12 @@ class Entity { // this. is selectedChar
                 const addition = Math.floor(selectedChar.img.width / 2);
                 if (selectedChar.img.style.transform === "scaleX(-1)") {
                     // move to left side of target
-                    selectedChar.img.style.transform = "scaleX(1)";
-                    selectedChar.move([targetChar.pos[0] - (addition / 2), targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
+                    selectedChar.img.style.transform = "scaleX(1)";// - (addition / 4)
+                    selectedChar.move([targetChar.pos[0], targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
                 } else {
                     // move to right side of target;
                     selectedChar.img.style.transform = "scaleX(-1)";
-                    selectedChar.move([targetChar.pos[0] + (3 * addition), targetChar.pos[1] + Math.floor(targetChar.img.height / 2)], targetChar)
+                    selectedChar.move([targetChar.pos[0] + (4 * addition), targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
                 }
             } else {
                 targetChar.hp -= selectedChar.dmg;
@@ -276,7 +276,7 @@ class Entity { // this. is selectedChar
                 if (targetChar.hp <= 0) {
                     // stop the animation
                     selectedChar.clearIntervals();
-                    console.log(targetChar, ' hp ', targetChar.hp);
+                    // console.log(targetChar, ' hp ', targetChar.hp);
                     selectedChar.killEntitiy(targetChar);
                     if (!selectedChar.allied) {
                         // chose another hero to attack
