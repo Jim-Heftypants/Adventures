@@ -7,6 +7,7 @@ let levelHasEnded = false;
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
 let maxLevelNumber = 0;
+const highestLevelAvailable = 8;
 
 let selectedChar;
 
@@ -141,6 +142,7 @@ function initializeGameOpening(levelNumber) {
 
 
 function loadLevel(levelNumber) {
+    console.log('wegwegwe')
     if (!hasBeenLoaded) {
         initializeGameOpening(levelNumber);
     }
@@ -153,10 +155,13 @@ function loadLevel(levelNumber) {
     const deSelectButton = document.getElementById('reset-selected');
     deSelectButton.style.display = '';
     const levelButtonContainer = document.getElementById('level-button-container');
+    console.log(levelButtonContainer);
     levelButtonContainer.style.display = 'none';
-    const levelNameDisp = document.getElementById(`level-${levelNumber + 1}-name`);
+    const levelNameDisp = document.getElementById(`level-name-display`);
+    console.log(levelNameDisp);
     levelNameDisp.style.opacity = 0;
     levelNameDisp.style.display = '';
+    levelNameDisp.innerHTML = levels[levelNumber].name;
     const level = levels[levelNumber];
     const secondAction = () => beginLevel(level.characterList, level.enemyList);
     const action = () => fadeOut(levelNameDisp, secondAction);
@@ -272,7 +277,7 @@ function resetGame(won) {
     deSelectButton.style.display = 'none';
     const levelButtonContainer = document.getElementById('level-button-container');
     levelButtonContainer.style.display = '';
-    if (won && maxLevelNumber === currentLevelNumber && currentLevelNumber < 3) {
+    if (won && maxLevelNumber === currentLevelNumber && currentLevelNumber < highestLevelAvailable + 1) {
         maxLevelNumber++;
         const levelButtons = document.getElementsByClassName('level-button');
         levelButtons[maxLevelNumber].style.opacity = 100 + '%';

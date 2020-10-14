@@ -11,7 +11,7 @@ window.addEventListener('load', () => {
     const levelButtonContainer = document.getElementById('level-button-container');
     const levelButtons = document.getElementsByClassName('level-button');
     for (let i = 0; i < levelButtons.length; i++) {
-        levelButtons[i].addEventListener('click', () => {
+        levelButtons[i].addEventListener('click', () => { 
             closeButton.style.display = 'none';
             loadLevel(i);
         })

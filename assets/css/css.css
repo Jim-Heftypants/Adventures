@@ -106,13 +106,15 @@ img {
   transform: rotate(-45deg);
 }
 
-.level-button-container {
-    margin: auto;
+#level-button-container {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .level-button {
-    margin-top: 10px;
-    margin-left: 10px;
+    margin-top: 3%;
+    margin-left: auto;
+    margin-right: auto;
     border: 5px solid blue;
     color: black;
     cursor: default;
@@ -120,3 +122,12 @@ img {
     height: 250px;
     opacity: 60%;
 }
+
+/* #level-1-button {
+    margin-top: 20px;
+    margin-left: 20px;
+}
+#level-5-button {
+    margin-top: 20px;
+    margin-left: 20px;
+} */
