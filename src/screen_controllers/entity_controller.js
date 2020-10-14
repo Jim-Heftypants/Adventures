@@ -45,7 +45,9 @@ function addDeathListener(entity) {
 
 function addEntityEvents(entity, allies, enemies) {
     if (entity.imgName != "") {
-        addDeathListener(entity);
+        if (!entity.observer) {
+            addDeathListener(entity);
+        }
         entity.enemies = enemies;
         const cloneArr = allies.slice();
         let selfIndex;
@@ -66,7 +68,7 @@ const allyClickEvents = (e) => {
     const entity = livingChars[entityName];
     if (!selectedChar || selectedChar.hp < 0) {
         selectedChar = entity;
-        entity.img.style.border = '2px solid gold';
+        entity.img.style.border = '4px solid gold';
         // console.log('selected char: ', selectedChar.imgName);
     } else if (selectedChar.baseDMG < 0) {
         selectedChar.autoAttack(entity);
@@ -142,34 +144,34 @@ function initializeGameOpening(levelNumber) {
 
 
 function loadLevel(levelNumber) {
-    console.log('wegwegwe')
     if (!hasBeenLoaded) {
         initializeGameOpening(levelNumber);
     }
     if (levelNumber > maxLevelNumber) {
         return;
     }
+    const level = levels[levelNumber];
     levelHasEnded = false;
     currentLevelNumber = levelNumber;
     // console.log('level selected: ', levelNumber);
     const deSelectButton = document.getElementById('reset-selected');
     deSelectButton.style.display = '';
     const levelButtonContainer = document.getElementById('level-button-container');
-    console.log(levelButtonContainer);
     levelButtonContainer.style.display = 'none';
     const levelNameDisp = document.getElementById(`level-name-display`);
-    console.log(levelNameDisp);
     levelNameDisp.style.opacity = 0;
     levelNameDisp.style.display = '';
-    levelNameDisp.innerHTML = levels[levelNumber].name;
-    const level = levels[levelNumber];
-    const secondAction = () => beginLevel(level.characterList, level.enemyList);
+    levelNameDisp.innerHTML = 'Level ' + levels[levelNumber].name;
+    const secondAction = () => beginLevel(level.characterList, level.enemyList, level);
     const action = () => fadeOut(levelNameDisp, secondAction);
     fadeIn(levelNameDisp, action);
 }
 
-function beginLevel(charactersArr, enemiesArr) {
+function beginLevel(charactersArr, enemiesArr, level) {
     // console.log('begin level called');
+    const levelMessage = document.getElementById('tutorial-message');
+    levelMessage.innerHTML = level.message;
+    levelMessage.style.display = '';
     setInitialTargets(charactersArr, enemiesArr);
     loadInCharacters(charactersArr, enemiesArr);
 }
@@ -189,7 +191,12 @@ function setInitialTargets(chars, enemies) {
 
 function loadInCharacters(charactersArr, enemiesArr) {
     for (let i = 0; i < charactersArr.length; i++) {
+        if (!charactersArr[i].observer) {
+            addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
+        }
         livingChars[charactersArr[i].imgName] = charactersArr[i];
+        charactersArr[i].container.style.top = charactersArr[i].pos[1] + 'px';
+        charactersArr[i].container.style.left = charactersArr[i].pos[0] + 'px';
         charactersArr[i].container.style.opacity = 0;
         charactersArr[i].container.style.display = '';
         const hpBar = document.getElementById(`${charactersArr[i].imgName}-hp-bar`);
@@ -204,6 +211,8 @@ function loadInCharacters(charactersArr, enemiesArr) {
             addEntityEvents(enemiesArr[i], enemiesArr, charactersArr);
         }
         livingEnemies[enemiesArr[i].imgName] = enemiesArr[i];
+        enemiesArr[i].container.style.top = enemiesArr[i].pos[1] + 'px';
+        enemiesArr[i].container.style.left = enemiesArr[i].pos[0] + 'px';
         enemiesArr[i].container.style.opacity = 0;
         enemiesArr[i].container.style.display = '';
         const hpBar = document.getElementById(`${enemiesArr[i].imgName}-hp-bar`);
@@ -226,6 +235,8 @@ function observerObserve(entity) {
 
 
 function endGame(charsList, enemyList) {
+    const levelMessage = document.getElementById('tutorial-message');
+    levelMessage.style.display = 'none';
     deSelect();
     const allCharsList = levels[currentLevelNumber].characterList;
     const allEnemyList = levels[currentLevelNumber].enemyList;

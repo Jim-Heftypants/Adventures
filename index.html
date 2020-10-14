@@ -11,8 +11,6 @@
     <script src="./dist/main.js"></script>
     <div id='game-container'>
 
-        <p id="reset-selected" style="display: none;">de-select hero</p>
-
         <h1 class="h-button" id="start-game-button">Start Game!</h1>
         <h1 class='h-button' id="game-controls-button">Controls</h1>
 
@@ -32,7 +30,7 @@
             <button id='level-8-button' class="level-button">8</button>
         </div>
 
-        <a href="#" class="close" style="display: none;"></a>
+        <a id="reset-selected" href="#" class="close" style="display: none;"></a>
         <div class='controls-display' style="display: none;">
             <h1>Click on a character to select it</h1>
             <h1>Once selected, click anywhere to move the character to that location,
@@ -42,6 +40,10 @@
             <h1>A selected character will be outlined in gold</h1>
             <h1>Enemy characters are red</h1>
             <h1>Defeat waves of enemies to complete a level</h1>
+        </div>
+
+        <div id='tutorial-container'>
+            <p style="display: none;" id="tutorial-message"></p>
         </div>
 
         <div id="a1-display" class='entity-container' style="position: absolute;">

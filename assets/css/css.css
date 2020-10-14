@@ -6,17 +6,17 @@ img {
 #game-container {
     position: relative;
     margin: auto;
-    height: 850px;
+    height: 900px;
     width: 90%;
     background-color: aqua;
     border: 5px solid black;
 }
 
-#reset-selected {
-    position: relative;
+/* #reset-selected {
+    position: absolute;
     margin-left: 95%;
     margin-top: 3%;
-}
+} */
 
 .entity-container {
     display: flex;
@@ -123,11 +123,10 @@ img {
     opacity: 60%;
 }
 
-/* #level-1-button {
-    margin-top: 20px;
-    margin-left: 20px;
+#tutorial-message {
+    margin-left: 10%;
+    margin-right: 10%;
+    text-align: center;
+    font-size: 35px;
+    color: red;
 }
-#level-5-button {
-    margin-top: 20px;
-    margin-left: 20px;
-} */

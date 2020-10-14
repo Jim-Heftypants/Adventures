@@ -213,7 +213,14 @@ class Entity { // this. is selectedChar
                 // console.log('auto attack called from track');
             } else {
                 const pos = self.pos;
-                let movePos = self.target.pos.slice();
+                const movePos = self.target.pos.slice();
+                if (pos[0] - movePos[0] < 0) {
+                    movePos[0] -= self.target.img.width;
+                    self.img.style.transform = "scaleX(1)";
+                } else {
+                    movePos[0] += self.target.img.width;
+                    self.img.style.transform = "scaleX(-1)";
+                }
                 let posChange = self.vectorToScalar(movePos);
                 pos[0] += posChange[0]; pos[1] += posChange[1];
                 if (pos[0] + Math.floor(self.img.width) > checker) { pos[0] = checker - Math.floor(self.img.width); }
@@ -284,14 +291,16 @@ class Entity { // this. is selectedChar
                     }
                 }
                 // console.log("border style: ", targetChar.img.style.border);
-                if (targetChar.img.style.border === "none" || targetChar.img.style.border === "") {
+                if (targetChar.img.style.border !== "4px solid gold") {
                     if (selectedChar.baseDMG > 0) {
                         targetChar.img.style.border = "2px solid red";
                     } else {
                         targetChar.img.style.border = "2px solid green";
                     }
                     let borderInterval = setInterval(() => {
-                        targetChar.img.style.border = "none";
+                        if (targetChar.img.style.border !== "4px solid gold") {
+                            targetChar.img.style.border = "none";
+                        }
                         clearInterval(borderInterval);
                     }, 500);
                 }
