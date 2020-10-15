@@ -88,6 +88,11 @@ class Entity { // this. is selectedChar
         const bigDiv = document.getElementById('game-container');
         const difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
         const checker = difference + Math.floor(bigDiv.offsetWidth);
+        if (pos[0] - endPos[0] < 0) {
+            this.img.style.transform = "scaleX(1)";
+        } else {
+            this.img.style.transform = "scaleX(-1)";
+        }
         this.currentAction = setInterval(() => frame(this), 20);
         function frame(self) {
             if (posChange[2] === 0) {
@@ -108,6 +113,7 @@ class Entity { // this. is selectedChar
                 if (pos[1] < 15) {pos[1] = 15;}
                 // console.log('posChange: ', posChange);
                 // console.log('pos: ', pos);
+
                 self.container.style.top = Math.floor(pos[1]) + 'px';
                 self.container.style.left = Math.floor(pos[0]) + 'px';
                 posChange[2] -= 1;
@@ -189,7 +195,7 @@ class Entity { // this. is selectedChar
         for (let i = 0; i < this.allies.length; i++) {
             if (!this.allies[i].movingOutTheWay) {                
                 const widthAddition = Math.floor(this.img.width / 2);
-                if (this.pos[0] > this.allies[i].pos[0] - widthAddition - this.range && this.pos[0] < this.allies[i].pos[0] + widthAddition + this.range) {
+                if (this.pos[0] > this.allies[i].pos[0] - widthAddition && this.pos[0] < this.allies[i].pos[0] + widthAddition) {
                     const heightAddition = Math.floor(this.img.height / 2);
                     if (this.pos[1] > this.allies[i].pos[1] - heightAddition && this.pos[1] < this.allies[i].pos[1] + heightAddition) {
                         // console.log(this.klass, "is moving to avoid", this.allies[i].klass);
@@ -255,18 +261,6 @@ class Entity { // this. is selectedChar
                 selectedChar.trackTarget();
                 return;
                 // move to enemy's new location -- needs to track current position
-            } else if (selectedChar.charactersStacked()) {
-                selectedChar.movingOutTheWay = true;
-                const addition = Math.floor(selectedChar.img.width / 2);
-                if (selectedChar.img.style.transform === "scaleX(-1)") {
-                    // move to left side of target
-                    selectedChar.img.style.transform = "scaleX(1)";// - (addition / 4)
-                    selectedChar.move([targetChar.pos[0], targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
-                } else {
-                    // move to right side of target;
-                    selectedChar.img.style.transform = "scaleX(-1)";
-                    selectedChar.move([targetChar.pos[0] + (4 * addition), targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
-                }
             } else {
                 targetChar.hp -= selectedChar.dmg;
                 if (targetChar.hp > targetChar.baseHP) { targetChar.hp = targetChar.baseHP; }
@@ -291,18 +285,34 @@ class Entity { // this. is selectedChar
                     }
                 }
                 // console.log("border style: ", targetChar.img.style.border);
-                if (targetChar.img.style.border !== "4px solid gold") {
+                if (targetChar.img.style.border !== "5px solid gold") {
                     if (selectedChar.baseDMG > 0) {
-                        targetChar.img.style.border = "2px solid red";
+                        targetChar.img.style.border = "3px solid red";
                     } else {
-                        targetChar.img.style.border = "2px solid green";
+                        targetChar.img.style.border = "3px solid green";
+                        if (targetChar.img.style.display === 'none') {
+                            console.log(selectedChar);
+                        }
                     }
                     let borderInterval = setInterval(() => {
-                        if (targetChar.img.style.border !== "4px solid gold") {
+                        if (targetChar.img.style.border !== "5px solid gold") {
                             targetChar.img.style.border = "none";
                         }
                         clearInterval(borderInterval);
                     }, 500);
+                }
+                if (selectedChar.range !== 'infinite' && selectedChar.charactersStacked()) {
+                    selectedChar.movingOutTheWay = true;
+                    const addition = Math.floor(selectedChar.img.width / 2);
+                    if (selectedChar.img.style.transform === "scaleX(-1)") {
+                        // move to left side of target
+                        selectedChar.img.style.transform = "scaleX(1)";// - (addition / 4)
+                        selectedChar.move([targetChar.pos[0], targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
+                    } else {
+                        // move to right side of target;
+                        selectedChar.img.style.transform = "scaleX(-1)";
+                        selectedChar.move([targetChar.pos[0] + (4 * addition), targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
+                    }
                 }
             }
         }

@@ -90,19 +90,13 @@
 /*!***********************************!*\
   !*** ./src/entities/character.js ***!
   \***********************************/
-/*! exports provided: tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue, Warrior, Cleric, Wizard, Rogue */
+/*! exports provided: tutorialChars, standardChars */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tutorialWarrior", function() { return tutorialWarrior; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tutorialCleric", function() { return tutorialCleric; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tutorialWizard", function() { return tutorialWizard; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tutorialRogue", function() { return tutorialRogue; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Warrior", function() { return Warrior; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cleric", function() { return Cleric; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Wizard", function() { return Wizard; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Rogue", function() { return Rogue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tutorialChars", function() { return tutorialChars; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "standardChars", function() { return standardChars; });
 /* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity */ "./src/entities/entity.js");
 
 /*
@@ -122,7 +116,7 @@ defense
 var tutorialWarrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a3", [450, 500], 20);
 var tutorialCleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "a4", [200, 300], 10);
 var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a1", [200, 600], 12);
-var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a2", [900, 500], 16); // tank
+var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a2", [900, 200], 16); // tank
 
 var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a3", [100, 400], 20); // heals
 
@@ -131,6 +125,8 @@ var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infi
 var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a1", [100, 100], 12); // mdps
 
 var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a2", [900, 500], 16);
+var tutorialChars = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue];
+var standardChars = [Warrior, Cleric, Wizard, Rogue];
 
 /***/ }),
 
@@ -138,7 +134,7 @@ var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100
 /*!*******************************!*\
   !*** ./src/entities/enemy.js ***!
   \*******************************/
-/*! exports provided: intro, healIntro, rangedIntro, puttinItAllTogetha, ezDoppelganger, level2, level3, doppelganger */
+/*! exports provided: intro, healIntro, rangedIntro, puttinItAllTogetha, ezDoppelganger, level3, level2, doppelganger */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -148,8 +144,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rangedIntro", function() { return rangedIntro; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "puttinItAllTogetha", function() { return puttinItAllTogetha; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ezDoppelganger", function() { return ezDoppelganger; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "level2", function() { return level2; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "level3", function() { return level3; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "level2", function() { return level2; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "doppelganger", function() { return doppelganger; });
 /* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity.js */ "./src/entities/entity.js");
 
@@ -165,10 +161,9 @@ img
 pos
 defense
 */
-// 
 // rdps
 
-var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 10, false, 'e1', [1000, 600], 8);
+var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 8, false, 'e1', [1000, 600], 8);
 var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e1', [500, 500], 8);
 var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [500, 500], 8);
 var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e2', [700, 200], 8);
@@ -180,13 +175,13 @@ var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 
 var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e3", [300, 400], 8);
 var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -10, false, "e4", [1000, 100], 10); // mdps
 
-var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 1, 1200, 7, false, "e2", [700, 200], 14);
+var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 6, false, "e2", [700, 200], 14);
 var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e2", [700, 200], 14);
 var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e2", [700, 200], 14);
 var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e1", [500, 500], 14);
 var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "e2", [700, 200], 18); // tank
 
-var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 100, 10, 1000, 1, false, "e3", [650, 500], 20);
+var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 70, 10, 1000, 1, false, "e3", [650, 500], 20);
 var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 100, 10, 1000, 6, false, "e3", [650, 500], 20);
 var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [300, 400], 20);
 var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [300, 400], 20);
@@ -203,9 +198,9 @@ var puttinItAllTogetha = [tutorialWarrior, tutorialCleric, tutorialWizard, tutor
 
 var ezDoppelganger = [ghettoWizard, loserRogue, weakWarrior, dumbCleric]; // level 6
 
-var level2 = [rogue2, rogue3, warrior2, warrior3]; // level 7
+var level3 = [wizard2, wizard3, cleric2, cleric3]; // level 7
 
-var level3 = [wizard2, wizard3, cleric2, cleric3]; // level 8
+var level2 = [rogue2, rogue3, warrior2, warrior3]; // level 8
 
 var doppelganger = [EWizard, ERogue, EWarrior, ECleric];
 
@@ -346,6 +341,13 @@ var Entity = /*#__PURE__*/function () {
       var bigDiv = document.getElementById('game-container');
       var difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
       var checker = difference + Math.floor(bigDiv.offsetWidth);
+
+      if (pos[0] - endPos[0] < 0) {
+        this.img.style.transform = "scaleX(1)";
+      } else {
+        this.img.style.transform = "scaleX(-1)";
+      }
+
       this.currentAction = setInterval(function () {
         return frame(_this2);
       }, 20);
@@ -487,7 +489,7 @@ var Entity = /*#__PURE__*/function () {
         if (!this.allies[i].movingOutTheWay) {
           var widthAddition = Math.floor(this.img.width / 2);
 
-          if (this.pos[0] > this.allies[i].pos[0] - widthAddition - this.range && this.pos[0] < this.allies[i].pos[0] + widthAddition + this.range) {
+          if (this.pos[0] > this.allies[i].pos[0] - widthAddition && this.pos[0] < this.allies[i].pos[0] + widthAddition) {
             var heightAddition = Math.floor(this.img.height / 2);
 
             if (this.pos[1] > this.allies[i].pos[1] - heightAddition && this.pos[1] < this.allies[i].pos[1] + heightAddition) {
@@ -586,20 +588,6 @@ var Entity = /*#__PURE__*/function () {
 
           selectedChar.trackTarget();
           return; // move to enemy's new location -- needs to track current position
-        } else if (selectedChar.charactersStacked()) {
-          selectedChar.movingOutTheWay = true;
-          var addition = Math.floor(selectedChar.img.width / 2);
-
-          if (selectedChar.img.style.transform === "scaleX(-1)") {
-            // move to left side of target
-            selectedChar.img.style.transform = "scaleX(1)"; // - (addition / 4)
-
-            selectedChar.move([targetChar.pos[0], targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
-          } else {
-            // move to right side of target;
-            selectedChar.img.style.transform = "scaleX(-1)";
-            selectedChar.move([targetChar.pos[0] + 4 * addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
-          }
         } else {
           targetChar.hp -= selectedChar.dmg;
 
@@ -629,20 +617,40 @@ var Entity = /*#__PURE__*/function () {
           } // console.log("border style: ", targetChar.img.style.border);
 
 
-          if (targetChar.img.style.border !== "4px solid gold") {
+          if (targetChar.img.style.border !== "5px solid gold") {
             if (selectedChar.baseDMG > 0) {
-              targetChar.img.style.border = "2px solid red";
+              targetChar.img.style.border = "3px solid red";
             } else {
-              targetChar.img.style.border = "2px solid green";
+              targetChar.img.style.border = "3px solid green";
+
+              if (targetChar.img.style.display === 'none') {
+                console.log(selectedChar);
+              }
             }
 
             var borderInterval = setInterval(function () {
-              if (targetChar.img.style.border !== "4px solid gold") {
+              if (targetChar.img.style.border !== "5px solid gold") {
                 targetChar.img.style.border = "none";
               }
 
               clearInterval(borderInterval);
             }, 500);
+          }
+
+          if (selectedChar.range !== 'infinite' && selectedChar.charactersStacked()) {
+            selectedChar.movingOutTheWay = true;
+            var addition = Math.floor(selectedChar.img.width / 2);
+
+            if (selectedChar.img.style.transform === "scaleX(-1)") {
+              // move to left side of target
+              selectedChar.img.style.transform = "scaleX(1)"; // - (addition / 4)
+
+              selectedChar.move([targetChar.pos[0], targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
+            } else {
+              // move to right side of target;
+              selectedChar.img.style.transform = "scaleX(-1)";
+              selectedChar.move([targetChar.pos[0] + 4 * addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
+            }
           }
         }
       }
@@ -708,53 +716,119 @@ function shuffle(a) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./screen_controllers/entity_controller */ "./src/screen_controllers/entity_controller.js");
-// import * as characters from './entities/character';
-// import * as enemies from './entities/enemy';
- // import showControls from './screen_controllers/controls';
 
-function closeAction() {
-  controlsContainer.style.display = 'none';
-  startGameButton.style.display = '';
-  controlsButton.style.display = '';
-  levelButtonContainer.style.display = 'none';
-  closeButton.style.display = 'none';
+
+function fadeOut(element) {
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var op = 40;
+  var timerDown = setInterval(function () {
+    if (op <= 0) {
+      clearInterval(timerDown);
+      element.style.display = 'none';
+
+      if (action) {
+        action();
+      }
+    }
+
+    element.style.opacity = op / 40;
+    op -= 1;
+  }, 50);
+}
+
+function fadeIn(element) {
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var op = 0;
+  var timerUp = setInterval(function () {
+    if (op >= 40) {
+      clearInterval(timerUp);
+
+      if (action) {
+        action();
+      }
+    }
+
+    element.style.opacity = op / 40;
+    op += 1;
+  }, 50);
 }
 
 window.addEventListener('load', function () {
-  var controlsContainer = document.getElementsByClassName('controls-display')[0];
+  var gameTag = document.getElementById('game-tag');
+  gameTag.style.opacity = 0;
+  gameTag.style.display = '';
+  var wiz = document.getElementById('wizard-base-img');
+  var ro = document.getElementById('rogue-base-img');
+  var war = document.getElementById('warrior-base-img');
+  var cle = document.getElementById('cleric-base-img');
+  var charArr = [wiz, ro, war, cle]; // const controlsContainer = document.getElementsByClassName('controls-display')[0];
+
   var closeButton = document.getElementsByClassName('close')[0];
-  var startGameButton = document.getElementById('start-game-button');
-  var controlsButton = document.getElementById('game-controls-button');
+  var startGameButton = document.getElementById('start-game-button'); // const controlsButton = document.getElementById('game-controls-button');
+
   var levelButtonContainer = document.getElementById('level-button-container');
   var levelButtons = document.getElementsByClassName('level-button');
 
-  var _loop = function _loop(i) {
-    levelButtons[i].addEventListener('click', function () {
-      closeButton.style.display = 'none';
-      closeButton.removeEventListener('click', closeAction);
-      Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(i);
-    });
-  };
+  function secondAction() {
+    function closeAction() {
+      // controlsContainer.style.display = 'none';
+      startGameButton.style.display = ''; // controlsButton.style.display = '';
 
-  for (var i = 0; i < levelButtons.length; i++) {
-    _loop(i);
+      levelButtonContainer.style.display = 'none';
+      closeButton.style.display = 'none';
+
+      for (var i = 0; i < 4; i++) {
+        charArr[i].style.display = '';
+      }
+    }
+
+    closeAction();
+
+    var _loop = function _loop(i) {
+      levelButtons[i].addEventListener('click', function () {
+        closeButton.style.display = 'none';
+        closeButton.removeEventListener('click', closeAction);
+
+        for (var _i2 = 0; _i2 < 4; _i2++) {
+          charArr[_i2].style.display = 'none';
+        }
+
+        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(i);
+      });
+    };
+
+    for (var i = 0; i < levelButtons.length; i++) {
+      _loop(i);
+    }
+
+    levelButtons[0].style.opacity = 100;
+    levelButtons[0].style.cursor = 'pointer';
+    closeButton.addEventListener('click', closeAction);
+    startGameButton.addEventListener('click', function () {
+      startGameButton.style.display = "none"; // controlsButton.style.display = 'none';
+
+      levelButtonContainer.style.display = '';
+      closeButton.style.display = '';
+
+      for (var _i = 0; _i < 4; _i++) {
+        charArr[_i].style.display = 'none';
+      }
+    }); // controlsButton.addEventListener('click', () => {
+    //     startGameButton.style.display = "none";
+    //     controlsButton.style.display = 'none';
+    //     controlsContainer.style.display = '';
+    //     closeButton.style.display = '';
+    //     for (let i = 0; i < 4; i++) {
+    //         charArr[i].style.display = 'none';
+    //     }
+    // })
   }
 
-  levelButtons[0].style.opacity = 100;
-  levelButtons[0].style.cursor = 'pointer';
-  closeButton.addEventListener('click', closeAction);
-  startGameButton.addEventListener('click', function () {
-    startGameButton.style.display = "none";
-    controlsButton.style.display = 'none';
-    levelButtonContainer.style.display = '';
-    closeButton.style.display = '';
-  });
-  controlsButton.addEventListener('click', function () {
-    startGameButton.style.display = "none";
-    controlsButton.style.display = 'none';
-    controlsContainer.style.display = '';
-    closeButton.style.display = '';
-  });
+  var action = function action() {
+    fadeOut(gameTag, secondAction);
+  };
+
+  fadeIn(gameTag, action);
 });
 
 /***/ }),
@@ -782,30 +856,153 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
 
-var chars = Object.values(_entities_character__WEBPACK_IMPORTED_MODULE_0__);
-var charactersArr = chars.slice(4);
+var charactersArr = Object.values(_entities_character__WEBPACK_IMPORTED_MODULE_0__);
 var enemiesArr = Object.values(_entities_enemy__WEBPACK_IMPORTED_MODULE_1__);
 
 var Level = function Level(name, enemyList) {
   var message = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
-  var characterList = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : charactersArr;
+  var actionChanges = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : function () {};
+  var characterList = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : charactersArr[1];
 
   _classCallCheck(this, Level);
 
   this.name = name;
   this.enemyList = enemyList;
   this.message = message;
-  this.characterList = characterList;
+  this.action = actionChanges;
+  this.characterList = characterList; // this.actionExpended = false;
 };
 
-var levelOne = new Level('One', enemiesArr[0], "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.", [chars[0]]);
-var levelTwo = new Level('Two', enemiesArr[1], "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the X button on the top right.", [chars[0], chars[1]]);
-var levelThree = new Level('Three', enemiesArr[2], "The wizard can attack enemies from any range. Click on it then on an enemy to begin attacking immediately.", [chars[0], chars[1], chars[2]]);
-var levelFour = new Level('Four', enemiesArr[3], "The newest character addition is the rogue. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", [chars[0], chars[1], chars[2], chars[3]]);
-var levelFive = new Level('Five', enemiesArr[4]);
-var levelSix = new Level('Six', enemiesArr[5]);
-var levelSeven = new Level('Seven', enemiesArr[6]);
-var levelEight = new Level('Eight', enemiesArr[7]);
+function modP(width, percent) {
+  return Math.floor(width * percent);
+}
+
+function applyMod(entity, mod) {
+  var x = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  var container = document.getElementById('game-container');
+  var width = Math.floor(container.offsetWidth);
+  var height = Math.floor(container.offsetHeight);
+
+  if (x) {
+    entity.pos[0] = modP(width, mod / 100);
+    entity.basePos[0] = entity.pos[0];
+  } else {
+    entity.pos[1] = modP(height, mod / 100);
+    entity.basePos[1] = entity.pos[1];
+  }
+}
+
+var actionOne = function actionOne() {
+  applyMod(charactersArr[0][0], 35);
+  applyMod(charactersArr[0][1], 15);
+  applyMod(charactersArr[0][2], 15);
+  applyMod(charactersArr[0][3], 55);
+  applyMod(enemiesArr[0][0], 55);
+};
+
+var actionTwo = function actionTwo() {
+  applyMod(enemiesArr[1][0], 55);
+  applyMod(enemiesArr[1][1], 75);
+};
+
+var actionThree = function actionThree() {
+  applyMod(enemiesArr[2][2], 75);
+};
+
+var actionFour = function actionFour() {
+  applyMod(enemiesArr[3][3], 35);
+};
+
+var actionFive = function actionFive() {
+  // WaCWiR
+  applyMod(charactersArr[1][0], 65);
+  applyMod(charactersArr[1][1], 45);
+  applyMod(charactersArr[1][2], 45);
+  applyMod(charactersArr[1][3], 25);
+  applyMod(charactersArr[1][0], 45, false);
+  applyMod(charactersArr[1][1], 25, false);
+  applyMod(charactersArr[1][2], 65, false);
+  applyMod(charactersArr[1][3], 45, false); // WiRWaC
+
+  applyMod(enemiesArr[4][0], 10);
+  applyMod(enemiesArr[4][1], 15);
+  applyMod(enemiesArr[4][2], 75);
+  applyMod(enemiesArr[4][3], 80);
+  applyMod(enemiesArr[4][0], 20, false);
+  applyMod(enemiesArr[4][1], 65, false);
+  applyMod(enemiesArr[4][2], 65, false);
+  applyMod(enemiesArr[4][3], 20, false);
+};
+
+var actionSix = function actionSix() {
+  // WaCWiR
+  applyMod(charactersArr[1][0], 60);
+  applyMod(charactersArr[1][1], 60);
+  applyMod(charactersArr[1][2], 30);
+  applyMod(charactersArr[1][3], 30);
+  applyMod(charactersArr[1][0], 60, false);
+  applyMod(charactersArr[1][1], 30, false);
+  applyMod(charactersArr[1][2], 30, false);
+  applyMod(charactersArr[1][3], 60, false); // WiRWaC
+
+  applyMod(enemiesArr[5][0], 5);
+  applyMod(enemiesArr[5][1], 45);
+  applyMod(enemiesArr[5][2], 45);
+  applyMod(enemiesArr[5][3], 85);
+  applyMod(enemiesArr[5][0], 45, false);
+  applyMod(enemiesArr[5][1], 10, false);
+  applyMod(enemiesArr[5][2], 70, false);
+  applyMod(enemiesArr[5][3], 45, false);
+};
+
+var actionSeven = function actionSeven() {
+  applyMod(charactersArr[1][0], 50);
+  applyMod(charactersArr[1][1], 10);
+  applyMod(charactersArr[1][2], 35);
+  applyMod(charactersArr[1][3], 65);
+  applyMod(charactersArr[1][0], 20, false);
+  applyMod(charactersArr[1][1], 45, false);
+  applyMod(charactersArr[1][2], 60, false);
+  applyMod(charactersArr[1][3], 35, false);
+  applyMod(enemiesArr[6][0], 25);
+  applyMod(enemiesArr[6][1], 10);
+  applyMod(enemiesArr[6][2], 80);
+  applyMod(enemiesArr[6][3], 45);
+  applyMod(enemiesArr[6][0], 15, false);
+  applyMod(enemiesArr[6][1], 45, false);
+  applyMod(enemiesArr[6][2], 45, false);
+  applyMod(enemiesArr[6][3], 70, false);
+};
+
+var actionEight = function actionEight() {
+  // WaCWiR
+  applyMod(charactersArr[1][0], 60);
+  applyMod(charactersArr[1][1], 60);
+  applyMod(charactersArr[1][2], 30);
+  applyMod(charactersArr[1][3], 30);
+  applyMod(charactersArr[1][0], 60, false);
+  applyMod(charactersArr[1][1], 30, false);
+  applyMod(charactersArr[1][2], 30, false);
+  applyMod(charactersArr[1][3], 60, false); // WiRWaC
+
+  applyMod(enemiesArr[7][0], 45);
+  applyMod(enemiesArr[7][1], 10);
+  applyMod(enemiesArr[7][2], 80);
+  applyMod(enemiesArr[7][3], 45);
+  applyMod(enemiesArr[7][0], 15, false);
+  applyMod(enemiesArr[7][1], 45, false);
+  applyMod(enemiesArr[7][2], 45, false);
+  applyMod(enemiesArr[7][3], 70, false);
+};
+
+var levelOne = new Level('One', enemiesArr[0], "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.", actionOne, [charactersArr[0][0]]);
+var levelTwo = new Level('Two', enemiesArr[1], "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", actionTwo, [charactersArr[0][0], charactersArr[0][1]]);
+var levelThree = new Level('Three', enemiesArr[2], "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", actionThree, [charactersArr[0][0], charactersArr[0][1], charactersArr[0][2]]);
+var levelFour = new Level('Four', enemiesArr[3], "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", actionFour, charactersArr[0]);
+var levelFive = new Level('Five', enemiesArr[4], "The tutorial levels are over. Time for more of a challenge", actionFive);
+var levelSix = new Level('Six', enemiesArr[5], "Wizards and Clerics", actionSix);
+var levelSeven = new Level('Seven', enemiesArr[6], "All melee", actionSeven);
+var levelEight = new Level('Eight', enemiesArr[7], "Fight yourself", actionEight);
 
 /***/ }),
 
@@ -825,8 +1022,8 @@ __webpack_require__.r(__webpack_exports__);
 var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
-var currentLevelNumber = 0;
-var maxLevelNumber = 0;
+var currentLevelNumber = 7;
+var maxLevelNumber = 7;
 var highestLevelAvailable = 8;
 var selectedChar;
 var livingEnemies = {};
@@ -835,8 +1032,6 @@ var livingChars = {};
 function addDeathListener(entity) {
   entity.observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutationRecord) {
-      // console.log(entity.imgName, 'style changed');
-      // console.log(mutationRecord);
       if (mutationRecord.target.style.display === 'none') {
         // console.log(entity.imgName, 'style === none');
         if (entity.allied) {
@@ -846,8 +1041,7 @@ function addDeathListener(entity) {
         }
 
         var c = Object.values(livingChars);
-        var en = Object.values(livingEnemies); // console.log('living allies: ', livingChars);
-        // console.log('living enemies: ', livingEnemies);
+        var en = Object.values(livingEnemies);
 
         if (c.length === 0 || en.length === 0) {
           if (!levelHasEnded) {
@@ -896,7 +1090,7 @@ var allyClickEvents = function allyClickEvents(e) {
 
   if (!selectedChar || selectedChar.hp < 0) {
     selectedChar = entity;
-    entity.img.style.border = '4px solid gold'; // console.log('selected char: ', selectedChar.imgName);
+    entity.img.style.border = '5px solid gold'; // console.log('selected char: ', selectedChar.imgName);
   } else if (selectedChar.baseDMG < 0) {
     selectedChar.autoAttack(entity);
     selectedChar.img.style.border = 'none';
@@ -929,28 +1123,26 @@ var enemyClickEvents = function enemyClickEvents(e) {
   e.stopPropagation(); // maybe move inside if
 };
 
-function setupEntities(charactersArr, enemiesArr) {
-  for (var i = 0; i < charactersArr.length; i++) {
-    addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
-  }
-
-  for (var _i = 0; _i < enemiesArr.length; _i++) {
-    addEntityEvents(enemiesArr[_i], enemiesArr, charactersArr);
-  }
-}
-
 function deSelect() {
+  // console.log('de-selected')
   if (selectedChar) {
     selectedChar.img.style.border = 'none';
     selectedChar = null;
   }
 }
 
-function initializeGameOpening(levelNumber) {
-  var deSelectButton = document.getElementById('reset-selected');
+function beginCurrentLevel() {
+  var beginLevelButton = document.getElementById('begin-level-button');
+  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(beginLevelButton);
+  var level = levels[currentLevelNumber];
+  beginLevel(level.characterList, level.enemyList, currentLevelNumber);
+}
+
+function initializeGameOpening() {
+  var deSelectButton = document.getElementById('test');
   deSelectButton.addEventListener('click', deSelect);
-  setupEntities(levels[levelNumber].characterList, levels[levelNumber].enemyList); // modify to be all the img elements
-  // end click position
+  var beginLevel = document.getElementById('begin-level-button');
+  beginLevel.addEventListener('click', beginCurrentLevel); // end click position
 
   var gameContainer = document.getElementById('game-container');
   gameContainer.addEventListener("click", function (e) {
@@ -973,7 +1165,7 @@ function initializeGameOpening(levelNumber) {
 
 function loadLevel(levelNumber) {
   if (!hasBeenLoaded) {
-    initializeGameOpening(levelNumber);
+    initializeGameOpening();
   }
 
   if (levelNumber > maxLevelNumber) {
@@ -982,35 +1174,39 @@ function loadLevel(levelNumber) {
 
   var level = levels[levelNumber];
   levelHasEnded = false;
-  currentLevelNumber = levelNumber; // console.log('level selected: ', levelNumber);
+  currentLevelNumber = levelNumber;
+  level.action(); // console.log('level selected: ', levelNumber);
 
-  var deSelectButton = document.getElementById('reset-selected');
-  deSelectButton.style.display = '';
   var levelButtonContainer = document.getElementById('level-button-container');
   levelButtonContainer.style.display = 'none';
   var levelNameDisp = document.getElementById("level-name-display");
   levelNameDisp.style.opacity = 0;
   levelNameDisp.style.display = '';
-  levelNameDisp.innerHTML = 'Level ' + levels[levelNumber].name;
+  levelNameDisp.innerHTML = 'Level ' + level.name;
+  var levelMessage = document.getElementById('tutorial-message');
+  levelMessage.innerHTML = level.message;
+  levelMessage.style.opacity = 0;
+  levelMessage.style.display = ''; // const secondAction = () => beginLevel(level.characterList, level.enemyList, levelNumber);
 
-  var secondAction = function secondAction() {
-    return beginLevel(level.characterList, level.enemyList, level);
+  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(levelNameDisp);
+
+  var levelNameAction = function levelNameAction() {
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(beginLevel);
   };
 
   var action = function action() {
-    return Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(levelNameDisp, secondAction);
+    return Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(levelNameDisp, levelNameAction);
   };
 
-  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(levelNameDisp, action);
+  var beginLevel = document.getElementById('begin-level-button');
+  beginLevel.style.opacity = 0;
+  beginLevel.style.display = '';
+  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(levelMessage, action);
 }
 
-function beginLevel(charactersArr, enemiesArr, level) {
-  // console.log('begin level called');
-  var levelMessage = document.getElementById('tutorial-message');
-  levelMessage.innerHTML = level.message;
-  levelMessage.style.display = '';
+function beginLevel(charactersArr, enemiesArr, levelNumber) {
   setInitialTargets(charactersArr, enemiesArr);
-  loadInCharacters(charactersArr, enemiesArr);
+  loadInCharacters(charactersArr, enemiesArr, levelNumber);
 }
 
 function setInitialTargets(chars, enemies) {
@@ -1027,8 +1223,26 @@ function setInitialTargets(chars, enemies) {
   }
 }
 
-function loadInCharacters(charactersArr, enemiesArr) {
-  for (var i = 0; i < charactersArr.length; i++) {
+function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
+  var deSelectButton = document.getElementById('test');
+  deSelectButton.style.opacity = 0;
+  deSelectButton.style.display = '';
+  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(deSelectButton);
+  var backgroundImg = document.getElementById('background-image');
+
+  if (levelNumber < 4) {
+    backgroundImg.src = document.getElementById('forest').src;
+  } else if (levelNumber < 7) {
+    backgroundImg.src = document.getElementById('snowy').src;
+  } else {
+    backgroundImg.src = document.getElementById('dungeon').src;
+  }
+
+  backgroundImg.style.opacity = 0;
+  backgroundImg.style.display = '';
+  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(backgroundImg);
+
+  var _loop = function _loop(i) {
     if (!charactersArr[i].observer) {
       addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
     }
@@ -1040,40 +1254,48 @@ function loadInCharacters(charactersArr, enemiesArr) {
     charactersArr[i].container.style.display = '';
     var hpBar = document.getElementById("".concat(charactersArr[i].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
-    charactersArr[i].container.addEventListener('click', allyClickEvents);
-    charactersArr[i].img.src = charactersArr[i].baseImg.src;
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[i].container);
-    observerObserve(charactersArr[i]);
-  }
 
-  var _loop = function _loop(_i2) {
-    if (!enemiesArr[_i2].observer) {
-      addEntityEvents(enemiesArr[_i2], enemiesArr, charactersArr);
-    }
-
-    livingEnemies[enemiesArr[_i2].imgName] = enemiesArr[_i2];
-    enemiesArr[_i2].container.style.top = enemiesArr[_i2].pos[1] + 'px';
-    enemiesArr[_i2].container.style.left = enemiesArr[_i2].pos[0] + 'px';
-    enemiesArr[_i2].container.style.opacity = 0;
-    enemiesArr[_i2].container.style.display = '';
-    var hpBar = document.getElementById("".concat(enemiesArr[_i2].imgName, "-hp-bar"));
-    hpBar.style.display = "flex";
-
-    enemiesArr[_i2].container.addEventListener('click', enemyClickEvents);
-
-    enemiesArr[_i2].img.src = enemiesArr[_i2].baseImg.src;
-
-    var action = function action() {
-      return enemiesArr[_i2].autoAttack(enemiesArr[_i2].target);
+    var actionEvent = function actionEvent() {
+      charactersArr[i].container.addEventListener('click', allyClickEvents);
     };
 
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i2].container, action); // begin attacking target
-
-    observerObserve(enemiesArr[_i2]);
+    charactersArr[i].img.src = charactersArr[i].baseImg.src;
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[i].container, actionEvent);
+    observerObserve(charactersArr[i]);
   };
 
-  for (var _i2 = 0; _i2 < enemiesArr.length; _i2++) {
-    _loop(_i2);
+  for (var i = 0; i < charactersArr.length; i++) {
+    _loop(i);
+  }
+
+  var _loop2 = function _loop2(_i) {
+    if (!enemiesArr[_i].observer) {
+      addEntityEvents(enemiesArr[_i], enemiesArr, charactersArr);
+    }
+
+    livingEnemies[enemiesArr[_i].imgName] = enemiesArr[_i];
+    enemiesArr[_i].container.style.top = enemiesArr[_i].pos[1] + 'px';
+    enemiesArr[_i].container.style.left = enemiesArr[_i].pos[0] + 'px';
+    enemiesArr[_i].container.style.opacity = 0;
+    enemiesArr[_i].container.style.display = '';
+    var hpBar = document.getElementById("".concat(enemiesArr[_i].imgName, "-hp-bar"));
+    hpBar.style.display = "flex";
+
+    enemiesArr[_i].container.addEventListener('click', enemyClickEvents);
+
+    enemiesArr[_i].img.src = enemiesArr[_i].baseImg.src;
+
+    var action = function action() {
+      return enemiesArr[_i].autoAttack(enemiesArr[_i].target);
+    };
+
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i].container, action); // begin attacking target
+
+    observerObserve(enemiesArr[_i]);
+  };
+
+  for (var _i = 0; _i < enemiesArr.length; _i++) {
+    _loop2(_i);
   }
 }
 
@@ -1088,6 +1310,8 @@ function observerObserve(entity) {
 function endGame(charsList, enemyList) {
   var levelMessage = document.getElementById('tutorial-message');
   levelMessage.style.display = 'none';
+  var deSelectButton = document.getElementById('test');
+  deSelectButton.style.display = 'none';
   deSelect();
   var allCharsList = levels[currentLevelNumber].characterList;
   var allEnemyList = levels[currentLevelNumber].enemyList;
@@ -1095,7 +1319,7 @@ function endGame(charsList, enemyList) {
   for (var i = 0; i < allCharsList.length; i++) {
     allCharsList[i].observer.disconnect();
 
-    if (allCharsList[i.currentAction]) {
+    if (allCharsList[i].currentAction) {
       clearInterval(allCharsList[i].currentAction);
     }
 
@@ -1107,28 +1331,31 @@ function endGame(charsList, enemyList) {
     allCharsList[i].img.src = allCharsList[i].baseImg.src;
   }
 
-  for (var _i3 = 0; _i3 < allEnemyList.length; _i3++) {
-    allEnemyList[_i3].observer.disconnect();
+  for (var _i2 = 0; _i2 < allEnemyList.length; _i2++) {
+    allEnemyList[_i2].observer.disconnect();
 
-    if (allEnemyList[_i3].currentAction) {
-      clearInterval(allEnemyList[_i3].currentAction);
+    if (allEnemyList[_i2].currentAction) {
+      clearInterval(allEnemyList[_i2].currentAction);
     }
 
-    if (allEnemyList[_i3].currentAnimation) {
-      clearInterval(allEnemyList[_i3].currentAnimation);
+    if (allEnemyList[_i2].currentAnimation) {
+      clearInterval(allEnemyList[_i2].currentAnimation);
     }
 
-    allEnemyList[_i3].container.removeEventListener('click', enemyClickEvents);
+    allEnemyList[_i2].container.removeEventListener('click', enemyClickEvents);
 
-    allEnemyList[_i3].img.src = allEnemyList[_i3].baseImg.src;
+    allEnemyList[_i2].img.src = allEnemyList[_i2].baseImg.src;
   }
 
-  for (var _i4 = 0; _i4 < charsList.length; _i4++) {
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(charsList[_i4].container);
+  var backgroundImg = document.getElementById('background-image');
+  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
+
+  for (var _i3 = 0; _i3 < charsList.length; _i3++) {
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(charsList[_i3].container);
   }
 
-  for (var _i5 = 0; _i5 < enemyList.length; _i5++) {
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i5].container);
+  for (var _i4 = 0; _i4 < enemyList.length; _i4++) {
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i4].container);
   }
 
   var gameFadeTimer = setInterval(function () {
@@ -1165,8 +1392,6 @@ function endGame(charsList, enemyList) {
 function resetGame(won) {
   livingChars = {};
   livingEnemies = {};
-  var deSelectButton = document.getElementById('reset-selected');
-  deSelectButton.style.display = 'none';
   var levelButtonContainer = document.getElementById('level-button-container');
   levelButtonContainer.style.display = '';
 
@@ -1192,14 +1417,14 @@ function resetGame(won) {
     levChars[i].setHpBars();
   }
 
-  for (var _i6 = 0; _i6 < levEnems.length; _i6++) {
-    levEnems[_i6].hp = levEnems[_i6].baseHP;
-    levEnems[_i6].pos[0] = levEnems[_i6].basePos[0];
-    levEnems[_i6].pos[1] = levEnems[_i6].basePos[1];
-    levEnems[_i6].container.style.top = levEnems[_i6].pos[1] + 'px';
-    levEnems[_i6].container.style.left = levEnems[_i6].pos[0] + 'px';
+  for (var _i5 = 0; _i5 < levEnems.length; _i5++) {
+    levEnems[_i5].hp = levEnems[_i5].baseHP;
+    levEnems[_i5].pos[0] = levEnems[_i5].basePos[0];
+    levEnems[_i5].pos[1] = levEnems[_i5].basePos[1];
+    levEnems[_i5].container.style.top = levEnems[_i5].pos[1] + 'px';
+    levEnems[_i5].container.style.left = levEnems[_i5].pos[0] + 'px';
 
-    levEnems[_i6].setHpBars();
+    levEnems[_i5].setHpBars();
   }
 }
 
@@ -1220,7 +1445,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fadeIn", function() { return fadeIn; });
 function fadeOut(element) {
   var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var op = 20;
+  var op = 40;
   var timerDown = setInterval(function () {
     if (op <= 0) {
       clearInterval(timerDown);
@@ -1231,15 +1456,15 @@ function fadeOut(element) {
       }
     }
 
-    element.style.opacity = op / 20;
+    element.style.opacity = op / 40;
     op -= 1;
-  }, 100);
+  }, 50);
 }
 function fadeIn(element) {
   var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   var op = 0;
   var timerUp = setInterval(function () {
-    if (op >= 20) {
+    if (op >= 40) {
       clearInterval(timerUp);
 
       if (action) {
@@ -1247,9 +1472,9 @@ function fadeIn(element) {
       }
     }
 
-    element.style.opacity = op / 20;
+    element.style.opacity = op / 40;
     op += 1;
-  }, 100);
+  }, 50);
 }
 
 /***/ })

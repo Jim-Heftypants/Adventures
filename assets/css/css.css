@@ -12,12 +12,6 @@ img {
     border: 5px solid black;
 }
 
-/* #reset-selected {
-    position: absolute;
-    margin-left: 95%;
-    margin-top: 3%;
-} */
-
 .entity-container {
     display: flex;
     flex-direction: column;
@@ -47,12 +41,17 @@ img {
     margin-top: 5%;
     text-align: center;
     color: blueviolet;
-    font-size: 50px;
+    font-size: 70px;
+}
+
+#level-name-display {
+    cursor: default;
 }
 
 #game-over-display, #game-won-display {
     color: red;
-    font-size: 75px;
+    font-size: 80px;
+    margin-top: 15%;
 }
 
 .links {
@@ -64,14 +63,15 @@ img {
 
 .h-button {
     cursor: pointer;
+    font-size: 75px;
 }
 
 #a1-display, #a2-display, #a3-display, #a4-display {
-    z-index: 5;
+    z-index: 7;
 }
 
 #e1-display, #e2-display, #e3-display, #e4-display {
-    z-index: 2;
+    z-index: 6;
 }
 
 .controls-display {
@@ -113,8 +113,8 @@ img {
 
 .level-button {
     margin-top: 3%;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 5%;
+    margin-right: 5%;
     border: 5px solid blue;
     color: black;
     cursor: default;
@@ -123,10 +123,95 @@ img {
     opacity: 60%;
 }
 
+
+#background-image {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+
 #tutorial-message {
+    position: relative;
     margin-left: 10%;
     margin-right: 10%;
     text-align: center;
-    font-size: 35px;
+    font-size: 40px;
     color: red;
+    z-index: 2;
+    cursor: default;
+}
+
+#begin-level-container {
+    position: relative;
+    top: 45%;
+    margin: auto;
+    width: 220px;
+}
+
+#begin-level-button {
+    padding: 10px;
+    border: 3px solid black;
+    position: relative;
+    text-align: center;
+    font-size: 40px;
+    background-color: chartreuse;
+    color: black;
+    cursor: pointer;
+}
+
+#test {
+    position: absolute;
+    right: 32px;
+    top: 32px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.3;
+    color: red;
+    background-color: red;
+    z-index: 3;
+}
+
+#warrior-base-img {
+    top: 15%;
+    position: relative;
+    left: 25%;
+    width: 180px;
+    height: 240px;
+}
+
+#rogue-base-img {
+    top: 15%;
+    position: relative;
+    left: 20%;
+    width: 180px;
+    height: 240px;
+}
+
+#wizard-base-img {
+    top: 15%;
+    position: relative;
+    left: 15%;
+    width: 180px;
+    height: 240px;
+}
+
+#cleric-base-img {
+    top: 15%;
+    position: relative;
+    left: 30%;
+    width: 180px;
+    height: 240px;
+}
+
+#game-tag {
+    font-size: 140px;
+    width: 700px;
+    text-align: center;
+    padding: 10px;
+    margin: auto;
+    margin-top: 25%;
+    color: red;
+    border: 5px solid red;
+    background-color: steelblue;
 }

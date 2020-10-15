@@ -11,8 +11,15 @@
     <script src="./dist/main.js"></script>
     <div id='game-container'>
 
-        <h1 class="h-button" id="start-game-button">Start Game!</h1>
-        <h1 class='h-button' id="game-controls-button">Controls</h1>
+        <p id='game-tag' style="display: none;">Adventures</p>
+
+        <img id='background-image' src='./assets/images/Backgrounds/forest.png' alt='background-image' style="display: none;" />
+        <img id='forest' src='./assets/images/Backgrounds/forest.png' style="display: none;" />
+        <img id='snowy' src='./assets/images/Backgrounds/snowy.png' style="display: none;" />
+        <img id='dungeon' src="./assets/images/Backgrounds/dungeon.png" style="display: none;" />
+
+        <h1 class="h-button" id="start-game-button" style="display: none;">Start Game!</h1>
+        <!-- <h1 class='h-button' id="game-controls-button">Controls</h1> -->
 
         <h1 class='level-name' id='game-over-display' style="display: none;">Game Over!</h1>
         <h1 class="level-name" id='game-won-display' style="display: none;">You Win!</h1>
@@ -30,8 +37,12 @@
             <button id='level-8-button' class="level-button">8</button>
         </div>
 
-        <a id="reset-selected" href="#" class="close" style="display: none;"></a>
-        <div class='controls-display' style="display: none;">
+        <div id='begin-level-container'>
+            <p id='begin-level-button' style="display: none;">Start Level</p>
+        </div>
+
+        <a href="#" class="close" style="display: none;"></a>
+        <!-- <div class='controls-display' style="display: none;">
             <h1>Click on a character to select it</h1>
             <h1>Once selected, click anywhere to move the character to that location,
                  click on an enemy to begin attacking them,
@@ -40,7 +51,10 @@
             <h1>A selected character will be outlined in gold</h1>
             <h1>Enemy characters are red</h1>
             <h1>Defeat waves of enemies to complete a level</h1>
-        </div>
+        </div> -->
+
+        <p id='test' style="display: none;"></p>
+        <!-- <p id="reset-selected" style="display: none;"> </p> -->
 
         <div id='tutorial-container'>
             <p style="display: none;" id="tutorial-message"></p>
@@ -58,7 +72,7 @@
             <img src="" alt="something went wrong" class="a1-image-display" />
         </div>
 
-        <img src="./assets/images/Wizard/Wizard.png" alt="Wizard" class="Wizard" style="display: none;" />
+        <img src="./assets/images/Wizard/Wizard.png" alt="Wizard" class="Wizard" style="display: none;" id='wizard-base-img'/>
         <img src="assets/images/Wizard/Wizard-attack-1.png" alt="Wizard" class="Wizard" style="display: none;" />
         <img src="assets/images/Wizard/Wizard-attack-2.png" alt="Wizard" class="Wizard" style="display: none;" />
         <img src="assets/images/Wizard/Wizard-attack-3.png" alt="Wizard" class="Wizard" style="display: none;" />
@@ -75,7 +89,7 @@
             <img src="" alt="something went wrong" class="a2-image-display" />
         </div>
 
-        <img src="./assets/images/Rogue/Rogue.png" alt="Rogue" class="Rogue" style="display: none;" />
+        <img src="./assets/images/Rogue/Rogue.png" alt="Rogue" class="Rogue" style="display: none;" id='rogue-base-img'/>
         <img src="./assets/images/Rogue/Rogue-attack-1.png" alt="Rogue" class="Rogue" style="display: none;" />
         <img src="./assets/images/Rogue/Rogue-attack-2.png" alt="Rogue" class="Rogue" style="display: none;" />
         <img src="./assets/images/Rogue/Rogue-attack-3.png" alt="Rogue" class="Rogue" style="display: none;" />
@@ -92,7 +106,7 @@
             <img src="" alt="something went wrong" class="a3-image-display" />
         </div>
 
-        <img src="./assets/images/Warrior/Warrior.png" alt="Warrior" class="Warrior" style="display: none;" />
+        <img src="./assets/images/Warrior/Warrior.png" alt="Warrior" class="Warrior" style="display: none;" id='warrior-base-img'/>
         <img src="./assets/images/Warrior/Warrior-attack-1.png" alt="Warrior" class="Warrior" style="display: none;" />
         <img src="./assets/images/Warrior/Warrior-attack-2.png" alt="Warrior" class="Warrior" style="display: none;" />
         <img src="./assets/images/Warrior/Warrior-attack-3.png" alt="Warrior" class="Warrior" style="display: none;" />
@@ -109,7 +123,7 @@
             <img src="" alt="something went wrong" class="a4-image-display" />
         </div>
 
-        <img src="./assets/images/Cleric/Cleric.png" alt="Cleric" class="Cleric" style="display: none;" />
+        <img src="./assets/images/Cleric/Cleric.png" alt="Cleric" class="Cleric" style="display: none;" id='cleric-base-img'/>
         <img src="./assets/images/Cleric/Cleric-attack-1.png" alt="Cleric" class="Cleric" style="display: none;" />
         <img src="./assets/images/Cleric/Cleric-attack-2.png" alt="Cleric" class="Cleric" style="display: none;" />
         <img src="./assets/images/Cleric/Cleric-attack-3.png" alt="Cleric" class="Cleric" style="display: none;" />
