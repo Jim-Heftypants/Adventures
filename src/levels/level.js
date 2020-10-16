@@ -46,7 +46,7 @@ const actionThree = () => {
     applyMod(enemiesArr[2][2], 75);
 }
 const actionFour = () => {
-    applyMod(enemiesArr[3][3], 25);
+    applyMod(enemiesArr[3][3], 35);
     
 }
 const actionFive = () => {

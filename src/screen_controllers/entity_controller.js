@@ -6,7 +6,7 @@ let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
-let maxLevelNumber = 0;
+let maxLevelNumber = 7;
 const highestLevelAvailable = 8;
 
 let selectedChar;

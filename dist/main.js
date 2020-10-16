@@ -900,7 +900,7 @@ var actionThree = function actionThree() {
 };
 
 var actionFour = function actionFour() {
-  applyMod(enemiesArr[3][3], 25);
+  applyMod(enemiesArr[3][3], 35);
 };
 
 var actionFive = function actionFive() {
@@ -1013,7 +1013,7 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
-var maxLevelNumber = 0;
+var maxLevelNumber = 7;
 var highestLevelAvailable = 8;
 var selectedChar;
 var livingEnemies = {};
