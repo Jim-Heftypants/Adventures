@@ -43,7 +43,7 @@ function addEntityEvents(entity, allies, enemies) {
     if (entity.imgName != "") {
         if (!entity.observer) {
             addDeathListener(entity);
-        }
+        } 
         entity.enemies = enemies;
         const cloneArr = allies.slice();
         let selfIndex;
