@@ -8,6 +8,10 @@ export function fadeOut(element, action = null) {
         }
         element.style.opacity = op / 40;
         op -= 1;
+        if (element.style.display === 'none') {
+            clearInterval(timerDown);
+            element.style.opacity = 0;
+        }
     }, 50);
 }
 
@@ -20,5 +24,9 @@ export function fadeIn(element, action = null) {
         }
         element.style.opacity = op / 40;
         op += 1;
+        if (element.style.display === 'none') {
+            clearInterval(timerUp);
+            element.style.opacity = 0;
+        }
     }, 50);
 }

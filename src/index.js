@@ -1,9 +1,11 @@
 import loadLevel from './screen_controllers/entity_controller';
 
-function fadeOut(element, action = null) {let op = 40;let timerDown = setInterval(function () {
-    if (op <= 0) {clearInterval(timerDown);element.style.display = 'none';if (action) { action(); }}element.style.opacity = op / 40;op -= 1;}, 50);
-} function fadeIn(element, action = null) {let op = 0;let timerUp = setInterval(function () {if (op >= 40) {clearInterval(timerUp);if (action)
-     { action(); }}element.style.opacity = op / 40;op += 1;}, 50);}
+function slowFade(element, action = null) { let op = 80; let timerDown = setInterval(function () {if (op <= 0) { clearInterval(timerDown);
+    element.style.display = 'none'; if (action) { action(); } } element.style.opacity = op / 40; op -= 1;}, 50);}
+
+// const handleLoadCharClick = (e) => {
+//     switch 
+// }
 
 window.addEventListener('load', () => {
     const gameTag = document.getElementById('game-tag');
@@ -19,8 +21,11 @@ window.addEventListener('load', () => {
     // const controlsButton = document.getElementById('game-controls-button');
     const levelButtonContainer = document.getElementById('level-button-container');
     const levelButtons = document.getElementsByClassName('level-button');
+    const backgroundImage = document.getElementById('background-image');
 
     function secondAction() {
+        const gTContainer = document.getElementById('game-tag-container');
+        gTContainer.style.display = 'none';
         function closeAction() {
             // controlsContainer.style.display = 'none';
             startGameButton.style.display = '';
@@ -30,6 +35,7 @@ window.addEventListener('load', () => {
             for (let i = 0; i < 4; i++) {
                 charArr[i].style.display = '';
             }
+            backgroundImage.style.display = '';
         }
         closeAction();
         for (let i = 0; i < levelButtons.length; i++) {
@@ -39,6 +45,7 @@ window.addEventListener('load', () => {
                 for (let i = 0; i < 4; i++) {
                     charArr[i].style.display = 'none';
                 }
+                backgroundImage.style.display = 'none';
                 loadLevel(i); 
             })
         }
@@ -53,6 +60,7 @@ window.addEventListener('load', () => {
             for (let i = 0; i < 4; i++) {
                 charArr[i].style.display = 'none';
             }
+            backgroundImage.style.display = 'none';
         })
         // controlsButton.addEventListener('click', () => {
         //     startGameButton.style.display = "none";
@@ -64,6 +72,5 @@ window.addEventListener('load', () => {
         //     }
         // })
     }
-    const action = () => { fadeOut(gameTag, secondAction) };
-    fadeIn(gameTag, action);
+    slowFade(gameTag, secondAction);
 })

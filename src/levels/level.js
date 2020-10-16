@@ -32,7 +32,8 @@ function applyMod(entity, mod, x=true) {
     }
 }
 
-const actionOne = () => { applyMod(charactersArr[0][0], 35);
+const actionOne = () => { 
+    applyMod(charactersArr[0][0], 35);
     applyMod(charactersArr[0][1], 15);
     applyMod(charactersArr[0][2], 15);
     applyMod(charactersArr[0][3], 55);
@@ -45,7 +46,8 @@ const actionThree = () => {
     applyMod(enemiesArr[2][2], 75);
 }
 const actionFour = () => {
-    applyMod(enemiesArr[3][3], 35);
+    applyMod(enemiesArr[3][3], 25);
+    
 }
 const actionFive = () => {
     // WaCWiR

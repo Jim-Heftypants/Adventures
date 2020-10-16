@@ -11,54 +11,46 @@
     <script src="./dist/main.js"></script>
     <div id='game-container'>
 
-        <p id='game-tag' style="display: none;">Adventures</p>
-
-        <img id='background-image' src='./assets/images/Backgrounds/forest.png' alt='background-image' style="display: none;" />
+        <img id='background-image' src='./assets/images/Backgrounds/title-screen-background.jpg' alt='background-image'/>
         <img id='forest' src='./assets/images/Backgrounds/forest.png' style="display: none;" />
         <img id='snowy' src='./assets/images/Backgrounds/snowy.png' style="display: none;" />
         <img id='dungeon' src="./assets/images/Backgrounds/dungeon.png" style="display: none;" />
+        <img id='title' src='./assets/images/Backgrounds/title-screen-background.jpg' style="display: none;"/>
+
+        <div id='game-tag-container'>
+            <p id='game-tag'>Adventures</p>
+        </div>
 
         <h1 class="h-button" id="start-game-button" style="display: none;">Start Game!</h1>
-        <!-- <h1 class='h-button' id="game-controls-button">Controls</h1> -->
 
-        <h1 class='level-name' id='game-over-display' style="display: none;">Game Over!</h1>
-        <h1 class="level-name" id='game-won-display' style="display: none;">You Win!</h1>
+        <h1 class='level-name' id='game-over-display' style="display: none;">Defeat</h1>
+        <h1 class="level-name" id='game-won-display' style="display: none;">Victory</h1>
 
         <h1 id='level-name-display' class="level-name" style="display: none;">Some Filler Text</h1>
-
-        <div id='level-button-container' class="level-button-container" style="display: none;">
-            <button id='level-1-button' class="level-button">1</button>
-            <button id='level-2-button' class="level-button">2</button>
-            <button id='level-3-button' class="level-button">3</button>
-            <button id='level-4-button' class="level-button">4</button>
-            <button id='level-5-button' class="level-button">5</button>
-            <button id='level-6-button' class="level-button">6</button>
-            <button id='level-7-button' class="level-button">7</button>
-            <button id='level-8-button' class="level-button">8</button>
-        </div>
-
-        <div id='begin-level-container'>
-            <p id='begin-level-button' style="display: none;">Start Level</p>
-        </div>
-
-        <a href="#" class="close" style="display: none;"></a>
-        <!-- <div class='controls-display' style="display: none;">
-            <h1>Click on a character to select it</h1>
-            <h1>Once selected, click anywhere to move the character to that location,
-                 click on an enemy to begin attacking them,
-                 or click on an ally to begin healing them.
-            </h1>
-            <h1>A selected character will be outlined in gold</h1>
-            <h1>Enemy characters are red</h1>
-            <h1>Defeat waves of enemies to complete a level</h1>
-        </div> -->
-
-        <p id='test' style="display: none;"></p>
-        <!-- <p id="reset-selected" style="display: none;"> </p> -->
 
         <div id='tutorial-container'>
             <p style="display: none;" id="tutorial-message"></p>
         </div>
+        
+        <div id='begin-level-container'>
+            <p id='begin-level-button' style="display: none;">Start Level</p>
+        </div>
+
+        <div id='level-button-container' class="level-button-container" style="display: none;">
+            <button id='level-1-button' class="level-button">Warrior</button>
+            <button id='level-2-button' class="level-button">Cleric</button>
+            <button id='level-3-button' class="level-button">Wizard</button>
+            <button id='level-4-button' class="level-button">Rogue</button>
+            <button id='level-5-button' class="level-button">Test</button>
+            <button id='level-6-button' class="level-button">Magic</button>
+            <button id='level-7-button' class="level-button">Melee</button>
+            <button id='level-8-button' class="level-button">Doppel-ganger</button>
+        </div>
+
+        <a href="#" class="close" style="display: none;"></a>
+        <a href="#" id="return-button" style="display: none;">Select Screen</a>
+        <p id='test' style="display: none;"></p>
+
 
         <div id="a1-display" class='entity-container' style="position: absolute;">
             <div id='a1-hp-bar' class="hp-bar-container">

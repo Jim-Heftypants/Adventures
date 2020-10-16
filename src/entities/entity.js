@@ -208,6 +208,9 @@ class Entity { // this. is selectedChar
     }
 
     trackTarget() { // hot code
+        clearInterval(this.currentAction);
+        clearInterval(this.currentAnimation);
+        this.img.src = this.baseImg.src;
         const bigDiv = document.getElementById('game-container');
         const difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
         const checker = difference + Math.floor(bigDiv.offsetWidth);
@@ -255,12 +258,8 @@ class Entity { // this. is selectedChar
                 return;
             }
             if (!selectedChar.withinAttackRange(targetChar)) {
-            // stop the animation
-                selectedChar.clearIntervals();
-                // console.log(selectedChar.klass, 'too far from', targetChar.klass, 'during attack - moving to new location');
                 selectedChar.trackTarget();
                 return;
-                // move to enemy's new location -- needs to track current position
             } else {
                 targetChar.hp -= selectedChar.dmg;
                 if (targetChar.hp > targetChar.baseHP) { targetChar.hp = targetChar.baseHP; }
@@ -268,14 +267,10 @@ class Entity { // this. is selectedChar
                     targetChar.target = selectedChar;
                     targetChar.clearIntervals();
                     targetChar.autoAttack(targetChar.target);
-                    // console.log('enemy is now targetting: ', selectedChar);
                 }
-                // hp finalized
                 targetChar.setHpBars();
                 
-                // console.log('target hp at: ', targetChar.hp);
                 if (targetChar.hp <= 0) {
-                    // stop the animation
                     selectedChar.clearIntervals();
                     // console.log(targetChar, ' hp ', targetChar.hp);
                     selectedChar.killEntitiy(targetChar);
@@ -340,7 +335,7 @@ class Entity { // this. is selectedChar
     }
 
     useAbility(ability) {
-
+        // not implimented
     }
 
 }

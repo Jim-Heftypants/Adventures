@@ -8,7 +8,7 @@ img {
     margin: auto;
     height: 900px;
     width: 90%;
-    background-color: aqua;
+    background-color: lawngreen;
     border: 5px solid black;
 }
 
@@ -36,7 +36,7 @@ img {
     background-color: red;
 }
 
-.level-name, .h-button {
+.level-name {
     position: relative;
     margin-top: 5%;
     text-align: center;
@@ -46,6 +46,8 @@ img {
 
 #level-name-display {
     cursor: default;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 #game-over-display, #game-won-display {
@@ -63,7 +65,17 @@ img {
 
 .h-button {
     cursor: pointer;
-    font-size: 75px;
+    text-align: center;
+    font-size: 100px;
+    position: relative;
+    margin: auto;
+    width: 550px;
+    padding: 15px;
+    top: 15%;
+    z-index: 2;
+    color: rgb(22, 141, 195);
+    background-color: rgb(143, 75, 143);
+    border: 6px solid steelblue;
 }
 
 #a1-display, #a2-display, #a3-display, #a4-display {
@@ -112,17 +124,19 @@ img {
 }
 
 .level-button {
-    margin-top: 3%;
-    margin-left: 5%;
-    margin-right: 5%;
+    margin-top: 2%;
+    margin-left: 3%;
+    margin-right: 3%;
     border: 5px solid blue;
     color: black;
     cursor: default;
-    width: 250px;
-    height: 250px;
+    width: 270px;
+    height: 270px;
     opacity: 60%;
+    font-size: 60px;
+    color: purple;
+    word-wrap: break-word;
 }
-
 
 #background-image {
     position: absolute;
@@ -144,74 +158,102 @@ img {
 
 #begin-level-container {
     position: relative;
-    top: 45%;
+    top: 15%;
     margin: auto;
-    width: 220px;
+    width: 340px;
 }
 
 #begin-level-button {
-    padding: 10px;
-    border: 3px solid black;
+    text-align: center;
+    padding: 12px;
+    border: 6px solid black;
     position: relative;
     text-align: center;
-    font-size: 40px;
-    background-color: chartreuse;
+    font-size: 60px;
+    background-color: blueviolet;
     color: black;
     cursor: pointer;
 }
 
-#test {
+#test, #return-button {
     position: absolute;
+    z-index: 3;
+}
+
+#return-button {
+    font-size: 30px;
+    cursor: pointer;
+    right: 4px;
+    top: 4px;
+    width: 80px;
+    padding: 4px;
+    text-align: center;
+    color: red;
+    background-color: cadetblue;
+    border: 3px solid crimson;
+    text-decoration: none;
+}
+
+#test {
     right: 32px;
     top: 32px;
     width: 32px;
     height: 32px;
-    opacity: 0.3;
-    color: red;
     background-color: red;
-    z-index: 3;
 }
 
 #warrior-base-img {
-    top: 15%;
+    top: 25%;
     position: relative;
-    left: 25%;
+    left: 32%;
     width: 180px;
     height: 240px;
+    z-index: 2;
 }
 
 #rogue-base-img {
-    top: 15%;
+    top: 25%;
     position: relative;
-    left: 20%;
+    left: 27%;
     width: 180px;
     height: 240px;
+    z-index: 2;
 }
 
 #wizard-base-img {
-    top: 15%;
+    top: 25%;
     position: relative;
-    left: 15%;
+    left: 22%;
     width: 180px;
     height: 240px;
+    z-index: 2;
 }
 
 #cleric-base-img {
-    top: 15%;
+    top: 25%;
     position: relative;
-    left: 30%;
+    left: 37%;
     width: 180px;
     height: 240px;
+    z-index: 2;
+}
+
+#game-tag-container {
+    width: 100%;
+    z-index: 2;
 }
 
 #game-tag {
-    font-size: 140px;
-    width: 700px;
+    top: 10%;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 180px;
+    width: 900px;
     text-align: center;
     padding: 10px;
-    margin: auto;
-    margin-top: 25%;
     color: red;
     border: 5px solid red;
     background-color: steelblue;
+    position: relative;
+    z-index: 2;
 }

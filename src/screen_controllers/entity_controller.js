@@ -5,8 +5,8 @@ let hasBeenLoaded = false;
 let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
-let currentLevelNumber = 7;
-let maxLevelNumber = 7;
+let currentLevelNumber = 0;
+let maxLevelNumber = 0;
 const highestLevelAvailable = 8;
 
 let selectedChar;
@@ -110,7 +110,16 @@ function beginCurrentLevel() {
     beginLevel(level.characterList, level.enemyList, currentLevelNumber);
 }
 
+function returnToSelectPage() {
+    document.getElementById('return-button').style.display = 'none';
+    document.getElementById('tutorial-message').style.display = 'none';
+    document.getElementById(`level-name-display`).style.display = 'none';
+    document.getElementById('begin-level-button').style.display = 'none';
+    document.getElementById('level-button-container').style.display = '';
+}
+
 function initializeGameOpening() {
+    document.getElementById('return-button').addEventListener('click', returnToSelectPage);
     const deSelectButton = document.getElementById('test');
     deSelectButton.addEventListener('click', deSelect);
 
@@ -151,6 +160,7 @@ function loadLevel(levelNumber) {
     currentLevelNumber = levelNumber;
     level.action();
     // console.log('level selected: ', levelNumber);
+    document.getElementById('return-button').style.display = '';
     const levelButtonContainer = document.getElementById('level-button-container');
     levelButtonContainer.style.display = 'none';
     const levelNameDisp = document.getElementById(`level-name-display`);
@@ -190,6 +200,7 @@ function setInitialTargets(chars, enemies) {
 }
 
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
+    document.getElementById('return-button').style.display = 'none';
     const deSelectButton = document.getElementById('test');
     deSelectButton.style.opacity = 0;
     deSelectButton.style.display = '';
