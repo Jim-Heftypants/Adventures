@@ -1,13 +1,12 @@
 import * as levelsObj from '../levels/level';
-import {fadeIn, fadeOut} from './fades';
+import { fadeIn, fadeOut } from './fades';
 
 let hasBeenLoaded = false;
 let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
-let maxLevelNumber = 7;
-const highestLevelAvailable = 8;
+let maxLevelNumber = 0;
 
 let selectedChar;
 
@@ -15,8 +14,10 @@ let livingEnemies = {};
 let livingChars = {};
 
 function addDeathListener(entity) {
-    entity.observer = new MutationObserver(function(mutations) {
+    entity.observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutationRecord) {
+            // console.log(entity.imgName, 'style changed');
+            // console.log(mutationRecord);
             if (mutationRecord.target.style.display === 'none') {
                 // console.log(entity.imgName, 'style === none');
                 if (entity.allied) {
@@ -26,6 +27,8 @@ function addDeathListener(entity) {
                 }
                 const c = Object.values(livingChars);
                 const en = Object.values(livingEnemies);
+                // console.log('living allies: ', livingChars);
+                // console.log('living enemies: ', livingEnemies);
                 if (c.length === 0 || en.length === 0) {
                     if (!levelHasEnded) {
                         // console.log('end game called');
@@ -41,15 +44,13 @@ function addDeathListener(entity) {
 
 function addEntityEvents(entity, allies, enemies) {
     if (entity.imgName != "") {
-        if (!entity.observer) {
-            addDeathListener(entity);
-        } 
+        addDeathListener(entity);
         entity.enemies = enemies;
         const cloneArr = allies.slice();
         let selfIndex;
         for (let i = 0; i < cloneArr.length; i++) {
             if (cloneArr[i].imgName === entity.imgName) { selfIndex = i; }
-        }
+        } 
         // remove self from allies list to prevent moving out of self image (healers excluded)
         if (entity.baseDMG > 0) { cloneArr.splice(selfIndex, 1); }
         entity.allies = cloneArr;
@@ -64,7 +65,7 @@ const allyClickEvents = (e) => {
     const entity = livingChars[entityName];
     if (!selectedChar || selectedChar.hp < 0) {
         selectedChar = entity;
-        entity.img.style.border = '5px solid gold';
+        entity.img.style.border = '2px solid gold';
         // console.log('selected char: ', selectedChar.imgName);
     } else if (selectedChar.baseDMG < 0) {
         selectedChar.autoAttack(entity);
@@ -95,36 +96,27 @@ const enemyClickEvents = (e) => {
     e.stopPropagation(); // maybe move inside if
 }
 
+function setupEntities(charactersArr, enemiesArr) {
+    for (let i = 0; i < charactersArr.length; i++) {
+        addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
+    }
+    for (let i = 0; i < enemiesArr.length; i++) {
+        addEntityEvents(enemiesArr[i], enemiesArr, charactersArr);
+    }
+}
+
 function deSelect() {
-    // console.log('de-selected')
     if (selectedChar) {
         selectedChar.img.style.border = 'none';
         selectedChar = null;
     }
 }
 
-function beginCurrentLevel() {
-    const beginLevelButton = document.getElementById('begin-level-button');
-    fadeOut(beginLevelButton);
-    const level = levels[currentLevelNumber];
-    beginLevel(level.characterList, level.enemyList, currentLevelNumber);
-}
-
-function returnToSelectPage() {
-    document.getElementById('return-button').style.display = 'none';
-    document.getElementById('tutorial-message').style.display = 'none';
-    document.getElementById(`level-name-display`).style.display = 'none';
-    document.getElementById('begin-level-button').style.display = 'none';
-    document.getElementById('level-button-container').style.display = '';
-}
-
-function initializeGameOpening() {
-    document.getElementById('return-button').addEventListener('click', returnToSelectPage);
-    const deSelectButton = document.getElementById('test');
+function initializeGameOpening(levelNumber) {
+    const deSelectButton = document.getElementById('reset-selected');
     deSelectButton.addEventListener('click', deSelect);
 
-    const beginLevel = document.getElementById('begin-level-button');
-    beginLevel.addEventListener('click', beginCurrentLevel)
+    setupEntities(levels[levelNumber].characterList, levels[levelNumber].enemyList); // modify to be all the img elements
 
     // end click position
     const gameContainer = document.getElementById('game-container');
@@ -150,40 +142,31 @@ function initializeGameOpening() {
 
 function loadLevel(levelNumber) {
     if (!hasBeenLoaded) {
-        initializeGameOpening();
+        initializeGameOpening(levelNumber);
     }
     if (levelNumber > maxLevelNumber) {
         return;
     }
-    const level = levels[levelNumber];
     levelHasEnded = false;
     currentLevelNumber = levelNumber;
-    level.action();
     // console.log('level selected: ', levelNumber);
-    document.getElementById('return-button').style.display = '';
+    const deSelectButton = document.getElementById('reset-selected');
+    deSelectButton.style.display = '';
     const levelButtonContainer = document.getElementById('level-button-container');
     levelButtonContainer.style.display = 'none';
-    const levelNameDisp = document.getElementById(`level-name-display`);
+    const levelNameDisp = document.getElementById(`level-${levelNumber + 1}-name`);
     levelNameDisp.style.opacity = 0;
     levelNameDisp.style.display = '';
-    levelNameDisp.innerHTML = 'Level ' + level.name;
-    const levelMessage = document.getElementById('tutorial-message');
-    levelMessage.innerHTML = level.message;
-    levelMessage.style.opacity = 0;
-    levelMessage.style.display = '';
-    // const secondAction = () => beginLevel(level.characterList, level.enemyList, levelNumber);
-    fadeIn(levelNameDisp);
-    const levelNameAction = () => { fadeIn(beginLevel); }
-    const action = () => fadeOut(levelNameDisp, levelNameAction);
-    const beginLevel = document.getElementById('begin-level-button');
-    beginLevel.style.opacity = 0;
-    beginLevel.style.display = '';
-    fadeIn(levelMessage, action);
+    const level = levels[levelNumber];
+    const secondAction = () => beginLevel(level.characterList, level.enemyList);
+    const action = () => fadeOut(levelNameDisp, secondAction);
+    fadeIn(levelNameDisp, action);
 }
 
-function beginLevel(charactersArr, enemiesArr, levelNumber) {
+function beginLevel(charactersArr, enemiesArr) {
+    // console.log('begin level called');
     setInitialTargets(charactersArr, enemiesArr);
-    loadInCharacters(charactersArr, enemiesArr, levelNumber);
+    loadInCharacters(charactersArr, enemiesArr);
 }
 
 function setInitialTargets(chars, enemies) {
@@ -199,37 +182,16 @@ function setInitialTargets(chars, enemies) {
     }
 }
 
-function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
-    document.getElementById('return-button').style.display = 'none';
-    const deSelectButton = document.getElementById('test');
-    deSelectButton.style.opacity = 0;
-    deSelectButton.style.display = '';
-    fadeIn(deSelectButton);
-    const backgroundImg = document.getElementById('background-image');
-    if (levelNumber < 4) {
-        backgroundImg.src = document.getElementById('forest').src;
-    } else if (levelNumber < 7) {
-        backgroundImg.src = document.getElementById('snowy').src;
-    } else {
-        backgroundImg.src = document.getElementById('dungeon').src;
-    }
-    backgroundImg.style.opacity = 0;
-    backgroundImg.style.display = '';
-    fadeIn(backgroundImg);
+function loadInCharacters(charactersArr, enemiesArr) {
     for (let i = 0; i < charactersArr.length; i++) {
-        if (!charactersArr[i].observer) {
-            addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
-        }
         livingChars[charactersArr[i].imgName] = charactersArr[i];
-        charactersArr[i].container.style.top = charactersArr[i].pos[1] + 'px';
-        charactersArr[i].container.style.left = charactersArr[i].pos[0] + 'px';
         charactersArr[i].container.style.opacity = 0;
         charactersArr[i].container.style.display = '';
         const hpBar = document.getElementById(`${charactersArr[i].imgName}-hp-bar`);
         hpBar.style.display = "flex";
-        const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
+        charactersArr[i].container.addEventListener('click', allyClickEvents);
         charactersArr[i].img.src = charactersArr[i].baseImg.src;
-        fadeIn(charactersArr[i].container, actionEvent);
+        fadeIn(charactersArr[i].container);
         observerObserve(charactersArr[i]);
     }
     for (let i = 0; i < enemiesArr.length; i++) {
@@ -237,8 +199,6 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
             addEntityEvents(enemiesArr[i], enemiesArr, charactersArr);
         }
         livingEnemies[enemiesArr[i].imgName] = enemiesArr[i];
-        enemiesArr[i].container.style.top = enemiesArr[i].pos[1] + 'px';
-        enemiesArr[i].container.style.left = enemiesArr[i].pos[0] + 'px';
         enemiesArr[i].container.style.opacity = 0;
         enemiesArr[i].container.style.display = '';
         const hpBar = document.getElementById(`${enemiesArr[i].imgName}-hp-bar`);
@@ -249,7 +209,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         fadeIn(enemiesArr[i].container, action); // begin attacking target
         observerObserve(enemiesArr[i]);
     }
-    
+
 }
 
 function observerObserve(entity) {
@@ -261,16 +221,12 @@ function observerObserve(entity) {
 
 
 function endGame(charsList, enemyList) {
-    const levelMessage = document.getElementById('tutorial-message');
-    levelMessage.style.display = 'none';
-    const deSelectButton = document.getElementById('test');
-    deSelectButton.style.display = 'none';
     deSelect();
     const allCharsList = levels[currentLevelNumber].characterList;
     const allEnemyList = levels[currentLevelNumber].enemyList;
     for (let i = 0; i < allCharsList.length; i++) {
         allCharsList[i].observer.disconnect();
-        if (allCharsList[i].currentAction) { clearInterval(allCharsList[i].currentAction); }
+        if (allCharsList[i.currentAction]) { clearInterval(allCharsList[i].currentAction); }
         if (allCharsList[i].currentAnimation) { clearInterval(allCharsList[i].currentAnimation); }
         allCharsList[i].container.removeEventListener('click', allyClickEvents);
         allCharsList[i].img.src = allCharsList[i].baseImg.src;
@@ -283,16 +239,13 @@ function endGame(charsList, enemyList) {
         allEnemyList[i].img.src = allEnemyList[i].baseImg.src;
     }
 
-    const backgroundImg = document.getElementById('background-image');
-    fadeOut(backgroundImg);
-
     for (let i = 0; i < charsList.length; i++) {
         fadeOut(charsList[i].container);
     }
     for (let i = 0; i < enemyList.length; i++) {
         fadeOut(enemyList[i].container);
     }
-    
+
     let gameFadeTimer = setInterval(() => {
         // console.log('fade called');
         let disp;
@@ -315,9 +268,11 @@ function endGame(charsList, enemyList) {
 function resetGame(won) {
     livingChars = {};
     livingEnemies = {};
+    const deSelectButton = document.getElementById('reset-selected');
+    deSelectButton.style.display = 'none';
     const levelButtonContainer = document.getElementById('level-button-container');
     levelButtonContainer.style.display = '';
-    if (won && maxLevelNumber === currentLevelNumber && currentLevelNumber < highestLevelAvailable + 1) {
+    if (won && maxLevelNumber === currentLevelNumber && currentLevelNumber < 3) {
         maxLevelNumber++;
         const levelButtons = document.getElementsByClassName('level-button');
         levelButtons[maxLevelNumber].style.opacity = 100 + '%';
