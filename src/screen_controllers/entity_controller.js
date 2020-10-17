@@ -6,7 +6,7 @@ let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
-let maxLevelNumber = 0;
+let maxLevelNumber = 7;
 const highestLevelAvailable = 8;
 
 let selectedChar;
@@ -58,43 +58,6 @@ function addEntityEvents(entity, allies, enemies) {
     }
 }
 
-const allyClickEvents = (e) => {
-    // console.log('character click');
-    const entityName = e.target.className.slice(0, 2);
-    const entity = livingChars[entityName];
-    if (!selectedChar || selectedChar.hp < 0) {
-        selectedChar = entity;
-        entity.img.style.border = '5px solid gold';
-        // console.log('selected char: ', selectedChar.imgName);
-    } else if (selectedChar.baseDMG < 0) {
-        selectedChar.autoAttack(entity);
-        selectedChar.img.style.border = 'none';
-        selectedChar = null;
-    }
-    e.stopPropagation();
-}
-
-const enemyClickEvents = (e) => {
-    const entityName = e.target.className.slice(0, 2);
-    // console.log('entity name', entityName);
-    const entity = livingEnemies[entityName];
-    // console.log('entity', entity);
-    if (selectedChar.hp < 0) {
-        selectedChar.img.style.border = 'none';
-        selectedChar = null;
-        return;
-    }
-    // console.log('enemy click');
-    if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
-        clearInterval(selectedChar.currentAction);
-        clearInterval(selectedChar.currentAnimation);
-        selectedChar.autoAttack(entity);
-        selectedChar.img.style.border = 'none';
-        selectedChar = null;
-    }
-    e.stopPropagation(); // maybe move inside if
-}
-
 function deSelect() {
     // console.log('de-selected')
     if (selectedChar) {
@@ -116,6 +79,77 @@ function returnToSelectPage() {
     document.getElementById(`level-name-display`).style.display = 'none';
     document.getElementById('begin-level-button').style.display = 'none';
     document.getElementById('level-button-container').style.display = '';
+    document.getElementById('close-button').style.display = '';
+}
+
+function selectChar(entity) {
+    if (!entity || entity.img.style.display === 'none') {
+        return;
+    }
+    if (!selectedChar || selectedChar.hp < 0) {
+        selectedChar = entity;
+        entity.img.style.border = '5px solid gold';
+        // console.log('selected char: ', selectedChar.imgName);
+    } else if (selectedChar.baseDMG < 0) {
+        selectedChar.autoAttack(entity);
+        selectedChar.img.style.border = 'none';
+        selectedChar = null;
+    }
+}
+
+function selectEnemy(entity) {
+    if (entity.img.style.display === 'none' || !selectedChar || selectedChar.hp < 0) {
+        selectedChar = null;
+        return;
+    }
+    if (selectedChar.allied && selectedChar.baseDMG > 0) {
+        clearInterval(selectedChar.currentAction);
+        clearInterval(selectedChar.currentAnimation);
+        selectedChar.autoAttack(entity);
+        selectedChar.img.style.border = 'none';
+        selectedChar = null;
+    }
+}
+
+const allyClickEvents = (e) => {
+    // console.log('character click');
+    const entityName = e.target.className.slice(0, 2);
+    const entity = livingChars[entityName];
+    e.stopPropagation();
+    selectChar(entity);
+}
+
+const enemyClickEvents = (e) => {
+    const entityName = e.target.className.slice(0, 2);
+    const entity = livingEnemies[entityName];
+    e.stopPropagation();
+    selectEnemy(entity);
+}
+
+function keydownEvent (e) {
+    let entity;
+    if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') { // char selection keydown
+        entity = livingChars['a' + e.key];
+        if (entity) { selectChar(entity); }
+    } else if (e.key === '5' || e.key === '6' || e.key === '7' || e.key === '8') {
+        entity = livingEnemies['e' + (e.key - 4)];
+        if (entity) { selectEnemy(entity); }
+    } else {
+        console.log('invalid key press');
+    }
+}
+
+function abilityClick(n) {
+    if (selectedChar) {
+        selectedChar.useAbility(n);
+    }
+}
+
+function setAbilityBoxes() {
+    const abilityBoxes = document.getElementsByClassName('inner-ability-div');
+    for (let i = 0; i < abilityBoxes.length; i++) {
+        abilityBoxes[i].addEventListener('click', () => abilityClick(i));
+    }
 }
 
 function initializeGameOpening() {
@@ -142,6 +176,12 @@ function initializeGameOpening() {
             selectedChar = null;
         }
     })
+
+    window.addEventListener('keypress', (e) => {
+        // console.log(e);
+        keydownEvent(e);
+    })
+    setAbilityBoxes();
 
     hasBeenLoaded = true;
 }
@@ -317,11 +357,14 @@ function resetGame(won) {
     livingEnemies = {};
     const levelButtonContainer = document.getElementById('level-button-container');
     levelButtonContainer.style.display = '';
-    if (won && maxLevelNumber === currentLevelNumber && currentLevelNumber < highestLevelAvailable + 1) {
+    document.getElementById('close-button').style.display = '';
+    if (won && maxLevelNumber === currentLevelNumber) {
         maxLevelNumber++;
         const levelButtons = document.getElementsByClassName('level-button');
-        levelButtons[maxLevelNumber].style.opacity = 100 + '%';
-        levelButtons[maxLevelNumber].style.cursor = 'pointer';
+        if (levelButtons[maxLevelNumber]) {
+            levelButtons[maxLevelNumber].style.opacity = 100 + '%';
+            levelButtons[maxLevelNumber].style.cursor = 'pointer';
+        }
     }
     // level.characterList, level.enemyList
     // console.log('levels arr: ', levels);

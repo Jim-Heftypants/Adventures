@@ -8,6 +8,8 @@ function slowFade(element, action = null) { let op = 80; let timerDown = setInte
 // }
 
 window.addEventListener('load', () => {
+    // const abilityBoxes = document.getElementsByClassName('inner-ability-div');
+
     const gameTag = document.getElementById('game-tag');
     gameTag.style.opacity = 0;
     gameTag.style.display = '';
@@ -17,31 +19,36 @@ window.addEventListener('load', () => {
     const charArr = [wiz, ro, war, cle];
     // const controlsContainer = document.getElementsByClassName('controls-display')[0];
     const closeButton = document.getElementsByClassName('close')[0];
-    const startGameButton = document.getElementById('start-game-button');
+    const hButtons = document.getElementsByClassName('h-button');
+    // const startGameButton = document.getElementById('start-game-button');
     // const controlsButton = document.getElementById('game-controls-button');
+    const keybindContainer = document.getElementById('keybindings-container');
     const levelButtonContainer = document.getElementById('level-button-container');
     const levelButtons = document.getElementsByClassName('level-button');
     const backgroundImage = document.getElementById('background-image');
+    const titleBackground = document.getElementById('title');
 
     function secondAction() {
         const gTContainer = document.getElementById('game-tag-container');
         gTContainer.style.display = 'none';
         function closeAction() {
             // controlsContainer.style.display = 'none';
-            startGameButton.style.display = '';
+            for (let i = 0; i < hButtons.length; i++) { hButtons[i].style.display = ''; }
             // controlsButton.style.display = '';
             levelButtonContainer.style.display = 'none';
+            keybindContainer.style.display = 'none';
             closeButton.style.display = 'none';
             for (let i = 0; i < 4; i++) {
                 charArr[i].style.display = '';
             }
+            backgroundImage.src = titleBackground.src;
             backgroundImage.style.display = '';
         }
         closeAction();
         for (let i = 0; i < levelButtons.length; i++) {
             levelButtons[i].addEventListener('click', () => { 
                 closeButton.style.display = 'none';
-                closeButton.removeEventListener('click', closeAction);
+                // closeButton.removeEventListener('click', closeAction);
                 for (let i = 0; i < 4; i++) {
                     charArr[i].style.display = 'none';
                 }
@@ -52,9 +59,8 @@ window.addEventListener('load', () => {
         levelButtons[0].style.opacity = 100;
         levelButtons[0].style.cursor = 'pointer';
         closeButton.addEventListener('click', closeAction)
-        startGameButton.addEventListener('click', () => {
-            startGameButton.style.display = "none";
-            // controlsButton.style.display = 'none';
+        hButtons[0].addEventListener('click', () => {
+            for (let i = 0; i < hButtons.length; i++) { hButtons[i].style.display = 'none'; }
             levelButtonContainer.style.display = '';
             closeButton.style.display = '';
             for (let i = 0; i < 4; i++) {
@@ -62,15 +68,15 @@ window.addEventListener('load', () => {
             }
             backgroundImage.style.display = 'none';
         })
-        // controlsButton.addEventListener('click', () => {
-        //     startGameButton.style.display = "none";
-        //     controlsButton.style.display = 'none';
-        //     controlsContainer.style.display = '';
-        //     closeButton.style.display = '';
-        //     for (let i = 0; i < 4; i++) {
-        //         charArr[i].style.display = 'none';
-        //     }
-        // })
+        hButtons[1].addEventListener('click', () => {
+            for (let i = 0; i < hButtons.length; i++) { hButtons[i].style.display = 'none'; }
+            keybindContainer.style.display = '';
+            closeButton.style.display = '';
+            for (let i = 0; i < 4; i++) {
+                charArr[i].style.display = 'none';
+            }
+            backgroundImage.style.display = 'none';
+        })
     }
     slowFade(gameTag, secondAction);
 })

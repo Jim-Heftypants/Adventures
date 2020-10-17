@@ -86,6 +86,68 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/entities/abilities.js":
+/*!***********************************!*\
+  !*** ./src/entities/abilities.js ***!
+  \***********************************/
+/*! exports provided: warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "warriorAbilities", function() { return warriorAbilities; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clericAbilities", function() { return clericAbilities; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "wizardAbilities", function() { return wizardAbilities; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rogueAbilities", function() { return rogueAbilities; });
+var groupHeal = function groupHeal(entity) {
+  for (var i = 0; i < entity.allies; i++) {
+    entity.allies[i].hp = Math.floor(entity.allies[i].hp + entity.allies[i].hp * 0.2);
+
+    if (entity.allies[i].hp > 100) {
+      entity.allies[i].hp = 100;
+    }
+
+    entity.allies[i].setHpBars();
+  }
+
+  return 10;
+};
+
+var powerSwing = function powerSwing(entity) {
+  entity.target.hp -= 20;
+  entity.target.setHpBars();
+  return 10;
+};
+
+var poisonDagger = function poisonDagger(entity, n) {
+  var timer = 0;
+
+  var _int = setInterval(function () {
+    timer++;
+    entity.target.hp -= 4;
+    entity.target.setHpBars();
+
+    if (timer > 5) {
+      clearInterval(_int);
+    }
+  }, 500);
+
+  return 10;
+};
+
+var meteor = function meteor(entity) {
+  entity.target.hp -= 25;
+  entity.target.setHpBars();
+  return 10;
+};
+
+var warriorAbilities = [powerSwing];
+var clericAbilities = [groupHeal];
+var wizardAbilities = [meteor];
+var rogueAbilities = [poisonDagger];
+
+/***/ }),
+
 /***/ "./src/entities/character.js":
 /*!***********************************!*\
   !*** ./src/entities/character.js ***!
@@ -98,7 +160,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tutorialChars", function() { return tutorialChars; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "standardChars", function() { return standardChars; });
 /* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity */ "./src/entities/entity.js");
+/* harmony import */ var _abilities_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./abilities.js */ "./src/entities/abilities.js");
 
+ // console.log('ab list', abilityObj);
+
+var abilityList = Object.values(_abilities_js__WEBPACK_IMPORTED_MODULE_1__); // console.log('ab array list', abilityObj)
+// console.log(abilityList[0]);
+
+var warriorAbilities = abilityList[0];
+var clericAbilities = abilityList[1];
+var wizardAbilities = abilityList[2];
+var rogueAbilities = abilityList[3];
 /*
 className
 range
@@ -113,18 +185,18 @@ defense
 */
 // tutorials
 
-var tutorialWarrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a3", [450, 500], 20);
-var tutorialCleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "a4", [200, 300], 10);
-var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a1", [200, 600], 12);
-var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a2", [900, 200], 16); // tank
+var tutorialWarrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [450, 500], 20, warriorAbilities);
+var tutorialCleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "a2", [200, 300], 10, clericAbilities);
+var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [200, 600], 12, wizardAbilities);
+var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 200], 16, rogueAbilities); // tank
 
-var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a3", [100, 400], 20); // heals
+var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20); // heals
 
-var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "a4", [400, 100], 10); // rdps
+var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "a2", [400, 100], 10); // rdps
 
-var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a1", [100, 100], 12); // mdps
+var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12); // mdps
 
-var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a2", [900, 500], 16);
+var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16);
 var tutorialChars = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue];
 var standardChars = [Warrior, Cleric, Wizard, Rogue];
 
@@ -163,30 +235,33 @@ defense
 */
 // rdps
 
-var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 8, false, 'e1', [1000, 600], 8);
-var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e1', [500, 500], 8);
-var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [500, 500], 8);
-var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e2', [700, 200], 8);
-var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e1", [500, 500], 15); // heals
+var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 8, false, 'e3', [1000, 600], 8);
+var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8);
+var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8);
+var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8); // fix
 
-var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -8, false, "e4", [1000, 300], 8);
-var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -10, false, "e4", [1000, 100], 8);
-var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e4", [1000, 100], 8);
-var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e3", [300, 400], 8);
-var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -10, false, "e4", [1000, 100], 10); // mdps
+var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 15); // heals
 
-var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 6, false, "e2", [700, 200], 14);
-var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e2", [700, 200], 14);
-var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e2", [700, 200], 14);
-var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e1", [500, 500], 14);
-var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "e2", [700, 200], 18); // tank
+var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -8, false, "e2", [1000, 300], 8);
+var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -10, false, "e2", [1000, 100], 8);
+var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e2", [1000, 100], 8);
+var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e4", [300, 400], 8); // fix
 
-var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 70, 10, 1000, 1, false, "e3", [650, 500], 20);
-var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 100, 10, 1000, 6, false, "e3", [650, 500], 20);
-var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [300, 400], 20);
-var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [300, 400], 20);
-var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e4", [1000, 100], 20);
-var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 10, false, "e3", [300, 400], 20); // level 1
+var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -10, false, "e2", [1000, 100], 10); // mdps
+
+var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 6, false, "e4", [700, 200], 14);
+var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e4", [700, 200], 14);
+var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e4", [700, 200], 14);
+var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e2", [500, 500], 14);
+var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "e4", [700, 200], 18); // tank
+
+var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 70, 10, 1000, 1, false, "e1", [650, 500], 20);
+var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 100, 10, 1000, 6, false, "e1", [650, 500], 20);
+var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e1", [300, 400], 20);
+var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e1", [300, 400], 20);
+var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [1000, 100], 20); // fix
+
+var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 10, false, "e1", [300, 400], 20); // level 1
 
 var intro = [punchingBag]; // level 2
 
@@ -236,6 +311,7 @@ var Entity = /*#__PURE__*/function () {
     var img = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : "";
     var pos = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : [0, 0];
     var defense = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0;
+    var abilities = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : [];
 
     _classCallCheck(this, Entity);
 
@@ -257,6 +333,8 @@ var Entity = /*#__PURE__*/function () {
     this.baseDMG = attackDMG;
     this.dmg = this.baseDMG;
     this.defense = defense;
+    this.abilities = abilities;
+    this.abilityAvailable = [true, true, true, true];
     this.imgName = img;
     this.img; // base standing image
 
@@ -683,7 +761,24 @@ var Entity = /*#__PURE__*/function () {
     }
   }, {
     key: "useAbility",
-    value: function useAbility(ability) {// not implimented
+    value: function useAbility(n) {
+      var _this5 = this;
+
+      if (!this.abilityAvailable[n]) {
+        return;
+      }
+
+      console.log('ability', n, 'used');
+      this.abilityAvailable[n] = false;
+      var ab = this.abilities[n];
+      console.log('ability: ', ab);
+      var cdTime = ab(this);
+      console.log('seconds for ability cd: ', cdTime);
+      var CDTimer = setInterval(function () {
+        _this5.abilityAvailable[n] = true;
+        console.log(_this5.imgName, ' ability ', n, ' off CD');
+        clearInterval(CDTimer);
+      }, cdTime * 1000);
     }
   }]);
 
@@ -739,6 +834,7 @@ function slowFade(element) {
 
 
 window.addEventListener('load', function () {
+  // const abilityBoxes = document.getElementsByClassName('inner-ability-div');
   var gameTag = document.getElementById('game-tag');
   gameTag.style.opacity = 0;
   gameTag.style.display = '';
@@ -749,11 +845,14 @@ window.addEventListener('load', function () {
   var charArr = [wiz, ro, war, cle]; // const controlsContainer = document.getElementsByClassName('controls-display')[0];
 
   var closeButton = document.getElementsByClassName('close')[0];
-  var startGameButton = document.getElementById('start-game-button'); // const controlsButton = document.getElementById('game-controls-button');
+  var hButtons = document.getElementsByClassName('h-button'); // const startGameButton = document.getElementById('start-game-button');
+  // const controlsButton = document.getElementById('game-controls-button');
 
+  var keybindContainer = document.getElementById('keybindings-container');
   var levelButtonContainer = document.getElementById('level-button-container');
   var levelButtons = document.getElementsByClassName('level-button');
   var backgroundImage = document.getElementById('background-image');
+  var titleBackground = document.getElementById('title');
 
   function secondAction() {
     var gTContainer = document.getElementById('game-tag-container');
@@ -761,15 +860,20 @@ window.addEventListener('load', function () {
 
     function closeAction() {
       // controlsContainer.style.display = 'none';
-      startGameButton.style.display = ''; // controlsButton.style.display = '';
+      for (var i = 0; i < hButtons.length; i++) {
+        hButtons[i].style.display = '';
+      } // controlsButton.style.display = '';
+
 
       levelButtonContainer.style.display = 'none';
+      keybindContainer.style.display = 'none';
       closeButton.style.display = 'none';
 
-      for (var i = 0; i < 4; i++) {
-        charArr[i].style.display = '';
+      for (var _i = 0; _i < 4; _i++) {
+        charArr[_i].style.display = '';
       }
 
+      backgroundImage.src = titleBackground.src;
       backgroundImage.style.display = '';
     }
 
@@ -777,11 +881,10 @@ window.addEventListener('load', function () {
 
     var _loop = function _loop(i) {
       levelButtons[i].addEventListener('click', function () {
-        closeButton.style.display = 'none';
-        closeButton.removeEventListener('click', closeAction);
+        closeButton.style.display = 'none'; // closeButton.removeEventListener('click', closeAction);
 
-        for (var _i2 = 0; _i2 < 4; _i2++) {
-          charArr[_i2].style.display = 'none';
+        for (var _i6 = 0; _i6 < 4; _i6++) {
+          charArr[_i6].style.display = 'none';
         }
 
         backgroundImage.style.display = 'none';
@@ -796,26 +899,34 @@ window.addEventListener('load', function () {
     levelButtons[0].style.opacity = 100;
     levelButtons[0].style.cursor = 'pointer';
     closeButton.addEventListener('click', closeAction);
-    startGameButton.addEventListener('click', function () {
-      startGameButton.style.display = "none"; // controlsButton.style.display = 'none';
+    hButtons[0].addEventListener('click', function () {
+      for (var _i2 = 0; _i2 < hButtons.length; _i2++) {
+        hButtons[_i2].style.display = 'none';
+      }
 
       levelButtonContainer.style.display = '';
       closeButton.style.display = '';
 
-      for (var _i = 0; _i < 4; _i++) {
-        charArr[_i].style.display = 'none';
+      for (var _i3 = 0; _i3 < 4; _i3++) {
+        charArr[_i3].style.display = 'none';
       }
 
       backgroundImage.style.display = 'none';
-    }); // controlsButton.addEventListener('click', () => {
-    //     startGameButton.style.display = "none";
-    //     controlsButton.style.display = 'none';
-    //     controlsContainer.style.display = '';
-    //     closeButton.style.display = '';
-    //     for (let i = 0; i < 4; i++) {
-    //         charArr[i].style.display = 'none';
-    //     }
-    // })
+    });
+    hButtons[1].addEventListener('click', function () {
+      for (var _i4 = 0; _i4 < hButtons.length; _i4++) {
+        hButtons[_i4].style.display = 'none';
+      }
+
+      keybindContainer.style.display = '';
+      closeButton.style.display = '';
+
+      for (var _i5 = 0; _i5 < 4; _i5++) {
+        charArr[_i5].style.display = 'none';
+      }
+
+      backgroundImage.style.display = 'none';
+    });
   }
 
   slowFade(gameTag, secondAction);
@@ -1013,7 +1124,7 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
-var maxLevelNumber = 0;
+var maxLevelNumber = 7;
 var highestLevelAvailable = 8;
 var selectedChar;
 var livingEnemies = {};
@@ -1073,46 +1184,6 @@ function addEntityEvents(entity, allies, enemies) {
   }
 }
 
-var allyClickEvents = function allyClickEvents(e) {
-  // console.log('character click');
-  var entityName = e.target.className.slice(0, 2);
-  var entity = livingChars[entityName];
-
-  if (!selectedChar || selectedChar.hp < 0) {
-    selectedChar = entity;
-    entity.img.style.border = '5px solid gold'; // console.log('selected char: ', selectedChar.imgName);
-  } else if (selectedChar.baseDMG < 0) {
-    selectedChar.autoAttack(entity);
-    selectedChar.img.style.border = 'none';
-    selectedChar = null;
-  }
-
-  e.stopPropagation();
-};
-
-var enemyClickEvents = function enemyClickEvents(e) {
-  var entityName = e.target.className.slice(0, 2); // console.log('entity name', entityName);
-
-  var entity = livingEnemies[entityName]; // console.log('entity', entity);
-
-  if (selectedChar.hp < 0) {
-    selectedChar.img.style.border = 'none';
-    selectedChar = null;
-    return;
-  } // console.log('enemy click');
-
-
-  if (selectedChar && selectedChar.allied && selectedChar.baseDMG > 0) {
-    clearInterval(selectedChar.currentAction);
-    clearInterval(selectedChar.currentAnimation);
-    selectedChar.autoAttack(entity);
-    selectedChar.img.style.border = 'none';
-    selectedChar = null;
-  }
-
-  e.stopPropagation(); // maybe move inside if
-};
-
 function deSelect() {
   // console.log('de-selected')
   if (selectedChar) {
@@ -1134,6 +1205,93 @@ function returnToSelectPage() {
   document.getElementById("level-name-display").style.display = 'none';
   document.getElementById('begin-level-button').style.display = 'none';
   document.getElementById('level-button-container').style.display = '';
+  document.getElementById('close-button').style.display = '';
+}
+
+function selectChar(entity) {
+  if (!entity || entity.img.style.display === 'none') {
+    return;
+  }
+
+  if (!selectedChar || selectedChar.hp < 0) {
+    selectedChar = entity;
+    entity.img.style.border = '5px solid gold'; // console.log('selected char: ', selectedChar.imgName);
+  } else if (selectedChar.baseDMG < 0) {
+    selectedChar.autoAttack(entity);
+    selectedChar.img.style.border = 'none';
+    selectedChar = null;
+  }
+}
+
+function selectEnemy(entity) {
+  if (entity.img.style.display === 'none' || !selectedChar || selectedChar.hp < 0) {
+    selectedChar = null;
+    return;
+  }
+
+  if (selectedChar.allied && selectedChar.baseDMG > 0) {
+    clearInterval(selectedChar.currentAction);
+    clearInterval(selectedChar.currentAnimation);
+    selectedChar.autoAttack(entity);
+    selectedChar.img.style.border = 'none';
+    selectedChar = null;
+  }
+}
+
+var allyClickEvents = function allyClickEvents(e) {
+  // console.log('character click');
+  var entityName = e.target.className.slice(0, 2);
+  var entity = livingChars[entityName];
+  e.stopPropagation();
+  selectChar(entity);
+};
+
+var enemyClickEvents = function enemyClickEvents(e) {
+  var entityName = e.target.className.slice(0, 2);
+  var entity = livingEnemies[entityName];
+  e.stopPropagation();
+  selectEnemy(entity);
+};
+
+function keydownEvent(e) {
+  var entity;
+
+  if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
+    // char selection keydown
+    entity = livingChars['a' + e.key];
+
+    if (entity) {
+      selectChar(entity);
+    }
+  } else if (e.key === '5' || e.key === '6' || e.key === '7' || e.key === '8') {
+    entity = livingEnemies['e' + (e.key - 4)];
+
+    if (entity) {
+      selectEnemy(entity);
+    }
+  } else {
+    console.log('invalid key press');
+  }
+}
+
+function abilityClick(n) {
+  if (selectedChar) {
+    selectedChar.useAbility(n);
+  }
+}
+
+function setAbilityBoxes() {
+  var abilityBoxes = document.getElementsByClassName('inner-ability-div');
+
+  var _loop = function _loop(i) {
+    abilityBoxes[i].addEventListener('click', function () {
+      return abilityClick(i);
+    });
+  };
+
+  for (var i = 0; i < abilityBoxes.length; i++) {
+    _loop(i);
+  }
 }
 
 function initializeGameOpening() {
@@ -1159,6 +1317,11 @@ function initializeGameOpening() {
       selectedChar = null;
     }
   });
+  window.addEventListener('keypress', function (e) {
+    // console.log(e);
+    keydownEvent(e);
+  });
+  setAbilityBoxes();
   hasBeenLoaded = true;
 }
 
@@ -1243,7 +1406,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   backgroundImg.style.display = '';
   Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(backgroundImg);
 
-  var _loop = function _loop(i) {
+  var _loop2 = function _loop2(i) {
     if (!charactersArr[i].observer) {
       addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
     }
@@ -1266,10 +1429,10 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   };
 
   for (var i = 0; i < charactersArr.length; i++) {
-    _loop(i);
+    _loop2(i);
   }
 
-  var _loop2 = function _loop2(_i) {
+  var _loop3 = function _loop3(_i) {
     if (!enemiesArr[_i].observer) {
       addEntityEvents(enemiesArr[_i], enemiesArr, charactersArr);
     }
@@ -1296,7 +1459,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   };
 
   for (var _i = 0; _i < enemiesArr.length; _i++) {
-    _loop2(_i);
+    _loop3(_i);
   }
 }
 
@@ -1395,12 +1558,16 @@ function resetGame(won) {
   livingEnemies = {};
   var levelButtonContainer = document.getElementById('level-button-container');
   levelButtonContainer.style.display = '';
+  document.getElementById('close-button').style.display = '';
 
-  if (won && maxLevelNumber === currentLevelNumber && currentLevelNumber < highestLevelAvailable + 1) {
+  if (won && maxLevelNumber === currentLevelNumber) {
     maxLevelNumber++;
     var levelButtons = document.getElementsByClassName('level-button');
-    levelButtons[maxLevelNumber].style.opacity = 100 + '%';
-    levelButtons[maxLevelNumber].style.cursor = 'pointer';
+
+    if (levelButtons[maxLevelNumber]) {
+      levelButtons[maxLevelNumber].style.opacity = 100 + '%';
+      levelButtons[maxLevelNumber].style.cursor = 'pointer';
+    }
   } // level.characterList, level.enemyList
   // console.log('levels arr: ', levels);
   // console.log('level ', currentLevelNumber, ': ', levels[currentLevelNumber]);

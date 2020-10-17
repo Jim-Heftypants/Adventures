@@ -3,9 +3,13 @@ img {
     height: 200px;
 }
 
+#full-container {
+    display: flex;
+}
+
 #game-container {
     position: relative;
-    margin: auto;
+    /* margin: auto; */
     height: 900px;
     width: 90%;
     background-color: lawngreen;
@@ -34,6 +38,14 @@ img {
 .hp-percentage-right {
     width: 0%;
     background-color: red;
+}
+
+.hotkey-character-display {
+    position: absolute;
+    font-size: 30px;
+    left: 10px;
+    top: 22px;
+    color: crimson;
 }
 
 .level-name {
@@ -71,7 +83,8 @@ img {
     margin: auto;
     width: 550px;
     padding: 15px;
-    top: 15%;
+    margin-top: 3%;
+    top: 5%;
     z-index: 2;
     color: rgb(22, 141, 195);
     background-color: rgb(143, 75, 143);
@@ -203,7 +216,7 @@ img {
 }
 
 #warrior-base-img {
-    top: 25%;
+    top: 20%;
     position: relative;
     left: 32%;
     width: 180px;
@@ -212,7 +225,7 @@ img {
 }
 
 #rogue-base-img {
-    top: 25%;
+    top: 20%;
     position: relative;
     left: 27%;
     width: 180px;
@@ -221,7 +234,7 @@ img {
 }
 
 #wizard-base-img {
-    top: 25%;
+    top: 20%;
     position: relative;
     left: 22%;
     width: 180px;
@@ -230,7 +243,7 @@ img {
 }
 
 #cleric-base-img {
-    top: 25%;
+    top: 20%;
     position: relative;
     left: 37%;
     width: 180px;
@@ -256,4 +269,44 @@ img {
     background-color: steelblue;
     position: relative;
     z-index: 2;
+}
+
+#keybindings-container {
+    display: flex;
+    flex-direction: row;
+    align-content: space-between;
+    margin-top: 10%;
+    margin-left: 10%;
+    margin-right: 10%;
+    width: 80%;
+    height: 80%;
+    color: red;
+    font-size: 60px;
+    /* text-align: center; */
+}
+
+#ally-keybinds, #enemy-keybinds {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#character-ability-container {
+    display: flex;
+    flex-direction: column;
+    width: 9%;
+    background-color: darkgreen;
+}
+
+.ability-boxes {
+    margin: auto;
+    width: 90%;
+    color: red;
+    font-size: 20px;
+    text-align: center;
+}
+
+.inner-ability-div {
+    width: 100%;
+    height: 120px;
+    background-color: lightskyblue;
 }

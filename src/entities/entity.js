@@ -1,5 +1,5 @@
 class Entity { // this. is selectedChar
-    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0) {
+    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0, abilities=[]) {
         this.klass = klass;
 
         this.range = range;
@@ -15,6 +15,9 @@ class Entity { // this. is selectedChar
         this.baseDMG = attackDMG;
         this.dmg = this.baseDMG;
         this.defense = defense;
+
+        this.abilities = abilities;
+        this.abilityAvailable = [true, true, true, true];
 
         this.imgName = img;
         this.img; // base standing image
@@ -334,8 +337,21 @@ class Entity { // this. is selectedChar
         this.img.src = this.baseImg.src;
     }
 
-    useAbility(ability) {
-        // not implimented
+    useAbility(n) {
+        if (!this.abilityAvailable[n]) {
+            return;
+        }
+        console.log('ability', n, 'used');
+        this.abilityAvailable[n] = false;
+        const ab = this.abilities[n];
+        console.log('ability: ', ab);
+        const cdTime = ab(this);
+        console.log('seconds for ability cd: ', cdTime);
+        let CDTimer = setInterval(() => {
+            this.abilityAvailable[n] = true;
+            console.log(this.imgName, ' ability ', n, ' off CD');
+            clearInterval(CDTimer);
+        }, (cdTime * 1000));
     }
 
 }
