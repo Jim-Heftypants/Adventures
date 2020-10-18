@@ -28,6 +28,29 @@ window.addEventListener('load', () => {
     const backgroundImage = document.getElementById('background-image');
     const titleBackground = document.getElementById('title');
 
+    const keybindInputs = document.getElementsByClassName('keybind-input');
+    for (let i = 0; i < keybindInputs.length; i++) {
+        keybindInputs[i].addEventListener("change", () => handleKeybindInput(keybindInputs[i]));
+    }
+
+    function handleKeybindInput(input) {
+        // console.log('pre-mod: ', input.value);
+        if (input.value.length > 1) {
+            input.value = input.value[0];
+        } else if (isOverlappingBind(input)) {
+            input.value = '';
+        }
+    }
+
+    function isOverlappingBind(input) {
+        let c = 0;
+        for (let i = 0; i < keybindInputs.length; i++) {
+            if (keybindInputs[i].value === input.value) { c++; }
+            if (c > 1) { return true; }
+        }
+        return false;
+    }
+
     function secondAction() {
         const gTContainer = document.getElementById('game-tag-container');
         gTContainer.style.display = 'none';

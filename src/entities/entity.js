@@ -18,6 +18,10 @@ class Entity { // this. is selectedChar
 
         this.abilities = abilities;
         this.abilityAvailable = [true, true, true, true];
+        this.abilityContainer;
+
+        this.hotkeyDisplay;
+        this.hotkey;
 
         this.imgName = img;
         this.img; // base standing image
@@ -55,6 +59,11 @@ class Entity { // this. is selectedChar
         this.img.style.display = "";
         this.container.style.left = this.pos[0] + "px";
         this.container.style.top = this.pos[1] + "px";
+        this.hotkeyDisplay = document.getElementById(this.imgName + '-hotkey-display');
+        this.hotkey = document.getElementById(this.imgName + '-keybind').value;
+        if (this.allied) {
+            this.abilityContainer = document.getElementById(this.imgName + '-ability-container');
+        }
     }
 
     vectorToScalar(endPos) {
@@ -83,7 +92,7 @@ class Entity { // this. is selectedChar
         clearInterval(this.currentAction);
         clearInterval(this.currentAnimation);
         this.img.src = this.baseImg.src;
-        endPos[0] = Math.floor(endPos[0] - (this.img.width));
+        endPos[0] = Math.floor(endPos[0] - (this.img.width * (3/2)));
         endPos[1] = Math.floor(endPos[1] - (this.img.height * (3/4)));
         let pos = this.pos;
         let posChange = this.vectorToScalar(endPos);
@@ -153,6 +162,11 @@ class Entity { // this. is selectedChar
 
     animateAttack() {
         if (this.attackImages) {
+            if (this.target.pos[0] < this.pos[0]) {
+                this.img.style.transform = "scaleX(-1)";
+            } else {
+                this.img.style.transform = "scaleX(1)";
+            }
             this.imgCycle += 1;
             this.imgCycle = this.imgCycle % 4;
             this.img.src = this.attackImages[this.imgCycle].src;
@@ -347,6 +361,9 @@ class Entity { // this. is selectedChar
         console.log('ability: ', ab);
         const cdTime = ab(this);
         console.log('seconds for ability cd: ', cdTime);
+        const innerBoxes = document.getElementsByClassName(this.imgName + '-inner-ability-divs');
+        // innerBoxes[n].style.animation = `inner-ability-animate ${cdTime}s linear 0s 1`; // didnt work
+        colorFade(innerBoxes[n], cdTime, [255, 0, 0], [0, 0, 255]);
         let CDTimer = setInterval(() => {
             this.abilityAvailable[n] = true;
             console.log(this.imgName, ' ability ', n, ' off CD');
@@ -356,6 +373,36 @@ class Entity { // this. is selectedChar
 
 }
 
+export default Entity;
+
+
+function colorFade(element, time, start, end) {
+    element.style.width = '100%';
+    element.style.border = 'none';
+    element.style.backgroundColor = 'rgb(' + start.toString() + ')';
+    let currentColor = start.slice();
+    const numIntervals = time * 5;
+    let deltaX = Math.floor((end[0] - start[0]) / numIntervals);
+    let deltaY = Math.floor((end[1] - start[1]) / numIntervals);
+    let deltaZ = Math.floor((end[2] - start[2]) / numIntervals);
+    let timeCount = 0;
+    let interval = setInterval(() => {
+        currentColor[0] += deltaX;
+        currentColor[1] += deltaY;
+        currentColor[2] += deltaZ;
+        element.style.backgroundColor = 'rgb(' + currentColor.toString() + ')';
+        timeCount++;
+        if (timeCount >= (time * 5)) {
+            element.style.backgroundColor = 'rgb(' + end.toString() + ')';
+            element.style.width = '95%';
+            element.style.border = '5px solid gold';
+            console.log('color fade complete');
+            clearInterval(interval);
+        }
+
+    }, 200);
+}
+
 function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -363,5 +410,3 @@ function shuffle(a) {
     }
     return a;
 }
-
-export default Entity;

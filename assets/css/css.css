@@ -83,8 +83,8 @@ img {
     margin: auto;
     width: 550px;
     padding: 15px;
-    margin-top: 3%;
-    top: 5%;
+    margin-top: 2%;
+    top: 4%;
     z-index: 2;
     color: rgb(22, 141, 195);
     background-color: rgb(143, 75, 143);
@@ -275,7 +275,7 @@ img {
     display: flex;
     flex-direction: row;
     align-content: space-between;
-    margin-top: 10%;
+    /* margin-top: 10%; */
     margin-left: 10%;
     margin-right: 10%;
     width: 80%;
@@ -290,14 +290,26 @@ img {
     margin-right: auto;
 }
 
-#character-ability-container {
+.keybind-div {
+    display: flex;
+}
+
+.keybind-input {
+    margin-top: 60px;
+    width: 40px;
+    height: 60px;
+    font-size: 50px;
+    text-align: center;
+}
+
+#all-characters-ability-container {
     display: flex;
     flex-direction: column;
     width: 9%;
     background-color: darkgreen;
 }
 
-.ability-boxes {
+.a1-ability-boxes, .a2-ability-boxes, .a3-ability-boxes, .a4-ability-boxes {
     margin: auto;
     width: 90%;
     color: red;
@@ -305,8 +317,9 @@ img {
     text-align: center;
 }
 
-.inner-ability-div {
-    width: 100%;
+.a1-inner-ability-divs, .a2-inner-ability-divs, .a3-inner-ability-divs, .a4-inner-ability-divs {
+    width: 95%;
     height: 120px;
-    background-color: lightskyblue;
+    background-color: rgb(0,0,255);
+    border: 5px solid gold;
 }

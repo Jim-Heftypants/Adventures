@@ -10,22 +10,78 @@
 <body>
     <script src="./dist/main.js"></script>
     <div id='full-container'>
-        <div id='character-ability-container'>
-            <div id='ability-1-box' class="ability-boxes">
-                <p id='ability-1-label' class='ability-labels'>1</p>
-                <div class="inner-ability-div"></div>
+        <div id='all-characters-ability-container'>
+            <div id='a1-ability-container' style="display: none;">
+                <div id='a1-ability-1-box' class="a1-ability-boxes">
+                    <p id='a1-ability-1-label' class='a1-ability-labels'>1</p>
+                    <div id='a1-inner-ability' class="a1-inner-ability-divs"></div>
+                </div>
+                <div id='a1-ability-2-box' class="a1-ability-boxes">
+                    <p id='a1-ability-2-label' class='a1-ability-labels'>2</p>
+                    <div id='a1-inner-ability' class="a1-inner-ability-divs"></div>
+                </div>
+                <div id='a1-ability-3-box' class="a1-ability-boxes">
+                    <p id='a1-ability-3-label' class='a1-ability-labels'>3</p>
+                    <div id='a1-inner-ability' class="a1-inner-ability-divs"></div>
+                </div>
+                <div id='a1-ability-4-box' class="a1-ability-boxes">
+                    <p id='a1-ability-4-label' class='a1-ability-labels'>4</p>
+                    <div id='a1-inner-ability' class="a1-inner-ability-divs"></div>
+                </div>
             </div>
-            <div id='ability-2-box' class="ability-boxes">
-                <p id='ability-2-label' class='ability-labels'>2</p>
-                <div class="inner-ability-div"></div>
+            <div id='a2-ability-container' style="display: none;">
+                <div id='a2-ability-1-box' class="a2-ability-boxes">
+                    <p id='a2-ability-1-label' class='a2-ability-labels'>1</p>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                </div>
+                <div id='a2-ability-2-box' class="a2-ability-boxes">
+                    <p id='a2-ability-2-label' class='a2-ability-labels'>2</p>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                </div>
+                <div id='a2-ability-3-box' class="a2-ability-boxes">
+                    <p id='a2-ability-3-label' class='a2-ability-labels'>3</p>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                </div>
+                <div id='a2-ability-4-box' class="a2-ability-boxes">
+                    <p id='a2-ability-4-label' class='a2-ability-labels'>4</p>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                </div>
             </div>
-            <div id='ability-3-box' class="ability-boxes">
-                <p id='ability-3-label' class='ability-labels'>3</p>
-                <div class="inner-ability-div"></div>
+            <div id='a3-ability-container' style="display: none;">
+                <div id='a3-ability-1-box' class="a3-ability-boxes">
+                    <p id='a3-ability-1-label' class='a3-ability-labels'>1</p>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                </div>
+                <div id='a3-ability-2-box' class="a3-ability-boxes">
+                    <p id='a3-ability-2-label' class='a3-ability-labels'>2</p>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                </div>
+                <div id='a3-ability-3-box' class="a3-ability-boxes">
+                    <p id='a3-ability-3-label' class='a3-ability-labels'>3</p>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                </div>
+                <div id='a3-ability-4-box' class="a3-ability-boxes">
+                    <p id='a3-ability-4-label' class='a3-ability-labels'>4</p>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                </div>
             </div>
-            <div id='ability-4-box' class="ability-boxes">
-                <p id='ability-4-label' class='ability-labels'>4</p>
-                <div class="inner-ability-div"></div>
+            <div id='a4-ability-container' style="display: none;">
+                <div id='a4-ability-1-box' class="a4-ability-boxes">
+                    <p id='a4-ability-1-label' class='a4-ability-labels'>1</p>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                </div>
+                <div id='a4-ability-2-box' class="a4-ability-boxes">
+                    <p id='a4-ability-2-label' class='a4-ability-labels'>2</p>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                </div>
+                <div id='a4-ability-3-box' class="a4-ability-boxes">
+                    <p id='a4-ability-3-label' class='a4-ability-labels'>3</p>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                </div>
+                <div id='a4-ability-4-box' class="a4-ability-boxes">
+                    <p id='a4-ability-4-label' class='a4-ability-labels'>4</p>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                </div>
             </div>
         </div>
         <div id='game-container'>
@@ -43,18 +99,23 @@
             <h1 class="h-button" id="start-game-button" style="display: none;">Start Game!</h1>
             <h1 class='h-button' id='keybindings-button' style="display: none;">Keybindings</h1>
 
-            <div id='keybindings-container' style="display: none;">
-                <div id='ally-keybinds'>
-                    <div><p>Warrior == 1</p></div>
-                    <div><p>Cleric == 2</p></div>
-                    <div><p>Wizard == 3</p></div>
-                    <div><p>Rogue == 4</p></div>
+            <div id='full-keybind-container'>
+                <div id='keybindings-rules'>
+                    <p>Keybinds must be a single character and must not be duplicates of other keybindings.</p>
                 </div>
-                <div id='enemy-keybinds'>
-                    <div><p>Enemy One == 5</p></div>
-                    <div><p>Enemy Two == 6</p></div>
-                    <div><p>Enemy Three == 7</p></div>
-                    <div><p>Enemy Four == 8</p></div>
+                <div id='keybindings-container' style="display: none;">
+                    <div id='ally-keybinds'>
+                        <div class='keybind-div'><p>Warrior ==&nbsp</p><input type='text' value="1" id='a1-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Cleric ==&nbsp</p><input type="text" value="2" id='a2-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Wizard ==&nbsp</p><input type="text" value="3" id='a3-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Rogue ==&nbsp</p><input type="text" value="4" id='a4-keybind' class='keybind-input'></input></div>
+                    </div>
+                    <div id='enemy-keybinds'>
+                        <div class='keybind-div'><p>Enemy One ==&nbsp</p><input type="text" value="5" id='e1-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Enemy Two ==&nbsp</p><input type="text" value="6" id='e2-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Enemy Three ==&nbsp</p><input type="text" value="7" id='e3-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Enemy Four ==&nbsp</p><input type="text" value="8" id='e4-keybind' class='keybind-input'></input></div>
+                    </div>
                 </div>
             </div>
 

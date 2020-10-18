@@ -13,6 +13,10 @@ let selectedChar;
 
 let livingEnemies = {};
 let livingChars = {};
+
+let currentAbilityBoxes;
+
+let hotkeys = {};
  
 function addDeathListener(entity) {
     entity.observer = new MutationObserver(function(mutations) {
@@ -61,6 +65,8 @@ function addEntityEvents(entity, allies, enemies) {
 function deSelect() {
     // console.log('de-selected')
     if (selectedChar) {
+        selectedChar.abilityContainer.style.display = 'none';
+        currentAbilityBoxes = null;
         selectedChar.img.style.border = 'none';
         selectedChar = null;
     }
@@ -87,10 +93,16 @@ function selectChar(entity) {
         return;
     }
     if (!selectedChar || selectedChar.hp < 0) {
+        // for (let i = 0; i < entity.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = ''; }
+        entity.abilityContainer.style.display = '';
+        currentAbilityBoxes = entity.abilityContainer;
         selectedChar = entity;
         entity.img.style.border = '5px solid gold';
         // console.log('selected char: ', selectedChar.imgName);
     } else if (selectedChar.baseDMG < 0) {
+        // for (let i = 0; i < selectedChar.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = 'none'; }
+        selectedChar.abilityContainer.style.display = 'none';
+        currentAbilityBoxes = null;
         selectedChar.autoAttack(entity);
         selectedChar.img.style.border = 'none';
         selectedChar = null;
@@ -107,6 +119,8 @@ function selectEnemy(entity) {
         clearInterval(selectedChar.currentAnimation);
         selectedChar.autoAttack(entity);
         selectedChar.img.style.border = 'none';
+        selectedChar.abilityContainer.style.display = 'none';
+        currentAbilityBoxes = null;
         selectedChar = null;
     }
 }
@@ -127,28 +141,35 @@ const enemyClickEvents = (e) => {
 }
 
 function keydownEvent (e) {
-    let entity;
-    if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') { // char selection keydown
-        entity = livingChars['a' + e.key];
-        if (entity) { selectChar(entity); }
-    } else if (e.key === '5' || e.key === '6' || e.key === '7' || e.key === '8') {
-        entity = livingEnemies['e' + (e.key - 4)];
-        if (entity) { selectEnemy(entity); }
+    const entity = hotkeys[e.key];
+    if (entity && entity.allied) {
+        selectChar(entity);
+    } else if (entity) {
+        selectEnemy(entity);
     } else {
-        console.log('invalid key press');
+        console.log('invalid key press of: ', e.key);
     }
 }
 
-function abilityClick(n) {
-    if (selectedChar) {
-        selectedChar.useAbility(n);
+function abilityClick(arr) {
+    const entity = livingChars['a'+arr[0]];
+    if (entity) {
+        entity.useAbility(arr[1]);
+    } else {
+        console.log('invalid entity for ability use');
     }
 }
 
 function setAbilityBoxes() {
-    const abilityBoxes = document.getElementsByClassName('inner-ability-div');
+    let abilityBoxes = [];
+    abilityBoxes.push(document.getElementsByClassName('a1-inner-ability-divs'));
+    abilityBoxes.push(document.getElementsByClassName('a2-inner-ability-divs'));
+    abilityBoxes.push(document.getElementsByClassName('a3-inner-ability-divs'));
+    abilityBoxes.push(document.getElementsByClassName('a4-inner-ability-divs'));
     for (let i = 0; i < abilityBoxes.length; i++) {
-        abilityBoxes[i].addEventListener('click', () => abilityClick(i));
+        for (let j = 0; j < abilityBoxes[i].length; j++) {
+            abilityBoxes[i][j].addEventListener('click', () => abilityClick([i+1, j]));
+        }
     }
 }
 
@@ -172,11 +193,12 @@ function initializeGameOpening() {
             clearInterval(selectedChar.currentAction);
             clearInterval(selectedChar.currentAnimation);
             selectedChar.img.style.border = 'none';
+            currentAbilityBoxes.style.display = 'none';
+            currentAbilityBoxes = null;
             selectedChar.move([e.x, e.y]);
             selectedChar = null;
         }
     })
-
     window.addEventListener('keypress', (e) => {
         // console.log(e);
         keydownEvent(e);
@@ -222,6 +244,7 @@ function loadLevel(levelNumber) {
 }
 
 function beginLevel(charactersArr, enemiesArr, levelNumber) {
+    hotkeys = {};
     setInitialTargets(charactersArr, enemiesArr);
     loadInCharacters(charactersArr, enemiesArr, levelNumber);
 }
@@ -267,6 +290,11 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         charactersArr[i].container.style.display = '';
         const hpBar = document.getElementById(`${charactersArr[i].imgName}-hp-bar`);
         hpBar.style.display = "flex";
+        // charactersArr[i].hotkeyDisplay.innerHTML = charactersArr[i].hotkey;
+        // hotkeys[charactersArr[i].hotkey] = charactersArr[i];
+        const hotkeyInput = document.getElementById(`a${i+1}-keybind`);
+        charactersArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
+        hotkeys[hotkeyInput.value] = charactersArr[i]
         const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
         charactersArr[i].img.src = charactersArr[i].baseImg.src;
         fadeIn(charactersArr[i].container, actionEvent);
@@ -283,13 +311,16 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         enemiesArr[i].container.style.display = '';
         const hpBar = document.getElementById(`${enemiesArr[i].imgName}-hp-bar`);
         hpBar.style.display = "flex";
+        const hotkeyInput = document.getElementById(`e${i+1}-keybind`);
+        enemiesArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
+        hotkeys[hotkeyInput.value] = enemiesArr[i]
         enemiesArr[i].container.addEventListener('click', enemyClickEvents);
         enemiesArr[i].img.src = enemiesArr[i].baseImg.src;
         const action = () => enemiesArr[i].autoAttack(enemiesArr[i].target);
         fadeIn(enemiesArr[i].container, action); // begin attacking target
         observerObserve(enemiesArr[i]);
     }
-    
+    // console.log("hotkeys: ", hotkeys);
 }
 
 function observerObserve(entity) {
@@ -301,6 +332,10 @@ function observerObserve(entity) {
 
 
 function endGame(charsList, enemyList) {
+    if (currentAbilityBoxes) {
+        currentAbilityBoxes.style.display = 'none';
+        currentAbilityBoxes = null;
+    }
     const levelMessage = document.getElementById('tutorial-message');
     levelMessage.style.display = 'none';
     const deSelectButton = document.getElementById('test');

@@ -101,13 +101,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rogueAbilities", function() { return rogueAbilities; });
 var groupHeal = function groupHeal(entity) {
   for (var i = 0; i < entity.allies; i++) {
-    entity.allies[i].hp = Math.floor(entity.allies[i].hp + entity.allies[i].hp * 0.2);
+    if (entity.allies[i].hp > 0) {
+      entity.allies[i].hp += 20;
 
-    if (entity.allies[i].hp > 100) {
-      entity.allies[i].hp = 100;
+      if (entity.allies[i].hp > 100) {
+        entity.allies[i].hp = 100;
+      }
+
+      entity.allies[i].setHpBars();
     }
-
-    entity.allies[i].setHpBars();
   }
 
   return 10;
@@ -116,6 +118,11 @@ var groupHeal = function groupHeal(entity) {
 var powerSwing = function powerSwing(entity) {
   entity.target.hp -= 20;
   entity.target.setHpBars();
+
+  if (entity.target.hp <= 0) {
+    entity.killEntitiy(entity.target);
+  }
+
   return 10;
 };
 
@@ -126,6 +133,11 @@ var poisonDagger = function poisonDagger(entity, n) {
     timer++;
     entity.target.hp -= 4;
     entity.target.setHpBars();
+
+    if (entity.target.hp <= 0) {
+      entity.killEntitiy(entity.target);
+      clearInterval(_int);
+    }
 
     if (timer > 5) {
       clearInterval(_int);
@@ -138,6 +150,11 @@ var poisonDagger = function poisonDagger(entity, n) {
 var meteor = function meteor(entity) {
   entity.target.hp -= 25;
   entity.target.setHpBars();
+
+  if (entity.target.hp <= 0) {
+    entity.killEntitiy(entity.target);
+  }
+
   return 10;
 };
 
@@ -335,6 +352,9 @@ var Entity = /*#__PURE__*/function () {
     this.defense = defense;
     this.abilities = abilities;
     this.abilityAvailable = [true, true, true, true];
+    this.abilityContainer;
+    this.hotkeyDisplay;
+    this.hotkey;
     this.imgName = img;
     this.img; // base standing image
 
@@ -372,6 +392,12 @@ var Entity = /*#__PURE__*/function () {
       this.img.style.display = "";
       this.container.style.left = this.pos[0] + "px";
       this.container.style.top = this.pos[1] + "px";
+      this.hotkeyDisplay = document.getElementById(this.imgName + '-hotkey-display');
+      this.hotkey = document.getElementById(this.imgName + '-keybind').value;
+
+      if (this.allied) {
+        this.abilityContainer = document.getElementById(this.imgName + '-ability-container');
+      }
     }
   }, {
     key: "vectorToScalar",
@@ -411,7 +437,7 @@ var Entity = /*#__PURE__*/function () {
       clearInterval(this.currentAction);
       clearInterval(this.currentAnimation);
       this.img.src = this.baseImg.src;
-      endPos[0] = Math.floor(endPos[0] - this.img.width);
+      endPos[0] = Math.floor(endPos[0] - this.img.width * (3 / 2));
       endPos[1] = Math.floor(endPos[1] - this.img.height * (3 / 4));
       var pos = this.pos;
       var posChange = this.vectorToScalar(endPos); // console.log("pos change on move", posChange);
@@ -510,6 +536,12 @@ var Entity = /*#__PURE__*/function () {
     key: "animateAttack",
     value: function animateAttack() {
       if (this.attackImages) {
+        if (this.target.pos[0] < this.pos[0]) {
+          this.img.style.transform = "scaleX(-1)";
+        } else {
+          this.img.style.transform = "scaleX(1)";
+        }
+
         this.imgCycle += 1;
         this.imgCycle = this.imgCycle % 4;
         this.img.src = this.attackImages[this.imgCycle].src;
@@ -774,6 +806,9 @@ var Entity = /*#__PURE__*/function () {
       console.log('ability: ', ab);
       var cdTime = ab(this);
       console.log('seconds for ability cd: ', cdTime);
+      var innerBoxes = document.getElementsByClassName(this.imgName + '-inner-ability-divs'); // innerBoxes[n].style.animation = `inner-ability-animate ${cdTime}s linear 0s 1`; // didnt work
+
+      colorFade(innerBoxes[n], cdTime, [255, 0, 0], [0, 0, 255]);
       var CDTimer = setInterval(function () {
         _this5.abilityAvailable[n] = true;
         console.log(_this5.imgName, ' ability ', n, ' off CD');
@@ -785,6 +820,35 @@ var Entity = /*#__PURE__*/function () {
   return Entity;
 }();
 
+/* harmony default export */ __webpack_exports__["default"] = (Entity);
+
+function colorFade(element, time, start, end) {
+  element.style.width = '100%';
+  element.style.border = 'none';
+  element.style.backgroundColor = 'rgb(' + start.toString() + ')';
+  var currentColor = start.slice();
+  var numIntervals = time * 5;
+  var deltaX = Math.floor((end[0] - start[0]) / numIntervals);
+  var deltaY = Math.floor((end[1] - start[1]) / numIntervals);
+  var deltaZ = Math.floor((end[2] - start[2]) / numIntervals);
+  var timeCount = 0;
+  var interval = setInterval(function () {
+    currentColor[0] += deltaX;
+    currentColor[1] += deltaY;
+    currentColor[2] += deltaZ;
+    element.style.backgroundColor = 'rgb(' + currentColor.toString() + ')';
+    timeCount++;
+
+    if (timeCount >= time * 5) {
+      element.style.backgroundColor = 'rgb(' + end.toString() + ')';
+      element.style.width = '95%';
+      element.style.border = '5px solid gold';
+      console.log('color fade complete');
+      clearInterval(interval);
+    }
+  }, 200);
+}
+
 function shuffle(a) {
   for (var i = a.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
@@ -795,8 +859,6 @@ function shuffle(a) {
 
   return a;
 }
-
-/* harmony default export */ __webpack_exports__["default"] = (Entity);
 
 /***/ }),
 
@@ -853,6 +915,42 @@ window.addEventListener('load', function () {
   var levelButtons = document.getElementsByClassName('level-button');
   var backgroundImage = document.getElementById('background-image');
   var titleBackground = document.getElementById('title');
+  var keybindInputs = document.getElementsByClassName('keybind-input');
+
+  var _loop = function _loop(i) {
+    keybindInputs[i].addEventListener("change", function () {
+      return handleKeybindInput(keybindInputs[i]);
+    });
+  };
+
+  for (var i = 0; i < keybindInputs.length; i++) {
+    _loop(i);
+  }
+
+  function handleKeybindInput(input) {
+    // console.log('pre-mod: ', input.value);
+    if (input.value.length > 1) {
+      input.value = input.value[0];
+    } else if (isOverlappingBind(input)) {
+      input.value = '';
+    }
+  }
+
+  function isOverlappingBind(input) {
+    var c = 0;
+
+    for (var _i = 0; _i < keybindInputs.length; _i++) {
+      if (keybindInputs[_i].value === input.value) {
+        c++;
+      }
+
+      if (c > 1) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 
   function secondAction() {
     var gTContainer = document.getElementById('game-tag-container');
@@ -860,8 +958,8 @@ window.addEventListener('load', function () {
 
     function closeAction() {
       // controlsContainer.style.display = 'none';
-      for (var i = 0; i < hButtons.length; i++) {
-        hButtons[i].style.display = '';
+      for (var _i2 = 0; _i2 < hButtons.length; _i2++) {
+        hButtons[_i2].style.display = '';
       } // controlsButton.style.display = '';
 
 
@@ -869,8 +967,8 @@ window.addEventListener('load', function () {
       keybindContainer.style.display = 'none';
       closeButton.style.display = 'none';
 
-      for (var _i = 0; _i < 4; _i++) {
-        charArr[_i].style.display = '';
+      for (var _i3 = 0; _i3 < 4; _i3++) {
+        charArr[_i3].style.display = '';
       }
 
       backgroundImage.src = titleBackground.src;
@@ -879,50 +977,50 @@ window.addEventListener('load', function () {
 
     closeAction();
 
-    var _loop = function _loop(i) {
-      levelButtons[i].addEventListener('click', function () {
+    var _loop2 = function _loop2(_i4) {
+      levelButtons[_i4].addEventListener('click', function () {
         closeButton.style.display = 'none'; // closeButton.removeEventListener('click', closeAction);
 
-        for (var _i6 = 0; _i6 < 4; _i6++) {
-          charArr[_i6].style.display = 'none';
+        for (var _i9 = 0; _i9 < 4; _i9++) {
+          charArr[_i9].style.display = 'none';
         }
 
         backgroundImage.style.display = 'none';
-        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(i);
+        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i4);
       });
     };
 
-    for (var i = 0; i < levelButtons.length; i++) {
-      _loop(i);
+    for (var _i4 = 0; _i4 < levelButtons.length; _i4++) {
+      _loop2(_i4);
     }
 
     levelButtons[0].style.opacity = 100;
     levelButtons[0].style.cursor = 'pointer';
     closeButton.addEventListener('click', closeAction);
     hButtons[0].addEventListener('click', function () {
-      for (var _i2 = 0; _i2 < hButtons.length; _i2++) {
-        hButtons[_i2].style.display = 'none';
+      for (var _i5 = 0; _i5 < hButtons.length; _i5++) {
+        hButtons[_i5].style.display = 'none';
       }
 
       levelButtonContainer.style.display = '';
       closeButton.style.display = '';
 
-      for (var _i3 = 0; _i3 < 4; _i3++) {
-        charArr[_i3].style.display = 'none';
+      for (var _i6 = 0; _i6 < 4; _i6++) {
+        charArr[_i6].style.display = 'none';
       }
 
       backgroundImage.style.display = 'none';
     });
     hButtons[1].addEventListener('click', function () {
-      for (var _i4 = 0; _i4 < hButtons.length; _i4++) {
-        hButtons[_i4].style.display = 'none';
+      for (var _i7 = 0; _i7 < hButtons.length; _i7++) {
+        hButtons[_i7].style.display = 'none';
       }
 
       keybindContainer.style.display = '';
       closeButton.style.display = '';
 
-      for (var _i5 = 0; _i5 < 4; _i5++) {
-        charArr[_i5].style.display = 'none';
+      for (var _i8 = 0; _i8 < 4; _i8++) {
+        charArr[_i8].style.display = 'none';
       }
 
       backgroundImage.style.display = 'none';
@@ -1129,6 +1227,8 @@ var highestLevelAvailable = 8;
 var selectedChar;
 var livingEnemies = {};
 var livingChars = {};
+var currentAbilityBoxes;
+var hotkeys = {};
 
 function addDeathListener(entity) {
   entity.observer = new MutationObserver(function (mutations) {
@@ -1187,6 +1287,8 @@ function addEntityEvents(entity, allies, enemies) {
 function deSelect() {
   // console.log('de-selected')
   if (selectedChar) {
+    selectedChar.abilityContainer.style.display = 'none';
+    currentAbilityBoxes = null;
     selectedChar.img.style.border = 'none';
     selectedChar = null;
   }
@@ -1214,9 +1316,15 @@ function selectChar(entity) {
   }
 
   if (!selectedChar || selectedChar.hp < 0) {
+    // for (let i = 0; i < entity.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = ''; }
+    entity.abilityContainer.style.display = '';
+    currentAbilityBoxes = entity.abilityContainer;
     selectedChar = entity;
     entity.img.style.border = '5px solid gold'; // console.log('selected char: ', selectedChar.imgName);
   } else if (selectedChar.baseDMG < 0) {
+    // for (let i = 0; i < selectedChar.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = 'none'; }
+    selectedChar.abilityContainer.style.display = 'none';
+    currentAbilityBoxes = null;
     selectedChar.autoAttack(entity);
     selectedChar.img.style.border = 'none';
     selectedChar = null;
@@ -1234,6 +1342,8 @@ function selectEnemy(entity) {
     clearInterval(selectedChar.currentAnimation);
     selectedChar.autoAttack(entity);
     selectedChar.img.style.border = 'none';
+    selectedChar.abilityContainer.style.display = 'none';
+    currentAbilityBoxes = null;
     selectedChar = null;
   }
 }
@@ -1254,39 +1364,44 @@ var enemyClickEvents = function enemyClickEvents(e) {
 };
 
 function keydownEvent(e) {
-  var entity;
+  var entity = hotkeys[e.key];
 
-  if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
-    // char selection keydown
-    entity = livingChars['a' + e.key];
-
-    if (entity) {
-      selectChar(entity);
-    }
-  } else if (e.key === '5' || e.key === '6' || e.key === '7' || e.key === '8') {
-    entity = livingEnemies['e' + (e.key - 4)];
-
-    if (entity) {
-      selectEnemy(entity);
-    }
+  if (entity && entity.allied) {
+    selectChar(entity);
+  } else if (entity) {
+    selectEnemy(entity);
   } else {
-    console.log('invalid key press');
+    console.log('invalid key press of: ', e.key);
   }
 }
 
-function abilityClick(n) {
-  if (selectedChar) {
-    selectedChar.useAbility(n);
+function abilityClick(arr) {
+  var entity = livingChars['a' + arr[0]];
+
+  if (entity) {
+    entity.useAbility(arr[1]);
+  } else {
+    console.log('invalid entity for ability use');
   }
 }
 
 function setAbilityBoxes() {
-  var abilityBoxes = document.getElementsByClassName('inner-ability-div');
+  var abilityBoxes = [];
+  abilityBoxes.push(document.getElementsByClassName('a1-inner-ability-divs'));
+  abilityBoxes.push(document.getElementsByClassName('a2-inner-ability-divs'));
+  abilityBoxes.push(document.getElementsByClassName('a3-inner-ability-divs'));
+  abilityBoxes.push(document.getElementsByClassName('a4-inner-ability-divs'));
 
   var _loop = function _loop(i) {
-    abilityBoxes[i].addEventListener('click', function () {
-      return abilityClick(i);
-    });
+    var _loop2 = function _loop2(j) {
+      abilityBoxes[i][j].addEventListener('click', function () {
+        return abilityClick([i + 1, j]);
+      });
+    };
+
+    for (var j = 0; j < abilityBoxes[i].length; j++) {
+      _loop2(j);
+    }
   };
 
   for (var i = 0; i < abilityBoxes.length; i++) {
@@ -1313,6 +1428,8 @@ function initializeGameOpening() {
       clearInterval(selectedChar.currentAction);
       clearInterval(selectedChar.currentAnimation);
       selectedChar.img.style.border = 'none';
+      currentAbilityBoxes.style.display = 'none';
+      currentAbilityBoxes = null;
       selectedChar.move([e.x, e.y]);
       selectedChar = null;
     }
@@ -1368,6 +1485,7 @@ function loadLevel(levelNumber) {
 }
 
 function beginLevel(charactersArr, enemiesArr, levelNumber) {
+  hotkeys = {};
   setInitialTargets(charactersArr, enemiesArr);
   loadInCharacters(charactersArr, enemiesArr, levelNumber);
 }
@@ -1406,7 +1524,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   backgroundImg.style.display = '';
   Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(backgroundImg);
 
-  var _loop2 = function _loop2(i) {
+  var _loop3 = function _loop3(i) {
     if (!charactersArr[i].observer) {
       addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
     }
@@ -1417,7 +1535,12 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     charactersArr[i].container.style.opacity = 0;
     charactersArr[i].container.style.display = '';
     var hpBar = document.getElementById("".concat(charactersArr[i].imgName, "-hp-bar"));
-    hpBar.style.display = "flex";
+    hpBar.style.display = "flex"; // charactersArr[i].hotkeyDisplay.innerHTML = charactersArr[i].hotkey;
+    // hotkeys[charactersArr[i].hotkey] = charactersArr[i];
+
+    var hotkeyInput = document.getElementById("a".concat(i + 1, "-keybind"));
+    charactersArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = charactersArr[i];
 
     var actionEvent = function actionEvent() {
       charactersArr[i].container.addEventListener('click', allyClickEvents);
@@ -1429,10 +1552,10 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   };
 
   for (var i = 0; i < charactersArr.length; i++) {
-    _loop2(i);
+    _loop3(i);
   }
 
-  var _loop3 = function _loop3(_i) {
+  var _loop4 = function _loop4(_i) {
     if (!enemiesArr[_i].observer) {
       addEntityEvents(enemiesArr[_i], enemiesArr, charactersArr);
     }
@@ -1444,6 +1567,9 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     enemiesArr[_i].container.style.display = '';
     var hpBar = document.getElementById("".concat(enemiesArr[_i].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
+    var hotkeyInput = document.getElementById("e".concat(_i + 1, "-keybind"));
+    enemiesArr[_i].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = enemiesArr[_i];
 
     enemiesArr[_i].container.addEventListener('click', enemyClickEvents);
 
@@ -1459,8 +1585,9 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   };
 
   for (var _i = 0; _i < enemiesArr.length; _i++) {
-    _loop3(_i);
-  }
+    _loop4(_i);
+  } // console.log("hotkeys: ", hotkeys);
+
 }
 
 function observerObserve(entity) {
@@ -1472,6 +1599,11 @@ function observerObserve(entity) {
 }
 
 function endGame(charsList, enemyList) {
+  if (currentAbilityBoxes) {
+    currentAbilityBoxes.style.display = 'none';
+    currentAbilityBoxes = null;
+  }
+
   var levelMessage = document.getElementById('tutorial-message');
   levelMessage.style.display = 'none';
   var deSelectButton = document.getElementById('test');
