@@ -1,5 +1,5 @@
 class Entity { // this. is selectedChar
-    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0, abilities=[]) {
+    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0, abilities=[], abilityNames=[]) {
         this.klass = klass;
 
         this.range = range;
@@ -17,6 +17,7 @@ class Entity { // this. is selectedChar
         this.defense = defense;
 
         this.abilities = abilities;
+        this.abilityNames = abilityNames;
         this.abilityAvailable = [true, true, true, true];
         this.abilityContainer;
 
@@ -62,7 +63,7 @@ class Entity { // this. is selectedChar
         this.hotkeyDisplay = document.getElementById(this.imgName + '-hotkey-display');
         this.hotkey = document.getElementById(this.imgName + '-keybind').value;
         if (this.allied) {
-            this.abilityContainer = document.getElementById(this.imgName + '-ability-container');
+            this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
         }
     }
 
@@ -156,6 +157,7 @@ class Entity { // this. is selectedChar
         clearInterval(entity.currentAction);
         clearInterval(entity.currentAnimation);
         entity.img.src = entity.baseImg.src;
+        if (entity.abilityContainer) { entity.abilityContainer.style.display = 'none'; }
         entity.hp = -100;
         entity.container.style.display = "none";
     }
@@ -302,9 +304,6 @@ class Entity { // this. is selectedChar
                         targetChar.img.style.border = "3px solid red";
                     } else {
                         targetChar.img.style.border = "3px solid green";
-                        if (targetChar.img.style.display === 'none') {
-                            console.log(selectedChar);
-                        }
                     }
                     let borderInterval = setInterval(() => {
                         if (targetChar.img.style.border !== "5px solid gold") {
@@ -358,15 +357,20 @@ class Entity { // this. is selectedChar
         console.log('ability', n, 'used');
         this.abilityAvailable[n] = false;
         const ab = this.abilities[n];
-        console.log('ability: ', ab);
+        // console.log('ability: ', ab);
         const cdTime = ab(this);
-        console.log('seconds for ability cd: ', cdTime);
+        if (cdTime === false) {
+            console.log('no target for ability');
+            this.abilityAvailable[n] = true;
+            return;
+        }
+        // console.log('seconds for ability cd: ', cdTime);
         const innerBoxes = document.getElementsByClassName(this.imgName + '-inner-ability-divs');
         // innerBoxes[n].style.animation = `inner-ability-animate ${cdTime}s linear 0s 1`; // didnt work
         colorFade(innerBoxes[n], cdTime, [255, 0, 0], [0, 0, 255]);
         let CDTimer = setInterval(() => {
             this.abilityAvailable[n] = true;
-            console.log(this.imgName, ' ability ', n, ' off CD');
+            // console.log(this.imgName, ' ability ', n, ' off CD');
             clearInterval(CDTimer);
         }, (cdTime * 1000));
     }
@@ -396,7 +400,7 @@ function colorFade(element, time, start, end) {
             element.style.backgroundColor = 'rgb(' + end.toString() + ')';
             element.style.width = '95%';
             element.style.border = '5px solid gold';
-            console.log('color fade complete');
+            // console.log('color fade complete');
             clearInterval(interval);
         }
 

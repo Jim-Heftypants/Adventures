@@ -22,7 +22,7 @@ window.addEventListener('load', () => {
     const hButtons = document.getElementsByClassName('h-button');
     // const startGameButton = document.getElementById('start-game-button');
     // const controlsButton = document.getElementById('game-controls-button');
-    const keybindContainer = document.getElementById('keybindings-container');
+    const keybindContainer = document.getElementById('full-keybind-container');
     const levelButtonContainer = document.getElementById('level-button-container');
     const levelButtons = document.getElementsByClassName('level-button');
     const backgroundImage = document.getElementById('background-image');
@@ -30,25 +30,18 @@ window.addEventListener('load', () => {
 
     const keybindInputs = document.getElementsByClassName('keybind-input');
     for (let i = 0; i < keybindInputs.length; i++) {
-        keybindInputs[i].addEventListener("change", () => handleKeybindInput(keybindInputs[i]));
+        keybindInputs[i].addEventListener("change", () => handleKeybindInput(keybindInputs[i], i));
     }
 
-    function handleKeybindInput(input) {
+    function handleKeybindInput(input, i) {
         // console.log('pre-mod: ', input.value);
         if (input.value.length > 1) {
             input.value = input.value[0];
-        } else if (isOverlappingBind(input)) {
-            input.value = '';
+        } else {
+            for (let j = 0; j < keybindInputs.length; j++) {
+                if (i !== j && keybindInputs[j].value === input.value) { keybindInputs[j].value = ''; }
+            }
         }
-    }
-
-    function isOverlappingBind(input) {
-        let c = 0;
-        for (let i = 0; i < keybindInputs.length; i++) {
-            if (keybindInputs[i].value === input.value) { c++; }
-            if (c > 1) { return true; }
-        }
-        return false;
     }
 
     function secondAction() {
@@ -65,6 +58,7 @@ window.addEventListener('load', () => {
                 charArr[i].style.display = '';
             }
             backgroundImage.src = titleBackground.src;
+            backgroundImage.style.opacity = 100;
             backgroundImage.style.display = '';
         }
         closeAction();

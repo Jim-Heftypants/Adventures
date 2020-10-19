@@ -7,7 +7,6 @@ let levelHasEnded = false;
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
 let maxLevelNumber = 7;
-const highestLevelAvailable = 8;
 
 let selectedChar;
 
@@ -76,7 +75,7 @@ function beginCurrentLevel() {
     const beginLevelButton = document.getElementById('begin-level-button');
     fadeOut(beginLevelButton);
     const level = levels[currentLevelNumber];
-    beginLevel(level.characterList, level.enemyList, currentLevelNumber);
+    beginLevel(level.characterList.slice(), level.enemyList.slice(), currentLevelNumber);
 }
 
 function returnToSelectPage() {
@@ -89,7 +88,7 @@ function returnToSelectPage() {
 }
 
 function selectChar(entity) {
-    if (!entity || entity.img.style.display === 'none') {
+    if (!entity || entity.container.style.display === 'none' || entity.hp < 0) {
         return;
     }
     if (!selectedChar || selectedChar.hp < 0) {
@@ -106,6 +105,13 @@ function selectChar(entity) {
         selectedChar.autoAttack(entity);
         selectedChar.img.style.border = 'none';
         selectedChar = null;
+    } else {
+        selectedChar.abilityContainer.style.display = 'none';
+        selectedChar.img.style.border = 'none';
+        entity.abilityContainer.style.display = '';
+        currentAbilityBoxes = entity.abilityContainer;
+        selectedChar = entity;
+        entity.img.style.border = '5px solid gold';
     }
 }
 
@@ -144,8 +150,10 @@ function keydownEvent (e) {
     const entity = hotkeys[e.key];
     if (entity && entity.allied) {
         selectChar(entity);
-    } else if (entity) {
+    } else if (entity && entity.klass) {
         selectEnemy(entity);
+    } else if ((entity === 0 || entity) && selectedChar) {
+        selectedChar.useAbility(entity);
     } else {
         console.log('invalid key press of: ', e.key);
     }
@@ -245,6 +253,7 @@ function loadLevel(levelNumber) {
 
 function beginLevel(charactersArr, enemiesArr, levelNumber) {
     hotkeys = {};
+    document.getElementById('begin-level-button').style.display = 'none';
     setInitialTargets(charactersArr, enemiesArr);
     loadInCharacters(charactersArr, enemiesArr, levelNumber);
 }
@@ -294,7 +303,19 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         // hotkeys[charactersArr[i].hotkey] = charactersArr[i];
         const hotkeyInput = document.getElementById(`a${i+1}-keybind`);
         charactersArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
-        hotkeys[hotkeyInput.value] = charactersArr[i]
+        hotkeys[hotkeyInput.value] = charactersArr[i];
+        const abilityHotkey = document.getElementById(`ab${i+1}-keybind`);
+        hotkeys[abilityHotkey.value] = i;
+        const abilityClassName = document.getElementById(`a${i+1}-class-name`);
+        abilityClassName.innerHTML = charactersArr[i].klass;
+        const abilityNames = document.getElementsByClassName(`a${i+1}-ability-labels`);
+        for (let j = 0; j < abilityNames.length; j++) {
+            if (charactersArr[i].abilityNames[j]) {
+                abilityNames[j].innerHTML = charactersArr[i].abilityNames[j];
+            } else {
+                abilityNames[j].innerHTML = 'No Ability';
+            }
+        }
         const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
         charactersArr[i].img.src = charactersArr[i].baseImg.src;
         fadeIn(charactersArr[i].container, actionEvent);
@@ -313,7 +334,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         hpBar.style.display = "flex";
         const hotkeyInput = document.getElementById(`e${i+1}-keybind`);
         enemiesArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
-        hotkeys[hotkeyInput.value] = enemiesArr[i]
+        hotkeys[hotkeyInput.value] = enemiesArr[i];
         enemiesArr[i].container.addEventListener('click', enemyClickEvents);
         enemiesArr[i].img.src = enemiesArr[i].baseImg.src;
         const action = () => enemiesArr[i].autoAttack(enemiesArr[i].target);

@@ -100,7 +100,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "wizardAbilities", function() { return wizardAbilities; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rogueAbilities", function() { return rogueAbilities; });
 var groupHeal = function groupHeal(entity) {
-  for (var i = 0; i < entity.allies; i++) {
+  for (var i = 0; i < entity.allies.length; i++) {
     if (entity.allies[i].hp > 0) {
       entity.allies[i].hp += 20;
 
@@ -109,6 +109,7 @@ var groupHeal = function groupHeal(entity) {
       }
 
       entity.allies[i].setHpBars();
+      setBorder(entity);
     }
   }
 
@@ -116,8 +117,13 @@ var groupHeal = function groupHeal(entity) {
 };
 
 var powerSwing = function powerSwing(entity) {
+  if (!entity.target) {
+    return false;
+  }
+
   entity.target.hp -= 20;
   entity.target.setHpBars();
+  setBorder(entity);
 
   if (entity.target.hp <= 0) {
     entity.killEntitiy(entity.target);
@@ -126,13 +132,18 @@ var powerSwing = function powerSwing(entity) {
   return 10;
 };
 
-var poisonDagger = function poisonDagger(entity, n) {
+var poisonDagger = function poisonDagger(entity) {
+  if (!entity.target) {
+    return false;
+  }
+
   var timer = 0;
 
   var _int = setInterval(function () {
     timer++;
     entity.target.hp -= 4;
     entity.target.setHpBars();
+    setBorder(entity);
 
     if (entity.target.hp <= 0) {
       entity.killEntitiy(entity.target);
@@ -148,8 +159,13 @@ var poisonDagger = function poisonDagger(entity, n) {
 };
 
 var meteor = function meteor(entity) {
+  if (!entity.target) {
+    return false;
+  }
+
   entity.target.hp -= 25;
   entity.target.setHpBars();
+  setBorder(entity);
 
   if (entity.target.hp <= 0) {
     entity.killEntitiy(entity.target);
@@ -157,6 +173,26 @@ var meteor = function meteor(entity) {
 
   return 10;
 };
+
+function setBorder(entity) {
+  var targetChar = entity.target;
+
+  if (targetChar.img.style.border !== "5px solid gold") {
+    if (entity.baseDMG > 0) {
+      targetChar.img.style.border = "4px solid red";
+    } else {
+      targetChar.img.style.border = "4px solid green";
+    }
+
+    var borderInterval = setInterval(function () {
+      if (targetChar.img.style.border !== "5px solid gold") {
+        targetChar.img.style.border = "none";
+      }
+
+      clearInterval(borderInterval);
+    }, 500);
+  }
+}
 
 var warriorAbilities = [powerSwing];
 var clericAbilities = [groupHeal];
@@ -188,6 +224,10 @@ var warriorAbilities = abilityList[0];
 var clericAbilities = abilityList[1];
 var wizardAbilities = abilityList[2];
 var rogueAbilities = abilityList[3];
+var waAbNames = ['Heroic Strike'];
+var cAbNames = ['Prayer of Healing'];
+var wiAbNames = ['Fire Blast'];
+var rAbNames = ['Poison Shiv'];
 /*
 className
 range
@@ -202,18 +242,18 @@ defense
 */
 // tutorials
 
-var tutorialWarrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [450, 500], 20, warriorAbilities);
-var tutorialCleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "a2", [200, 300], 10, clericAbilities);
-var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [200, 600], 12, wizardAbilities);
-var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 200], 16, rogueAbilities); // tank
+var tutorialWarrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 8, true, "a1", [450, 500], 20, warriorAbilities, waAbNames);
+var tutorialCleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [200, 300], 10, clericAbilities, cAbNames);
+var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [200, 600], 12, wizardAbilities, wiAbNames);
+var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 8, true, "a4", [900, 200], 16, rogueAbilities, rAbNames); // tank
 
-var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20); // heals
+var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 8, true, "a1", [100, 400], 20, warriorAbilities, waAbNames); // heals
 
-var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -10, true, "a2", [400, 100], 10); // rdps
+var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 10, clericAbilities, cAbNames); // rdps
 
-var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12); // mdps
+var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames); // mdps
 
-var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16);
+var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 8, true, "a4", [900, 500], 16, rogueAbilities, rAbNames);
 var tutorialChars = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue];
 var standardChars = [Warrior, Cleric, Wizard, Rogue];
 
@@ -252,33 +292,33 @@ defense
 */
 // rdps
 
-var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 8, false, 'e3', [1000, 600], 8);
-var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8);
-var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8);
-var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8); // fix
+var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 6, false, 'e3', [1000, 600], 8);
+var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 10, false, 'e3', [500, 500], 8);
+var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 11, false, 'e3', [500, 500], 8);
+var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 11, false, 'e1', [700, 200], 8); // fix
 
-var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 15); // heals
+var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 16, false, "e3", [500, 500], 15); // heals
 
-var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -8, false, "e2", [1000, 300], 8);
-var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -10, false, "e2", [1000, 100], 8);
-var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e2", [1000, 100], 8);
-var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -14, false, "e4", [300, 400], 8); // fix
+var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -7, false, "e2", [1000, 300], 8);
+var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -8, false, "e2", [1000, 100], 8);
+var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -11, false, "e2", [1000, 100], 8);
+var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -11, false, "e4", [300, 400], 8); // fix
 
-var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -10, false, "e2", [1000, 100], 10); // mdps
+var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -8, false, "e2", [1000, 100], 10); // mdps
 
-var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 6, false, "e4", [700, 200], 14);
-var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e4", [700, 200], 14);
-var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e4", [700, 200], 14);
-var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 9, false, "e2", [500, 500], 14);
-var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "e4", [700, 200], 18); // tank
+var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 5, false, "e4", [700, 200], 14);
+var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 7, false, "e4", [700, 200], 14);
+var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 7, false, "e4", [700, 200], 14);
+var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 7, false, "e2", [500, 500], 14);
+var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 8, false, "e4", [700, 200], 18); // tank
 
 var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 70, 10, 1000, 1, false, "e1", [650, 500], 20);
-var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 100, 10, 1000, 6, false, "e1", [650, 500], 20);
-var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e1", [300, 400], 20);
-var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e1", [300, 400], 20);
-var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [1000, 100], 20); // fix
+var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 100, 10, 1000, 5, false, "e1", [650, 500], 20);
+var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 7, false, "e1", [300, 400], 20);
+var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 7, false, "e1", [300, 400], 20);
+var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 7, false, "e3", [1000, 100], 20); // fix
 
-var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 10, false, "e1", [300, 400], 20); // level 1
+var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 8, false, "e1", [300, 400], 20); // level 1
 
 var intro = [punchingBag]; // level 2
 
@@ -288,13 +328,13 @@ var rangedIntro = [tutorialWarrior, tutorialCleric, tutorialWizard]; // level 4
 
 var puttinItAllTogetha = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue]; // level 5
 
-var ezDoppelganger = [ghettoWizard, loserRogue, weakWarrior, dumbCleric]; // level 6
+var ezDoppelganger = [weakWarrior, dumbCleric, ghettoWizard, loserRogue]; // level 6
 
 var level3 = [wizard2, wizard3, cleric2, cleric3]; // level 7
 
 var level2 = [rogue2, rogue3, warrior2, warrior3]; // level 8
 
-var doppelganger = [EWizard, ERogue, EWarrior, ECleric];
+var doppelganger = [EWarrior, ECleric, EWizard, ERogue];
 
 /***/ }),
 
@@ -329,6 +369,7 @@ var Entity = /*#__PURE__*/function () {
     var pos = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : [0, 0];
     var defense = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0;
     var abilities = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : [];
+    var abilityNames = arguments.length > 11 && arguments[11] !== undefined ? arguments[11] : [];
 
     _classCallCheck(this, Entity);
 
@@ -351,6 +392,7 @@ var Entity = /*#__PURE__*/function () {
     this.dmg = this.baseDMG;
     this.defense = defense;
     this.abilities = abilities;
+    this.abilityNames = abilityNames;
     this.abilityAvailable = [true, true, true, true];
     this.abilityContainer;
     this.hotkeyDisplay;
@@ -396,7 +438,7 @@ var Entity = /*#__PURE__*/function () {
       this.hotkey = document.getElementById(this.imgName + '-keybind').value;
 
       if (this.allied) {
-        this.abilityContainer = document.getElementById(this.imgName + '-ability-container');
+        this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
       }
     }
   }, {
@@ -529,6 +571,11 @@ var Entity = /*#__PURE__*/function () {
       clearInterval(entity.currentAction);
       clearInterval(entity.currentAnimation);
       entity.img.src = entity.baseImg.src;
+
+      if (entity.abilityContainer) {
+        entity.abilityContainer.style.display = 'none';
+      }
+
       entity.hp = -100;
       entity.container.style.display = "none";
     }
@@ -730,10 +777,6 @@ var Entity = /*#__PURE__*/function () {
               targetChar.img.style.border = "3px solid red";
             } else {
               targetChar.img.style.border = "3px solid green";
-
-              if (targetChar.img.style.display === 'none') {
-                console.log(selectedChar);
-              }
             }
 
             var borderInterval = setInterval(function () {
@@ -802,16 +845,23 @@ var Entity = /*#__PURE__*/function () {
 
       console.log('ability', n, 'used');
       this.abilityAvailable[n] = false;
-      var ab = this.abilities[n];
-      console.log('ability: ', ab);
+      var ab = this.abilities[n]; // console.log('ability: ', ab);
+
       var cdTime = ab(this);
-      console.log('seconds for ability cd: ', cdTime);
+
+      if (cdTime === false) {
+        console.log('no target for ability');
+        this.abilityAvailable[n] = true;
+        return;
+      } // console.log('seconds for ability cd: ', cdTime);
+
+
       var innerBoxes = document.getElementsByClassName(this.imgName + '-inner-ability-divs'); // innerBoxes[n].style.animation = `inner-ability-animate ${cdTime}s linear 0s 1`; // didnt work
 
       colorFade(innerBoxes[n], cdTime, [255, 0, 0], [0, 0, 255]);
       var CDTimer = setInterval(function () {
-        _this5.abilityAvailable[n] = true;
-        console.log(_this5.imgName, ' ability ', n, ' off CD');
+        _this5.abilityAvailable[n] = true; // console.log(this.imgName, ' ability ', n, ' off CD');
+
         clearInterval(CDTimer);
       }, cdTime * 1000);
     }
@@ -842,8 +892,8 @@ function colorFade(element, time, start, end) {
     if (timeCount >= time * 5) {
       element.style.backgroundColor = 'rgb(' + end.toString() + ')';
       element.style.width = '95%';
-      element.style.border = '5px solid gold';
-      console.log('color fade complete');
+      element.style.border = '5px solid gold'; // console.log('color fade complete');
+
       clearInterval(interval);
     }
   }, 200);
@@ -910,7 +960,7 @@ window.addEventListener('load', function () {
   var hButtons = document.getElementsByClassName('h-button'); // const startGameButton = document.getElementById('start-game-button');
   // const controlsButton = document.getElementById('game-controls-button');
 
-  var keybindContainer = document.getElementById('keybindings-container');
+  var keybindContainer = document.getElementById('full-keybind-container');
   var levelButtonContainer = document.getElementById('level-button-container');
   var levelButtons = document.getElementsByClassName('level-button');
   var backgroundImage = document.getElementById('background-image');
@@ -919,7 +969,7 @@ window.addEventListener('load', function () {
 
   var _loop = function _loop(i) {
     keybindInputs[i].addEventListener("change", function () {
-      return handleKeybindInput(keybindInputs[i]);
+      return handleKeybindInput(keybindInputs[i], i);
     });
   };
 
@@ -927,29 +977,17 @@ window.addEventListener('load', function () {
     _loop(i);
   }
 
-  function handleKeybindInput(input) {
+  function handleKeybindInput(input, i) {
     // console.log('pre-mod: ', input.value);
     if (input.value.length > 1) {
       input.value = input.value[0];
-    } else if (isOverlappingBind(input)) {
-      input.value = '';
-    }
-  }
-
-  function isOverlappingBind(input) {
-    var c = 0;
-
-    for (var _i = 0; _i < keybindInputs.length; _i++) {
-      if (keybindInputs[_i].value === input.value) {
-        c++;
-      }
-
-      if (c > 1) {
-        return true;
+    } else {
+      for (var j = 0; j < keybindInputs.length; j++) {
+        if (i !== j && keybindInputs[j].value === input.value) {
+          keybindInputs[j].value = '';
+        }
       }
     }
-
-    return false;
   }
 
   function secondAction() {
@@ -958,8 +996,8 @@ window.addEventListener('load', function () {
 
     function closeAction() {
       // controlsContainer.style.display = 'none';
-      for (var _i2 = 0; _i2 < hButtons.length; _i2++) {
-        hButtons[_i2].style.display = '';
+      for (var _i = 0; _i < hButtons.length; _i++) {
+        hButtons[_i].style.display = '';
       } // controlsButton.style.display = '';
 
 
@@ -967,60 +1005,61 @@ window.addEventListener('load', function () {
       keybindContainer.style.display = 'none';
       closeButton.style.display = 'none';
 
-      for (var _i3 = 0; _i3 < 4; _i3++) {
-        charArr[_i3].style.display = '';
+      for (var _i2 = 0; _i2 < 4; _i2++) {
+        charArr[_i2].style.display = '';
       }
 
       backgroundImage.src = titleBackground.src;
+      backgroundImage.style.opacity = 100;
       backgroundImage.style.display = '';
     }
 
     closeAction();
 
-    var _loop2 = function _loop2(_i4) {
-      levelButtons[_i4].addEventListener('click', function () {
+    var _loop2 = function _loop2(_i3) {
+      levelButtons[_i3].addEventListener('click', function () {
         closeButton.style.display = 'none'; // closeButton.removeEventListener('click', closeAction);
 
-        for (var _i9 = 0; _i9 < 4; _i9++) {
-          charArr[_i9].style.display = 'none';
+        for (var _i8 = 0; _i8 < 4; _i8++) {
+          charArr[_i8].style.display = 'none';
         }
 
         backgroundImage.style.display = 'none';
-        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i4);
+        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i3);
       });
     };
 
-    for (var _i4 = 0; _i4 < levelButtons.length; _i4++) {
-      _loop2(_i4);
+    for (var _i3 = 0; _i3 < levelButtons.length; _i3++) {
+      _loop2(_i3);
     }
 
     levelButtons[0].style.opacity = 100;
     levelButtons[0].style.cursor = 'pointer';
     closeButton.addEventListener('click', closeAction);
     hButtons[0].addEventListener('click', function () {
-      for (var _i5 = 0; _i5 < hButtons.length; _i5++) {
-        hButtons[_i5].style.display = 'none';
+      for (var _i4 = 0; _i4 < hButtons.length; _i4++) {
+        hButtons[_i4].style.display = 'none';
       }
 
       levelButtonContainer.style.display = '';
       closeButton.style.display = '';
 
-      for (var _i6 = 0; _i6 < 4; _i6++) {
-        charArr[_i6].style.display = 'none';
+      for (var _i5 = 0; _i5 < 4; _i5++) {
+        charArr[_i5].style.display = 'none';
       }
 
       backgroundImage.style.display = 'none';
     });
     hButtons[1].addEventListener('click', function () {
-      for (var _i7 = 0; _i7 < hButtons.length; _i7++) {
-        hButtons[_i7].style.display = 'none';
+      for (var _i6 = 0; _i6 < hButtons.length; _i6++) {
+        hButtons[_i6].style.display = 'none';
       }
 
       keybindContainer.style.display = '';
       closeButton.style.display = '';
 
-      for (var _i8 = 0; _i8 < 4; _i8++) {
-        charArr[_i8].style.display = 'none';
+      for (var _i7 = 0; _i7 < 4; _i7++) {
+        charArr[_i7].style.display = 'none';
       }
 
       backgroundImage.style.display = 'none';
@@ -1223,7 +1262,6 @@ var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
 var maxLevelNumber = 7;
-var highestLevelAvailable = 8;
 var selectedChar;
 var livingEnemies = {};
 var livingChars = {};
@@ -1298,7 +1336,7 @@ function beginCurrentLevel() {
   var beginLevelButton = document.getElementById('begin-level-button');
   Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(beginLevelButton);
   var level = levels[currentLevelNumber];
-  beginLevel(level.characterList, level.enemyList, currentLevelNumber);
+  beginLevel(level.characterList.slice(), level.enemyList.slice(), currentLevelNumber);
 }
 
 function returnToSelectPage() {
@@ -1311,7 +1349,7 @@ function returnToSelectPage() {
 }
 
 function selectChar(entity) {
-  if (!entity || entity.img.style.display === 'none') {
+  if (!entity || entity.container.style.display === 'none' || entity.hp < 0) {
     return;
   }
 
@@ -1328,6 +1366,13 @@ function selectChar(entity) {
     selectedChar.autoAttack(entity);
     selectedChar.img.style.border = 'none';
     selectedChar = null;
+  } else {
+    selectedChar.abilityContainer.style.display = 'none';
+    selectedChar.img.style.border = 'none';
+    entity.abilityContainer.style.display = '';
+    currentAbilityBoxes = entity.abilityContainer;
+    selectedChar = entity;
+    entity.img.style.border = '5px solid gold';
   }
 }
 
@@ -1368,8 +1413,10 @@ function keydownEvent(e) {
 
   if (entity && entity.allied) {
     selectChar(entity);
-  } else if (entity) {
+  } else if (entity && entity.klass) {
     selectEnemy(entity);
+  } else if ((entity === 0 || entity) && selectedChar) {
+    selectedChar.useAbility(entity);
   } else {
     console.log('invalid key press of: ', e.key);
   }
@@ -1486,6 +1533,7 @@ function loadLevel(levelNumber) {
 
 function beginLevel(charactersArr, enemiesArr, levelNumber) {
   hotkeys = {};
+  document.getElementById('begin-level-button').style.display = 'none';
   setInitialTargets(charactersArr, enemiesArr);
   loadInCharacters(charactersArr, enemiesArr, levelNumber);
 }
@@ -1541,6 +1589,19 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     var hotkeyInput = document.getElementById("a".concat(i + 1, "-keybind"));
     charactersArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
     hotkeys[hotkeyInput.value] = charactersArr[i];
+    var abilityHotkey = document.getElementById("ab".concat(i + 1, "-keybind"));
+    hotkeys[abilityHotkey.value] = i;
+    var abilityClassName = document.getElementById("a".concat(i + 1, "-class-name"));
+    abilityClassName.innerHTML = charactersArr[i].klass;
+    var abilityNames = document.getElementsByClassName("a".concat(i + 1, "-ability-labels"));
+
+    for (var j = 0; j < abilityNames.length; j++) {
+      if (charactersArr[i].abilityNames[j]) {
+        abilityNames[j].innerHTML = charactersArr[i].abilityNames[j];
+      } else {
+        abilityNames[j].innerHTML = 'No Ability';
+      }
+    }
 
     var actionEvent = function actionEvent() {
       charactersArr[i].container.addEventListener('click', allyClickEvents);
