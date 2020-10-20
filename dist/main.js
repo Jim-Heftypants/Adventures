@@ -117,7 +117,10 @@ var groupHeal = function groupHeal(entity) {
 };
 
 var powerSwing = function powerSwing(entity) {
-  if (!entity.target) {
+  if (!entity.target || !entity.withinAttackRange(entity.target)) {
+    entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
+
+    document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
     return false;
   }
 
@@ -133,7 +136,10 @@ var powerSwing = function powerSwing(entity) {
 };
 
 var poisonDagger = function poisonDagger(entity) {
-  if (!entity.target) {
+  if (!entity.target || !entity.withinAttackRange(entity.target)) {
+    entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
+
+    document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
     return false;
   }
 
@@ -160,6 +166,9 @@ var poisonDagger = function poisonDagger(entity) {
 
 var meteor = function meteor(entity) {
   if (!entity.target) {
+    entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
+
+    document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
     return false;
   }
 
@@ -394,6 +403,7 @@ var Entity = /*#__PURE__*/function () {
     this.abilities = abilities;
     this.abilityNames = abilityNames;
     this.abilityAvailable = [true, true, true, true];
+    this.abilityShouldCast = [false, false, false, false];
     this.abilityContainer;
     this.hotkeyDisplay;
     this.hotkey;
@@ -410,6 +420,7 @@ var Entity = /*#__PURE__*/function () {
     this.currentAction;
     this.currentAnimation;
     this.imgCycle = 0;
+    this.isAttacking = false;
     this.target;
     this.allies;
     this.enemies;
@@ -476,9 +487,7 @@ var Entity = /*#__PURE__*/function () {
 
       var attackOnFinish = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       this.movingOutTheWay = true;
-      clearInterval(this.currentAction);
-      clearInterval(this.currentAnimation);
-      this.img.src = this.baseImg.src;
+      this.clearIntervals();
       endPos[0] = Math.floor(endPos[0] - this.img.width * (3 / 2));
       endPos[1] = Math.floor(endPos[1] - this.img.height * (3 / 4));
       var pos = this.pos;
@@ -723,6 +732,18 @@ var Entity = /*#__PURE__*/function () {
 
       // make some kind of animation start
       this.clearIntervals();
+      this.isAttacking = true;
+
+      if (this.allied) {
+        for (var i = 0; i < 4; i++) {
+          // console.log(this.abilityShouldCast[i]);
+          if (this.abilityShouldCast[i]) {
+            this.abilityShouldCast[i] = false;
+            this.useAbility(i);
+          }
+        }
+      }
+
       this.currentAnimation = setInterval(function () {
         return _this4.animateAttack(_this4);
       }, Math.floor(this.as / 4));
@@ -796,11 +817,11 @@ var Entity = /*#__PURE__*/function () {
               // move to left side of target
               selectedChar.img.style.transform = "scaleX(1)"; // - (addition / 4)
 
-              selectedChar.move([targetChar.pos[0], targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
+              selectedChar.move([targetChar.pos[0] + addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
             } else {
               // move to right side of target;
               selectedChar.img.style.transform = "scaleX(-1)";
-              selectedChar.move([targetChar.pos[0] + 4 * addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
+              selectedChar.move([targetChar.pos[0] + 5 * addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
             }
           }
         }
@@ -833,6 +854,8 @@ var Entity = /*#__PURE__*/function () {
       clearInterval(this.currentAction);
       clearInterval(this.currentAnimation);
       this.img.src = this.baseImg.src;
+      this.imgCycle = 0;
+      this.isAttacking = false;
     }
   }, {
     key: "useAbility",
@@ -843,7 +866,7 @@ var Entity = /*#__PURE__*/function () {
         return;
       }
 
-      console.log('ability', n, 'used');
+      console.log('ability', n, 'attempted');
       this.abilityAvailable[n] = false;
       var ab = this.abilities[n]; // console.log('ability: ', ab);
 
@@ -1261,7 +1284,7 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
-var maxLevelNumber = 7;
+var maxLevelNumber = 0;
 var selectedChar;
 var livingEnemies = {};
 var livingChars = {};
@@ -1361,11 +1384,13 @@ function selectChar(entity) {
     entity.img.style.border = '5px solid gold'; // console.log('selected char: ', selectedChar.imgName);
   } else if (selectedChar.baseDMG < 0) {
     // for (let i = 0; i < selectedChar.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = 'none'; }
-    selectedChar.abilityContainer.style.display = 'none';
-    currentAbilityBoxes = null;
+    if (selectedChar.target === entity && selectedChar.isAttacking) {
+      deSelect();
+      return;
+    }
+
     selectedChar.autoAttack(entity);
-    selectedChar.img.style.border = 'none';
-    selectedChar = null;
+    deSelect();
   } else {
     selectedChar.abilityContainer.style.display = 'none';
     selectedChar.img.style.border = 'none';
@@ -1377,8 +1402,11 @@ function selectChar(entity) {
 }
 
 function selectEnemy(entity) {
-  if (entity.img.style.display === 'none' || !selectedChar || selectedChar.hp < 0) {
+  if (!selectedChar || selectedChar.hp < 0) {
     selectedChar = null;
+    return;
+  } else if (selectedChar.target === entity && selectedChar.isAttacking || entity.hp < 0) {
+    deSelect();
     return;
   }
 

@@ -19,6 +19,7 @@ class Entity { // this. is selectedChar
         this.abilities = abilities;
         this.abilityNames = abilityNames;
         this.abilityAvailable = [true, true, true, true];
+        this.abilityShouldCast = [false, false, false, false];
         this.abilityContainer;
 
         this.hotkeyDisplay;
@@ -34,6 +35,7 @@ class Entity { // this. is selectedChar
         this.currentAction;
         this.currentAnimation;
         this.imgCycle = 0;
+        this.isAttacking = false;
 
         this.target;
 
@@ -90,9 +92,7 @@ class Entity { // this. is selectedChar
 
     move(endPos, attackOnFinish = false) {
         this.movingOutTheWay = true;
-        clearInterval(this.currentAction);
-        clearInterval(this.currentAnimation);
-        this.img.src = this.baseImg.src;
+        this.clearIntervals();
         endPos[0] = Math.floor(endPos[0] - (this.img.width * (3/2)));
         endPos[1] = Math.floor(endPos[1] - (this.img.height * (3/4)));
         let pos = this.pos;
@@ -264,6 +264,16 @@ class Entity { // this. is selectedChar
     beginAttack(targetChar) {
         // make some kind of animation start
         this.clearIntervals();
+        this.isAttacking = true;
+        if (this.allied) {
+            for (let i = 0; i < 4; i++) {
+                // console.log(this.abilityShouldCast[i]);
+                if (this.abilityShouldCast[i]) {
+                    this.abilityShouldCast[i] = false;
+                    this.useAbility(i);
+                }
+            }
+        }
         this.currentAnimation = setInterval(() => this.animateAttack(this), Math.floor(this.as / 4))
         this.currentAction = setInterval(() => attack(this), this.as);
         function attack(selectedChar) {
@@ -318,11 +328,11 @@ class Entity { // this. is selectedChar
                     if (selectedChar.img.style.transform === "scaleX(-1)") {
                         // move to left side of target
                         selectedChar.img.style.transform = "scaleX(1)";// - (addition / 4)
-                        selectedChar.move([targetChar.pos[0], targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
+                        selectedChar.move([targetChar.pos[0] + addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
                     } else {
                         // move to right side of target;
                         selectedChar.img.style.transform = "scaleX(-1)";
-                        selectedChar.move([targetChar.pos[0] + (4 * addition), targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
+                        selectedChar.move([targetChar.pos[0] + (5 * addition), targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
                     }
                 }
             }
@@ -348,13 +358,15 @@ class Entity { // this. is selectedChar
         clearInterval(this.currentAction);
         clearInterval(this.currentAnimation);
         this.img.src = this.baseImg.src;
+        this.imgCycle = 0;
+        this.isAttacking = false;
     }
 
     useAbility(n) {
         if (!this.abilityAvailable[n]) {
             return;
         }
-        console.log('ability', n, 'used');
+        console.log('ability', n, 'attempted');
         this.abilityAvailable[n] = false;
         const ab = this.abilities[n];
         // console.log('ability: ', ab);

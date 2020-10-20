@@ -6,7 +6,7 @@ let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
-let maxLevelNumber = 7;
+let maxLevelNumber = 0;
 
 let selectedChar;
 
@@ -100,11 +100,12 @@ function selectChar(entity) {
         // console.log('selected char: ', selectedChar.imgName);
     } else if (selectedChar.baseDMG < 0) {
         // for (let i = 0; i < selectedChar.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = 'none'; }
-        selectedChar.abilityContainer.style.display = 'none';
-        currentAbilityBoxes = null;
+        if (selectedChar.target === entity && selectedChar.isAttacking) {
+            deSelect();
+            return;
+        }
         selectedChar.autoAttack(entity);
-        selectedChar.img.style.border = 'none';
-        selectedChar = null;
+        deSelect();
     } else {
         selectedChar.abilityContainer.style.display = 'none';
         selectedChar.img.style.border = 'none';
@@ -116,8 +117,11 @@ function selectChar(entity) {
 }
 
 function selectEnemy(entity) {
-    if (entity.img.style.display === 'none' || !selectedChar || selectedChar.hp < 0) {
+    if (!selectedChar || selectedChar.hp < 0) {
         selectedChar = null;
+        return;
+    } else if ((selectedChar.target === entity && selectedChar.isAttacking) || entity.hp < 0) {
+        deSelect();
         return;
     }
     if (selectedChar.allied && selectedChar.baseDMG > 0) {

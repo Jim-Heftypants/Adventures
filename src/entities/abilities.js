@@ -11,7 +11,10 @@ const groupHeal = (entity) => {
 }
 
 const powerSwing = (entity) => {
-    if (!entity.target) {
+    if (!entity.target || !entity.withinAttackRange(entity.target)) {
+        entity.abilityShouldCast[0] = true;
+        // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
+        document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
         return false;
     }
     entity.target.hp -= 20;
@@ -24,7 +27,10 @@ const powerSwing = (entity) => {
 }
 
 const poisonDagger = (entity) => {
-    if (!entity.target) {
+    if (!entity.target || !entity.withinAttackRange(entity.target)) {
+        entity.abilityShouldCast[0] = true;
+        // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
+        document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
         return false;
     }
     let timer = 0;
@@ -46,6 +52,9 @@ const poisonDagger = (entity) => {
 
 const meteor = (entity) => {
     if (!entity.target) {
+        entity.abilityShouldCast[0] = true;
+        // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
+        document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
         return false;
     }
     entity.target.hp -= 25;
