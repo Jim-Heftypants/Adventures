@@ -864,16 +864,16 @@ var Entity = /*#__PURE__*/function () {
 
       if (!this.abilityAvailable[n]) {
         return;
-      }
+      } // console.log('ability', n, 'attempted');
 
-      console.log('ability', n, 'attempted');
+
       this.abilityAvailable[n] = false;
       var ab = this.abilities[n]; // console.log('ability: ', ab);
 
       var cdTime = ab(this);
 
       if (cdTime === false) {
-        console.log('no target for ability');
+        // console.log('no target for ability');
         this.abilityAvailable[n] = true;
         return;
       } // console.log('seconds for ability cd: ', cdTime);
@@ -1712,6 +1712,8 @@ function endGame(charsList, enemyList) {
       clearInterval(allCharsList[i].currentAnimation);
     }
 
+    allCharsList[i].isAttacking = false;
+    allCharsList[i].target = null;
     allCharsList[i].container.removeEventListener('click', allyClickEvents);
     allCharsList[i].img.src = allCharsList[i].baseImg.src;
   }
@@ -1726,6 +1728,9 @@ function endGame(charsList, enemyList) {
     if (allEnemyList[_i2].currentAnimation) {
       clearInterval(allEnemyList[_i2].currentAnimation);
     }
+
+    allEnemyList[_i2].isAttacking = false;
+    allEnemyList[_i2].target = null;
 
     allEnemyList[_i2].container.removeEventListener('click', enemyClickEvents);
 

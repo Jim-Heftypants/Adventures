@@ -372,6 +372,8 @@ function endGame(charsList, enemyList) {
         allCharsList[i].observer.disconnect();
         if (allCharsList[i].currentAction) { clearInterval(allCharsList[i].currentAction); }
         if (allCharsList[i].currentAnimation) { clearInterval(allCharsList[i].currentAnimation); }
+        allCharsList[i].isAttacking = false;
+        allCharsList[i].target = null;
         allCharsList[i].container.removeEventListener('click', allyClickEvents);
         allCharsList[i].img.src = allCharsList[i].baseImg.src;
     }
@@ -379,6 +381,8 @@ function endGame(charsList, enemyList) {
         allEnemyList[i].observer.disconnect();
         if (allEnemyList[i].currentAction) { clearInterval(allEnemyList[i].currentAction); }
         if (allEnemyList[i].currentAnimation) { clearInterval(allEnemyList[i].currentAnimation); }
+        allEnemyList[i].isAttacking = false;
+        allEnemyList[i].target = null;
         allEnemyList[i].container.removeEventListener('click', enemyClickEvents);
         allEnemyList[i].img.src = allEnemyList[i].baseImg.src;
     }

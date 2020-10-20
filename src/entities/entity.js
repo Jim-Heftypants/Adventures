@@ -366,13 +366,13 @@ class Entity { // this. is selectedChar
         if (!this.abilityAvailable[n]) {
             return;
         }
-        console.log('ability', n, 'attempted');
+        // console.log('ability', n, 'attempted');
         this.abilityAvailable[n] = false;
         const ab = this.abilities[n];
         // console.log('ability: ', ab);
         const cdTime = ab(this);
         if (cdTime === false) {
-            console.log('no target for ability');
+            // console.log('no target for ability');
             this.abilityAvailable[n] = true;
             return;
         }
