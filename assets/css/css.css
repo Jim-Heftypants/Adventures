@@ -327,6 +327,7 @@ img {
 }
 
 #all-characters-ability-container {
+    height: 900px;
     display: flex;
     flex-direction: column;
     width: 9%;
@@ -335,11 +336,13 @@ img {
 }
 
 .a1-ability-boxes, .a2-ability-boxes, .a3-ability-boxes, .a4-ability-boxes {
+    /* height: 150px; */
     margin: auto;
     width: 90%;
     color: red;
-    font-size: 25px;
+    font-size: 30px;
     text-align: center;
+    margin-bottom: 10px;
 }
 
 .a1-inner-ability-divs, .a2-inner-ability-divs, .a3-inner-ability-divs, .a4-inner-ability-divs {
@@ -347,6 +350,10 @@ img {
     height: 120px;
     background-color: rgb(0,0,255);
     border: 5px solid gold;
+}
+
+.a1-ability-labels {
+    margin: 0;
 }
 
 .class-names {

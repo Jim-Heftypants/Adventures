@@ -159,7 +159,7 @@ function keydownEvent (e) {
     } else if ((entity === 0 || entity) && selectedChar) {
         selectedChar.useAbility(entity);
     } else {
-        console.log('invalid key press of: ', e.key);
+        // console.log('invalid key press of: ', e.key);
     }
 }
 
@@ -168,7 +168,7 @@ function abilityClick(arr) {
     if (entity) {
         entity.useAbility(arr[1]);
     } else {
-        console.log('invalid entity for ability use');
+        // console.log('invalid entity for ability use');
     }
 }
 
@@ -256,7 +256,6 @@ function loadLevel(levelNumber) {
 }
 
 function beginLevel(charactersArr, enemiesArr, levelNumber) {
-    hotkeys = {};
     document.getElementById('begin-level-button').style.display = 'none';
     setInitialTargets(charactersArr, enemiesArr);
     loadInCharacters(charactersArr, enemiesArr, levelNumber);
@@ -357,6 +356,7 @@ function observerObserve(entity) {
 
 
 function endGame(charsList, enemyList) {
+    hotkeys = {};
     if (currentAbilityBoxes) {
         currentAbilityBoxes.style.display = 'none';
         currentAbilityBoxes = null;
