@@ -10,6 +10,9 @@ let maxLevelNumber = 0;
 
 let selectedChar;
 
+let countToReach = 0;
+let moveFinishCount = 0;
+
 let livingEnemies = {};
 let livingChars = {};
 
@@ -42,10 +45,28 @@ function addDeathListener(entity) {
     })
 }
 
+function createXPObserver(char) {
+    char.xpObserver = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutationRecord) {
+            if (char.observationToken && mutationRecord.target.style.border === '5px solid gold') {
+                moveFinishCount++;
+                char.observationToken = false;
+                // char.xpObserver.disconnect();
+                if (moveFinishCount === countToReach) {
+                    addCharXP();
+                }
+            }
+        })
+    })
+}
+
 function addEntityEvents(entity, allies, enemies) {
     if (entity.imgName != "") {
         if (!entity.observer) {
             addDeathListener(entity);
+            if (entity.allied) {
+                createXPObserver(entity);
+            }
         }
         entity.enemies = enemies;
         const cloneArr = allies.slice();
@@ -274,6 +295,17 @@ function setInitialTargets(chars, enemies) {
     }
 }
 
+function setAvailableAbilities(char) {
+    const abilities = document.getElementsByClassName(char.imgName + '-ability-boxes');
+    for (let i = 0; i < abilities.length; i++) {
+        if (i < char.abilities.length) {
+            abilities[i].style.display = '';
+        } else {
+            abilities[i].style.display = 'none';
+        }
+    }
+}
+
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     document.getElementById('return-button').style.display = 'none';
     const deSelectButton = document.getElementById('test');
@@ -312,6 +344,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         const abilityClassName = document.getElementById(`a${i+1}-class-name`);
         abilityClassName.innerHTML = charactersArr[i].klass;
         const abilityNames = document.getElementsByClassName(`a${i+1}-ability-labels`);
+        setAvailableAbilities(charactersArr[i]);
         for (let j = 0; j < abilityNames.length; j++) {
             if (charactersArr[i].abilityNames[j]) {
                 abilityNames[j].innerHTML = charactersArr[i].abilityNames[j];
@@ -387,21 +420,94 @@ function endGame(charsList, enemyList) {
         allEnemyList[i].img.src = allEnemyList[i].baseImg.src;
     }
 
-    const backgroundImg = document.getElementById('background-image');
-    fadeOut(backgroundImg);
+    if (charsList.length > 0) {
+        endMoveChars(charsList);
+    } else {
+        const backgroundImg = document.getElementById('background-image');
+        fadeOut(backgroundImg);
+        for (let i = 0; i < enemyList.length; i++) {
+            fadeOut(enemyList[i].container);
+        }
+        fadeOutGame(false);
+    }
+}
 
+function xpObserverObserve(char) {
+    char.observationToken = true;
+    char.xpObserver.observe(char.img, { attributes: true, attributeFilter: ['style'] });
+}
+
+function modEndPos() {
+    const container = document.getElementById('game-container');
+    const width = Math.floor(container.offsetWidth);
+    const height = Math.floor(container.offsetHeight);
+    // console.log(width);
+    const widthExtra = width - (160 * 4);
+    // console.log(widthExtra);
+    return ([Math.floor(widthExtra / 4), Math.floor(height * 0.66), Math.floor(width/10)]);
+}
+
+function endMoveChars(charsList) {
+    moveFinishCount = 0;
+    countToReach = charsList.length;
+    const basePos = modEndPos(); // make into % values
     for (let i = 0; i < charsList.length; i++) {
-        fadeOut(charsList[i].container);
+        xpObserverObserve(charsList[i]);
+        charsList[i].move([(i*160) + ((i+1)*basePos[0]) + basePos[2], basePos[1]], false, true);
     }
-    for (let i = 0; i < enemyList.length; i++) {
-        fadeOut(enemyList[i].container);
+}
+
+function addCharXP() {
+    const c = Object.values(livingChars);
+    // console.log(c);
+    for (let i = 0; i < c.length; i++) {
+        c[i].xpObserver.disconnect();
+        c[i].hpContainerLeft.style.backgroundColor = 'gold';
+        const xpPercent = Math.floor((c[i].xp / c[i].nextLevelXP) * 100);
+        c[i].hpContainerLeft.style.width = `${xpPercent}%`;
+        c[i].hpContainerRight.style.width = `${100 - xpPercent}%`;
+        const levelUpDisp = document.getElementById(c[i].imgName + '-level-up');
+        levelUpDisp.style.top = Math.floor(c[i].pos[1] - 75) + 'px';
+        levelUpDisp.style.left = Math.floor(c[i].pos[0]) + 'px';
     }
-    
-    let gameFadeTimer = setInterval(() => {
+    fadeOutGame(true);
+    const xpPerC = levels[currentLevelNumber].xp / c.length;
+    const xpPerInterval = xpPerC / 60; // 4 seconds for the animation, .05 sec intervals
+    let timeCount = 0;
+    const xpInterval = setInterval(() => {
+        if (timeCount === 60) {
+            clearInterval(xpInterval);
+            for (let i = 0; i < c.length; i++) {
+                c[i].xp = Math.ceil(c[i].xp);
+                // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+                c[i].container.style.border = 'none';
+                fadeOut(c[i].container);
+            }
+            const backgroundImg = document.getElementById('background-image');
+            fadeOut(backgroundImg);
+        }
+        for (let i = 0; i < c.length; i++) {
+            c[i].xp += xpPerInterval;
+            if (c[i].xp > c[i].nextLevelXP) {
+                c[i].levelUp();
+            }
+            const xpPercent = Math.floor((c[i].xp / c[i].nextLevelXP) * 100);
+            c[i].hpContainerLeft.style.width = `${xpPercent}%`;
+            c[i].hpContainerRight.style.width = `${100 - xpPercent}%`;
+        }
+        timeCount++;
+    }, 50);
+}
+
+function fadeOutGame(won) {
+    let theThing = (actionIterations) => {
+        if (!actionIterations) {
+            actionIterations = 40;
+        }
         // console.log('fade called');
         let disp;
         let secondAction;
-        if (charsList.length === 0) {
+        if (!won) {
             disp = document.getElementById('game-over-display');
             secondAction = () => resetGame(false);
         } else {
@@ -410,10 +516,14 @@ function endGame(charsList, enemyList) {
         }
         disp.style.opacity = 0;
         disp.style.display = '';
-        const action = () => fadeOut(disp, secondAction);
+        const action = () => fadeOut(disp, secondAction, actionIterations);
         fadeIn(disp, action);
-        clearInterval(gameFadeTimer);
-    }, 2000);
+    }
+    if (!won) {
+        setTimeout(theThing, 2000);
+    } else {
+        theThing(60);
+    }
 }
 
 function resetGame(won) {
@@ -430,20 +540,19 @@ function resetGame(won) {
             levelButtons[maxLevelNumber].style.cursor = 'pointer';
         }
     }
-    // level.characterList, level.enemyList
-    // console.log('levels arr: ', levels);
-    // console.log('level ', currentLevelNumber, ': ', levels[currentLevelNumber]);
     const levChars = levels[currentLevelNumber].characterList;
     const levEnems = levels[currentLevelNumber].enemyList;
     for (let i = 0; i < levChars.length; i++) {
-        levChars[i].hp = levChars[i].baseHP;
+        levChars[i].hp = levChars[i].baseHP; levChars[i].dmg = levChars[i].baseDMG; levChars[i].defense = levChars[i].baseDefense;
         levChars[i].pos[0] = levChars[i].basePos[0]; levChars[i].pos[1] = levChars[i].basePos[1];
         levChars[i].container.style.top = levChars[i].pos[1] + 'px';
         levChars[i].container.style.left = levChars[i].pos[0] + 'px';
+        levChars[i].hpContainerLeft.style.backgroundColor = 'blue';
+        levChars[i].img.style.border = 'none';
         levChars[i].setHpBars();
     }
     for (let i = 0; i < levEnems.length; i++) {
-        levEnems[i].hp = levEnems[i].baseHP;
+        levEnems[i].hp = levEnems[i].baseHP; levEnems[i].dmg = levEnems[i].baseDMG; levEnems[i].defense = levEnems[i].baseDefense;
         levEnems[i].pos[0] = levEnems[i].basePos[0]; levEnems[i].pos[1] = levEnems[i].basePos[1];
         levEnems[i].container.style.top = levEnems[i].pos[1] + 'px';
         levEnems[i].container.style.left = levEnems[i].pos[0] + 'px';

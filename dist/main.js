@@ -214,13 +214,11 @@ var rogueAbilities = [poisonDagger];
 /*!***********************************!*\
   !*** ./src/entities/character.js ***!
   \***********************************/
-/*! exports provided: tutorialChars, standardChars */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tutorialChars", function() { return tutorialChars; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "standardChars", function() { return standardChars; });
 /* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity */ "./src/entities/entity.js");
 /* harmony import */ var _abilities_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./abilities.js */ "./src/entities/abilities.js");
 
@@ -245,7 +243,7 @@ MS
 AS
 DMG
 true
-img
+imgName
 pos
 defense
 */
@@ -256,15 +254,16 @@ var tutorialCleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric
 var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [200, 600], 12, wizardAbilities, wiAbNames);
 var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 8, true, "a4", [900, 200], 16, rogueAbilities, rAbNames); // tank
 
-var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 8, true, "a1", [100, 400], 20, warriorAbilities, waAbNames); // heals
+var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, warriorAbilities, waAbNames); // heals
 
 var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 10, clericAbilities, cAbNames); // rdps
 
-var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames); // mdps
+var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames); // mdps
 
-var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 8, true, "a4", [900, 500], 16, rogueAbilities, rAbNames);
-var tutorialChars = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue];
-var standardChars = [Warrior, Cleric, Wizard, Rogue];
+var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, rogueAbilities, rAbNames); // export const tutorialChars = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue];
+
+var charactersArr = [Warrior, Cleric, Wizard, Rogue];
+/* harmony default export */ __webpack_exports__["default"] = (charactersArr);
 
 /***/ }),
 
@@ -301,12 +300,12 @@ defense
 */
 // rdps
 
-var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 6, false, 'e3', [1000, 600], 8);
-var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 10, false, 'e3', [500, 500], 8);
-var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 11, false, 'e3', [500, 500], 8);
-var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 11, false, 'e1', [700, 200], 8); // fix
+var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8);
+var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8);
+var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8);
+var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8); // fix
 
-var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 16, false, "e3", [500, 500], 15); // heals
+var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12); // heals
 
 var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -7, false, "e2", [1000, 300], 8);
 var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -8, false, "e2", [1000, 100], 8);
@@ -315,19 +314,19 @@ var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 
 
 var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -8, false, "e2", [1000, 100], 10); // mdps
 
-var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 5, false, "e4", [700, 200], 14);
-var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 7, false, "e4", [700, 200], 14);
-var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 7, false, "e4", [700, 200], 14);
-var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 7, false, "e2", [500, 500], 14);
-var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 8, false, "e4", [700, 200], 18); // tank
+var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 6, false, "e4", [700, 200], 14);
+var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 8, false, "e4", [700, 200], 14);
+var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 8, false, "e4", [700, 200], 14);
+var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 8, false, "e2", [500, 500], 14);
+var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "e4", [700, 200], 16); // tank
 
-var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 70, 10, 1000, 1, false, "e1", [650, 500], 20);
-var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 100, 10, 1000, 5, false, "e1", [650, 500], 20);
-var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 7, false, "e1", [300, 400], 20);
-var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 7, false, "e1", [300, 400], 20);
-var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 7, false, "e3", [1000, 100], 20); // fix
+var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 50, 10, 1000, 1, false, "e1", [650, 500], 20);
+var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 6, false, "e1", [650, 500], 20);
+var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e1", [300, 400], 20);
+var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e1", [300, 400], 20);
+var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [1000, 100], 20); // fix
 
-var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 8, false, "e1", [300, 400], 20); // level 1
+var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 10, false, "e1", [300, 400], 20); // level 1
 
 var intro = [punchingBag]; // level 2
 
@@ -384,6 +383,7 @@ var Entity = /*#__PURE__*/function () {
 
     this.klass = klass;
     this.range = range;
+    this.trueBaseHp = baseHP;
     this.baseHP = baseHP;
     this.hp = this.baseHP;
     this.baseMS = ms; // speed / time
@@ -397,10 +397,21 @@ var Entity = /*#__PURE__*/function () {
     this.basePos[1] = pos[1];
     this.baseAS = attackSpeed;
     this.as = this.baseAS;
+    this.trueBaseDMG = attackDMG;
     this.baseDMG = attackDMG;
     this.dmg = this.baseDMG;
-    this.defense = defense;
-    this.abilities = abilities;
+    this.trueBaseDefense = defense;
+    this.baseDefense = defense;
+    this.defense = this.baseDefense;
+
+    if (this.allied) {
+      this.xp = 0;
+      this.level = 1;
+      this.nextLevelXP = 100;
+    }
+
+    this.allAbilities = abilities;
+    this.abilities = [];
     this.abilityNames = abilityNames;
     this.abilityAvailable = [true, true, true, true];
     this.abilityShouldCast = [false, false, false, false];
@@ -417,6 +428,8 @@ var Entity = /*#__PURE__*/function () {
     this.baseImg; // standard stand image
 
     this.container;
+    this.hpContainerLeft;
+    this.hpContainerRight;
     this.currentAction;
     this.currentAnimation;
     this.imgCycle = 0;
@@ -426,6 +439,8 @@ var Entity = /*#__PURE__*/function () {
     this.enemies;
     this.movingOutTheWay = false;
     this.observer;
+    this.xpObserver;
+    this.observationToken = true;
     window.addEventListener('load', function () {
       _this.addInlineStyle();
     });
@@ -447,9 +462,43 @@ var Entity = /*#__PURE__*/function () {
       this.container.style.top = this.pos[1] + "px";
       this.hotkeyDisplay = document.getElementById(this.imgName + '-hotkey-display');
       this.hotkey = document.getElementById(this.imgName + '-keybind').value;
+      this.hpContainerLeft = document.getElementById(this.imgName + '-hp-left');
+      this.hpContainerRight = document.getElementById(this.imgName + '-hp-right');
 
       if (this.allied) {
         this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
+      }
+    }
+  }, {
+    key: "levelUp",
+    value: function levelUp() {
+      var levelUpDisp = document.getElementById(this.imgName + '-level-up'); // console.log('levelUpDisp: ', levelUpDisp);
+
+      levelUpDisp.style.display = '';
+      fastFadeOut(levelUpDisp);
+      this.xp -= this.nextLevelXP;
+      this.nextLevelXP += this.nextLevelXP * 0.1;
+      this.level++;
+      this.baseDefense += Math.ceil(this.trueBaseDefense * 0.05);
+      this.baseDMG += Math.ceil(this.trueBaseDMG * 0.1);
+      this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
+
+      switch (this.level) {
+        case 5:
+          this.abilities.push(this.allAbilities[0]);
+          break;
+
+        case 10:
+          this.abilities.push(this.allAbilities[1]);
+          break;
+
+        case 15:
+          this.abilities.push(this.allAbilities[2]);
+          break;
+
+        case 20:
+          this.abilities.push(this.allAbilities[3]);
+          break;
       }
     }
   }, {
@@ -486,6 +535,7 @@ var Entity = /*#__PURE__*/function () {
       var _this2 = this;
 
       var attackOnFinish = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var addXPBar = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       this.movingOutTheWay = true;
       this.clearIntervals();
       endPos[0] = Math.floor(endPos[0] - this.img.width * (3 / 2));
@@ -518,6 +568,10 @@ var Entity = /*#__PURE__*/function () {
           if (attackOnFinish) {
             // console.log('self in move end: ', self);
             self.autoAttack(attackOnFinish); // needs editing
+          } else if (addXPBar) {
+            // console.log('move ended');
+            self.img.style.transform = "scaleX(1)";
+            self.img.style.border = '5px solid gold';
           }
         } else {
           // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
@@ -606,14 +660,12 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "setHpBars",
     value: function setHpBars() {
-      var leftBar = document.getElementById("".concat(this.imgName, "-hp-left"));
-      var rightBar = document.getElementById("".concat(this.imgName, "-hp-right"));
       var leftWidth = Math.floor(this.hp / this.baseHP * 100);
       var rightWidth = 100 - leftWidth;
       if (leftWidth < 0) leftWidth = 0;
       if (rightWidth < 0) rightWidth = 0;
-      leftBar.style.width = leftWidth + '%';
-      rightBar.style.width = rightWidth + '%';
+      this.hpContainerLeft.style.width = leftWidth + '%';
+      this.hpContainerRight.style.width = rightWidth + '%';
     }
   }, {
     key: "setTargetAndAttack",
@@ -767,7 +819,7 @@ var Entity = /*#__PURE__*/function () {
           selectedChar.trackTarget();
           return;
         } else {
-          targetChar.hp -= selectedChar.dmg;
+          targetChar.hp -= selectedChar.dmg * 15 / targetChar.defense;
 
           if (targetChar.hp > targetChar.baseHP) {
             targetChar.hp = targetChar.baseHP;
@@ -862,7 +914,7 @@ var Entity = /*#__PURE__*/function () {
     value: function useAbility(n) {
       var _this5 = this;
 
-      if (!this.abilityAvailable[n]) {
+      if (!this.abilityAvailable[n] || this.abilities.length === 0) {
         return;
       } // console.log('ability', n, 'attempted');
 
@@ -933,6 +985,51 @@ function shuffle(a) {
   return a;
 }
 
+function fastFadeOut(element) {
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var op = 25;
+  var timerDown = setInterval(function () {
+    if (op <= 0) {
+      clearInterval(timerDown);
+      element.style.display = 'none';
+
+      if (action) {
+        action();
+      }
+    }
+
+    element.style.opacity = op / 25;
+    op -= 1;
+
+    if (element.style.display === 'none') {
+      clearInterval(timerDown);
+      element.style.opacity = 0;
+    }
+  }, 25);
+}
+
+function fastFadeIn(element) {
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var op = 0;
+  var timerUp = setInterval(function () {
+    if (op >= 20) {
+      clearInterval(timerUp);
+
+      if (action) {
+        action();
+      }
+    }
+
+    element.style.opacity = op / 20;
+    op += 1;
+
+    if (element.style.display === 'none') {
+      clearInterval(timerUp);
+      element.style.opacity = 0;
+    }
+  }, 25);
+}
+
 /***/ }),
 
 /***/ "./src/index.js":
@@ -970,6 +1067,7 @@ function slowFade(element) {
 
 window.addEventListener('load', function () {
   // const abilityBoxes = document.getElementsByClassName('inner-ability-div');
+  // console.log(document.getElementById('a1-hp-left'));
   var gameTag = document.getElementById('game-tag');
   gameTag.style.opacity = 0;
   gameTag.style.display = '';
@@ -1115,20 +1213,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _entities_enemy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../entities/enemy */ "./src/entities/enemy.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+// import * as charactersObj from '../entities/character';
 
+ // const charactersArr = Object.values(charactersObj);
 
-var charactersArr = Object.values(_entities_character__WEBPACK_IMPORTED_MODULE_0__);
 var enemiesArr = Object.values(_entities_enemy__WEBPACK_IMPORTED_MODULE_1__);
 
-var Level = function Level(name, enemyList) {
-  var message = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
-  var actionChanges = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : function () {};
-  var characterList = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : charactersArr[1];
+var Level = function Level(name, enemyList, xp) {
+  var message = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
+  var actionChanges = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : function () {};
+  var characterList = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"];
 
   _classCallCheck(this, Level);
 
   this.name = name;
   this.enemyList = enemyList;
+  this.xp = xp;
   this.message = message;
   this.action = actionChanges;
   this.characterList = characterList; // this.actionExpended = false;
@@ -1153,37 +1253,37 @@ function applyMod(entity, mod) {
   }
 }
 
-var actionOne = function actionOne() {
-  applyMod(charactersArr[0][0], 35);
-  applyMod(charactersArr[0][1], 15);
-  applyMod(charactersArr[0][2], 15);
-  applyMod(charactersArr[0][3], 55);
+var firstFourActions = function firstFourActions() {
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 35);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 15);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 15);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 55);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 55, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 33, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 66, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 22, false);
   applyMod(enemiesArr[0][0], 55);
-};
-
-var actionTwo = function actionTwo() {
+  applyMod(enemiesArr[0][0], 55, false);
   applyMod(enemiesArr[1][0], 55);
   applyMod(enemiesArr[1][1], 75);
-};
-
-var actionThree = function actionThree() {
+  applyMod(enemiesArr[1][0], 55, false);
+  applyMod(enemiesArr[1][1], 33, false);
   applyMod(enemiesArr[2][2], 75);
-};
-
-var actionFour = function actionFour() {
+  applyMod(enemiesArr[2][2], 66, false);
   applyMod(enemiesArr[3][3], 35);
+  applyMod(enemiesArr[3][3], 22, false);
 };
 
 var actionFive = function actionFive() {
   // WaCWiR
-  applyMod(charactersArr[1][0], 65);
-  applyMod(charactersArr[1][1], 45);
-  applyMod(charactersArr[1][2], 45);
-  applyMod(charactersArr[1][3], 25);
-  applyMod(charactersArr[1][0], 45, false);
-  applyMod(charactersArr[1][1], 25, false);
-  applyMod(charactersArr[1][2], 65, false);
-  applyMod(charactersArr[1][3], 45, false); // WiRWaC
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 65);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 45);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 45);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 25);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 45, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 25, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 65, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 45, false); // WiRWaC
 
   applyMod(enemiesArr[4][0], 10);
   applyMod(enemiesArr[4][1], 15);
@@ -1197,14 +1297,14 @@ var actionFive = function actionFive() {
 
 var actionSix = function actionSix() {
   // WaCWiR
-  applyMod(charactersArr[1][0], 60);
-  applyMod(charactersArr[1][1], 60);
-  applyMod(charactersArr[1][2], 30);
-  applyMod(charactersArr[1][3], 30);
-  applyMod(charactersArr[1][0], 60, false);
-  applyMod(charactersArr[1][1], 30, false);
-  applyMod(charactersArr[1][2], 30, false);
-  applyMod(charactersArr[1][3], 60, false); // WiRWaC
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 60);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 60);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 30);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 30);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 60, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 30, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 30, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 60, false); // WiRWaC
 
   applyMod(enemiesArr[5][0], 5);
   applyMod(enemiesArr[5][1], 45);
@@ -1217,14 +1317,14 @@ var actionSix = function actionSix() {
 };
 
 var actionSeven = function actionSeven() {
-  applyMod(charactersArr[1][0], 50);
-  applyMod(charactersArr[1][1], 10);
-  applyMod(charactersArr[1][2], 35);
-  applyMod(charactersArr[1][3], 65);
-  applyMod(charactersArr[1][0], 20, false);
-  applyMod(charactersArr[1][1], 45, false);
-  applyMod(charactersArr[1][2], 60, false);
-  applyMod(charactersArr[1][3], 35, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 50);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 10);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 35);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 65);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 20, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 45, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 60, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 35, false);
   applyMod(enemiesArr[6][0], 25);
   applyMod(enemiesArr[6][1], 10);
   applyMod(enemiesArr[6][2], 80);
@@ -1237,14 +1337,14 @@ var actionSeven = function actionSeven() {
 
 var actionEight = function actionEight() {
   // WaCWiR
-  applyMod(charactersArr[1][0], 60);
-  applyMod(charactersArr[1][1], 60);
-  applyMod(charactersArr[1][2], 30);
-  applyMod(charactersArr[1][3], 30);
-  applyMod(charactersArr[1][0], 60, false);
-  applyMod(charactersArr[1][1], 30, false);
-  applyMod(charactersArr[1][2], 30, false);
-  applyMod(charactersArr[1][3], 60, false); // WiRWaC
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 60);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 60);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 30);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 30);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], 60, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], 30, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], 30, false);
+  applyMod(_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3], 60, false); // WiRWaC
 
   applyMod(enemiesArr[7][0], 45);
   applyMod(enemiesArr[7][1], 10);
@@ -1256,14 +1356,14 @@ var actionEight = function actionEight() {
   applyMod(enemiesArr[7][3], 70, false);
 };
 
-var levelOne = new Level('One', enemiesArr[0], "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.", actionOne, [charactersArr[0][0]]);
-var levelTwo = new Level('Two', enemiesArr[1], "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", actionTwo, [charactersArr[0][0], charactersArr[0][1]]);
-var levelThree = new Level('Three', enemiesArr[2], "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", actionThree, [charactersArr[0][0], charactersArr[0][1], charactersArr[0][2]]);
-var levelFour = new Level('Four', enemiesArr[3], "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", actionFour, charactersArr[0]);
-var levelFive = new Level('Five', enemiesArr[4], "The tutorial levels are over. Time for more of a challenge", actionFive);
-var levelSix = new Level('Six', enemiesArr[5], "Wizards and Clerics", actionSix);
-var levelSeven = new Level('Seven', enemiesArr[6], "All melee", actionSeven);
-var levelEight = new Level('Eight', enemiesArr[7], "Fight yourself", actionEight);
+var levelOne = new Level('One', enemiesArr[0], 25, "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0]]);
+var levelTwo = new Level('Two', enemiesArr[1], 50, "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1]]);
+var levelThree = new Level('Three', enemiesArr[2], 75, "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2]]);
+var levelFour = new Level('Four', enemiesArr[3], 100, "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", firstFourActions, _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"]);
+var levelFive = new Level('Five', enemiesArr[4], 150, "The tutorial levels are over. Time for more of a challenge", actionFive);
+var levelSix = new Level('Six', enemiesArr[5], 200, "Wizards and Clerics", actionSix);
+var levelSeven = new Level('Seven', enemiesArr[6], 250, "All melee", actionSeven);
+var levelEight = new Level('Eight', enemiesArr[7], 350, "Fight yourself", actionEight);
 
 /***/ }),
 
@@ -1286,6 +1386,8 @@ var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
 var maxLevelNumber = 0;
 var selectedChar;
+var countToReach = 0;
+var moveFinishCount = 0;
 var livingEnemies = {};
 var livingChars = {};
 var currentAbilityBoxes;
@@ -1319,10 +1421,29 @@ function addDeathListener(entity) {
   });
 }
 
+function createXPObserver(_char) {
+  _char.xpObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutationRecord) {
+      if (_char.observationToken && mutationRecord.target.style.border === '5px solid gold') {
+        moveFinishCount++;
+        _char.observationToken = false; // char.xpObserver.disconnect();
+
+        if (moveFinishCount === countToReach) {
+          addCharXP();
+        }
+      }
+    });
+  });
+}
+
 function addEntityEvents(entity, allies, enemies) {
   if (entity.imgName != "") {
     if (!entity.observer) {
       addDeathListener(entity);
+
+      if (entity.allied) {
+        createXPObserver(entity);
+      }
     }
 
     entity.enemies = enemies;
@@ -1577,6 +1698,18 @@ function setInitialTargets(chars, enemies) {
   }
 }
 
+function setAvailableAbilities(_char2) {
+  var abilities = document.getElementsByClassName(_char2.imgName + '-ability-boxes');
+
+  for (var i = 0; i < abilities.length; i++) {
+    if (i < _char2.abilities.length) {
+      abilities[i].style.display = '';
+    } else {
+      abilities[i].style.display = 'none';
+    }
+  }
+}
+
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   document.getElementById('return-button').style.display = 'none';
   var deSelectButton = document.getElementById('test');
@@ -1619,6 +1752,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     var abilityClassName = document.getElementById("a".concat(i + 1, "-class-name"));
     abilityClassName.innerHTML = charactersArr[i].klass;
     var abilityNames = document.getElementsByClassName("a".concat(i + 1, "-ability-labels"));
+    setAvailableAbilities(charactersArr[i]);
 
     for (var j = 0; j < abilityNames.length; j++) {
       if (charactersArr[i].abilityNames[j]) {
@@ -1736,23 +1870,112 @@ function endGame(charsList, enemyList) {
     allEnemyList[_i2].img.src = allEnemyList[_i2].baseImg.src;
   }
 
-  var backgroundImg = document.getElementById('background-image');
-  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
+  if (charsList.length > 0) {
+    endMoveChars(charsList);
+  } else {
+    var backgroundImg = document.getElementById('background-image');
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
 
-  for (var _i3 = 0; _i3 < charsList.length; _i3++) {
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(charsList[_i3].container);
+    for (var _i3 = 0; _i3 < enemyList.length; _i3++) {
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i3].container);
+    }
+
+    fadeOutGame(false);
+  }
+}
+
+function xpObserverObserve(_char3) {
+  _char3.observationToken = true;
+
+  _char3.xpObserver.observe(_char3.img, {
+    attributes: true,
+    attributeFilter: ['style']
+  });
+}
+
+function modEndPos() {
+  var container = document.getElementById('game-container');
+  var width = Math.floor(container.offsetWidth);
+  var height = Math.floor(container.offsetHeight); // console.log(width);
+
+  var widthExtra = width - 160 * 4; // console.log(widthExtra);
+
+  return [Math.floor(widthExtra / 4), Math.floor(height * 0.66), Math.floor(width / 10)];
+}
+
+function endMoveChars(charsList) {
+  moveFinishCount = 0;
+  countToReach = charsList.length;
+  var basePos = modEndPos(); // make into % values
+
+  for (var i = 0; i < charsList.length; i++) {
+    xpObserverObserve(charsList[i]);
+    charsList[i].move([i * 160 + (i + 1) * basePos[0] + basePos[2], basePos[1]], false, true);
+  }
+}
+
+function addCharXP() {
+  var c = Object.values(livingChars); // console.log(c);
+
+  for (var i = 0; i < c.length; i++) {
+    c[i].xpObserver.disconnect();
+    c[i].hpContainerLeft.style.backgroundColor = 'gold';
+    var xpPercent = Math.floor(c[i].xp / c[i].nextLevelXP * 100);
+    c[i].hpContainerLeft.style.width = "".concat(xpPercent, "%");
+    c[i].hpContainerRight.style.width = "".concat(100 - xpPercent, "%");
+    var levelUpDisp = document.getElementById(c[i].imgName + '-level-up');
+    levelUpDisp.style.top = Math.floor(c[i].pos[1] - 75) + 'px';
+    levelUpDisp.style.left = Math.floor(c[i].pos[0]) + 'px';
   }
 
-  for (var _i4 = 0; _i4 < enemyList.length; _i4++) {
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i4].container);
-  }
+  fadeOutGame(true);
+  var xpPerC = levels[currentLevelNumber].xp / c.length;
+  var xpPerInterval = xpPerC / 60; // 4 seconds for the animation, .05 sec intervals
 
-  var gameFadeTimer = setInterval(function () {
-    // console.log('fade called');
+  var timeCount = 0;
+  var xpInterval = setInterval(function () {
+    if (timeCount === 60) {
+      clearInterval(xpInterval);
+
+      for (var _i4 = 0; _i4 < c.length; _i4++) {
+        c[_i4].xp = Math.ceil(c[_i4].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+
+        c[_i4].container.style.border = 'none';
+        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i4].container);
+      }
+
+      var backgroundImg = document.getElementById('background-image');
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
+    }
+
+    for (var _i5 = 0; _i5 < c.length; _i5++) {
+      c[_i5].xp += xpPerInterval;
+
+      if (c[_i5].xp > c[_i5].nextLevelXP) {
+        c[_i5].levelUp();
+      }
+
+      var _xpPercent = Math.floor(c[_i5].xp / c[_i5].nextLevelXP * 100);
+
+      c[_i5].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
+      c[_i5].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
+    }
+
+    timeCount++;
+  }, 50);
+}
+
+function fadeOutGame(won) {
+  var theThing = function theThing(actionIterations) {
+    if (!actionIterations) {
+      actionIterations = 40;
+    } // console.log('fade called');
+
+
     var disp;
     var secondAction;
 
-    if (charsList.length === 0) {
+    if (!won) {
       disp = document.getElementById('game-over-display');
 
       secondAction = function secondAction() {
@@ -1770,12 +1993,17 @@ function endGame(charsList, enemyList) {
     disp.style.display = '';
 
     var action = function action() {
-      return Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(disp, secondAction);
+      return Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(disp, secondAction, actionIterations);
     };
 
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(disp, action);
-    clearInterval(gameFadeTimer);
-  }, 2000);
+  };
+
+  if (!won) {
+    setTimeout(theThing, 2000);
+  } else {
+    theThing(60);
+  }
 }
 
 function resetGame(won) {
@@ -1793,31 +2021,34 @@ function resetGame(won) {
       levelButtons[maxLevelNumber].style.opacity = 100 + '%';
       levelButtons[maxLevelNumber].style.cursor = 'pointer';
     }
-  } // level.characterList, level.enemyList
-  // console.log('levels arr: ', levels);
-  // console.log('level ', currentLevelNumber, ': ', levels[currentLevelNumber]);
-
+  }
 
   var levChars = levels[currentLevelNumber].characterList;
   var levEnems = levels[currentLevelNumber].enemyList;
 
   for (var i = 0; i < levChars.length; i++) {
     levChars[i].hp = levChars[i].baseHP;
+    levChars[i].dmg = levChars[i].baseDMG;
+    levChars[i].defense = levChars[i].baseDefense;
     levChars[i].pos[0] = levChars[i].basePos[0];
     levChars[i].pos[1] = levChars[i].basePos[1];
     levChars[i].container.style.top = levChars[i].pos[1] + 'px';
     levChars[i].container.style.left = levChars[i].pos[0] + 'px';
+    levChars[i].hpContainerLeft.style.backgroundColor = 'blue';
+    levChars[i].img.style.border = 'none';
     levChars[i].setHpBars();
   }
 
-  for (var _i5 = 0; _i5 < levEnems.length; _i5++) {
-    levEnems[_i5].hp = levEnems[_i5].baseHP;
-    levEnems[_i5].pos[0] = levEnems[_i5].basePos[0];
-    levEnems[_i5].pos[1] = levEnems[_i5].basePos[1];
-    levEnems[_i5].container.style.top = levEnems[_i5].pos[1] + 'px';
-    levEnems[_i5].container.style.left = levEnems[_i5].pos[0] + 'px';
+  for (var _i6 = 0; _i6 < levEnems.length; _i6++) {
+    levEnems[_i6].hp = levEnems[_i6].baseHP;
+    levEnems[_i6].dmg = levEnems[_i6].baseDMG;
+    levEnems[_i6].defense = levEnems[_i6].baseDefense;
+    levEnems[_i6].pos[0] = levEnems[_i6].basePos[0];
+    levEnems[_i6].pos[1] = levEnems[_i6].basePos[1];
+    levEnems[_i6].container.style.top = levEnems[_i6].pos[1] + 'px';
+    levEnems[_i6].container.style.left = levEnems[_i6].pos[0] + 'px';
 
-    levEnems[_i5].setHpBars();
+    levEnems[_i6].setHpBars();
   }
 }
 
@@ -1838,7 +2069,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fadeIn", function() { return fadeIn; });
 function fadeOut(element) {
   var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var op = 40;
+  var iterations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 40;
+  var op = iterations;
   var timerDown = setInterval(function () {
     if (op <= 0) {
       clearInterval(timerDown);
@@ -1849,7 +2081,7 @@ function fadeOut(element) {
       }
     }
 
-    element.style.opacity = op / 40;
+    element.style.opacity = op / iterations;
     op -= 1;
 
     if (element.style.display === 'none') {
@@ -1860,9 +2092,10 @@ function fadeOut(element) {
 }
 function fadeIn(element) {
   var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var iterations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 40;
   var op = 0;
   var timerUp = setInterval(function () {
-    if (op >= 40) {
+    if (op >= iterations) {
       clearInterval(timerUp);
 
       if (action) {
@@ -1870,7 +2103,7 @@ function fadeIn(element) {
       }
     }
 
-    element.style.opacity = op / 40;
+    element.style.opacity = op / iterations;
     op += 1;
 
     if (element.style.display === 'none') {

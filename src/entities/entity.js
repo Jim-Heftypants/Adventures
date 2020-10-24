@@ -3,6 +3,7 @@ class Entity { // this. is selectedChar
         this.klass = klass;
 
         this.range = range;
+        this.trueBaseHp = baseHP;
         this.baseHP = baseHP;
         this.hp = this.baseHP;
         this.baseMS = ms; // speed / time
@@ -12,11 +13,20 @@ class Entity { // this. is selectedChar
         this.basePos = []; this.basePos[0] = pos[0]; this.basePos[1] = pos[1];
         this.baseAS = attackSpeed;
         this.as = this.baseAS;
+        this.trueBaseDMG = attackDMG;
         this.baseDMG = attackDMG;
         this.dmg = this.baseDMG;
-        this.defense = defense;
+        this.trueBaseDefense = defense;
+        this.baseDefense = defense
+        this.defense = this.baseDefense;
+        if (this.allied) {
+            this.xp = 0;
+            this.level = 1;
+            this.nextLevelXP = 100;
+        }
 
-        this.abilities = abilities;
+        this.allAbilities = abilities;
+        this.abilities = [];
         this.abilityNames = abilityNames;
         this.abilityAvailable = [true, true, true, true];
         this.abilityShouldCast = [false, false, false, false];
@@ -31,6 +41,8 @@ class Entity { // this. is selectedChar
         this.moveImages; // cycle through array of images
         this.baseImg; // standard stand image
         this.container;
+        this.hpContainerLeft;
+        this.hpContainerRight;
 
         this.currentAction;
         this.currentAnimation;
@@ -45,6 +57,8 @@ class Entity { // this. is selectedChar
         this.movingOutTheWay = false;
 
         this.observer;
+        this.xpObserver;
+        this.observationToken = true;
 
         window.addEventListener('load', () => {
             this.addInlineStyle();
@@ -64,8 +78,37 @@ class Entity { // this. is selectedChar
         this.container.style.top = this.pos[1] + "px";
         this.hotkeyDisplay = document.getElementById(this.imgName + '-hotkey-display');
         this.hotkey = document.getElementById(this.imgName + '-keybind').value;
+        this.hpContainerLeft = document.getElementById(this.imgName + '-hp-left');
+        this.hpContainerRight = document.getElementById(this.imgName + '-hp-right');
         if (this.allied) {
             this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
+        }
+    }
+
+    levelUp() {
+        const levelUpDisp = document.getElementById(this.imgName + '-level-up');
+        // console.log('levelUpDisp: ', levelUpDisp);
+        levelUpDisp.style.display = '';
+        fastFadeOut(levelUpDisp);
+        this.xp -= this.nextLevelXP;
+        this.nextLevelXP += (this.nextLevelXP * 0.1);
+        this.level++;
+        this.baseDefense += Math.ceil(this.trueBaseDefense * 0.05);
+        this.baseDMG += Math.ceil(this.trueBaseDMG * 0.1);
+        this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
+        switch (this.level) {
+            case (5):
+                this.abilities.push(this.allAbilities[0]);
+                break;
+            case (10):
+                this.abilities.push(this.allAbilities[1]);
+                break;
+            case (15):
+                this.abilities.push(this.allAbilities[2]);
+                break;
+            case (20):
+                this.abilities.push(this.allAbilities[3]);
+                break;
         }
     }
 
@@ -90,7 +133,7 @@ class Entity { // this. is selectedChar
         return ([xChange, yChange, numRepeats])
     }
 
-    move(endPos, attackOnFinish = false) {
+    move(endPos, attackOnFinish = false, addXPBar=false) {
         this.movingOutTheWay = true;
         this.clearIntervals();
         endPos[0] = Math.floor(endPos[0] - (this.img.width * (3/2)));
@@ -116,6 +159,10 @@ class Entity { // this. is selectedChar
                 if (attackOnFinish) {
                     // console.log('self in move end: ', self);
                     self.autoAttack(attackOnFinish); // needs editing
+                } else if (addXPBar) {
+                    // console.log('move ended');
+                    self.img.style.transform = "scaleX(1)";
+                    self.img.style.border = '5px solid gold';
                 }
             } else { // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
             // begin some kind of animation
@@ -176,14 +223,12 @@ class Entity { // this. is selectedChar
     }
 
     setHpBars() {
-        const leftBar = document.getElementById(`${this.imgName}-hp-left`);
-        const rightBar = document.getElementById(`${this.imgName}-hp-right`);
         let leftWidth = Math.floor((this.hp / this.baseHP) * 100);
         let rightWidth = 100 - leftWidth;
         if (leftWidth < 0) leftWidth = 0;
         if (rightWidth < 0) rightWidth = 0;
-        leftBar.style.width = leftWidth + '%';
-        rightBar.style.width = rightWidth + '%';
+        this.hpContainerLeft.style.width = leftWidth + '%';
+        this.hpContainerRight.style.width = rightWidth + '%';
     }
 
     setTargetAndAttack() {
@@ -290,7 +335,7 @@ class Entity { // this. is selectedChar
                 selectedChar.trackTarget();
                 return;
             } else {
-                targetChar.hp -= selectedChar.dmg;
+                targetChar.hp -= (selectedChar.dmg * 15 / targetChar.defense);
                 if (targetChar.hp > targetChar.baseHP) { targetChar.hp = targetChar.baseHP; }
                 if (!targetChar.allied && selectedChar.allied && targetChar.baseDMG > 0 && selectedChar.defense > targetChar.target.defense) {
                     targetChar.target = selectedChar;
@@ -363,7 +408,7 @@ class Entity { // this. is selectedChar
     }
 
     useAbility(n) {
-        if (!this.abilityAvailable[n]) {
+        if (!this.abilityAvailable[n] || this.abilities.length === 0) {
             return;
         }
         // console.log('ability', n, 'attempted');
@@ -425,4 +470,37 @@ function shuffle(a) {
         [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+}
+
+function fastFadeOut(element, action = null) {
+    let op = 25;
+    let timerDown = setInterval(function () {
+        if (op <= 0) {
+            clearInterval(timerDown);
+            element.style.display = 'none';
+            if (action) { action(); }
+        }
+        element.style.opacity = op / 25;
+        op -= 1;
+        if (element.style.display === 'none') {
+            clearInterval(timerDown);
+            element.style.opacity = 0;
+        }
+    }, 25);
+}
+
+function fastFadeIn(element, action = null) {
+    let op = 0;
+    let timerUp = setInterval(function () {
+        if (op >= 20) {
+            clearInterval(timerUp);
+            if (action) { action(); }
+        }
+        element.style.opacity = op / 20;
+        op += 1;
+        if (element.style.display === 'none') {
+            clearInterval(timerUp);
+            element.style.opacity = 0;
+        }
+    }, 25);
 }

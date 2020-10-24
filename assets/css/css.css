@@ -14,7 +14,7 @@ img {
     height: 900px;
     width: 90%;
     background-color: lawngreen;
-    border: 5px solid black;
+    border-left: 2px solid black;
 }
 
 .entity-container {
@@ -72,6 +72,7 @@ img {
     color: red;
     font-size: 80px;
     margin-top: 15%;
+    z-index: 4;
 }
 
 .links {
@@ -208,7 +209,7 @@ img {
     padding: 4px;
     text-align: center;
     color: red;
-    background-color: cadetblue;
+    background-color: whitesmoke;
     border: 3px solid crimson;
     text-decoration: none;
 }
@@ -318,9 +319,9 @@ img {
     height: 900px;
     display: flex;
     flex-direction: column;
-    width: 9%;
+    width: 10%;
     background-color: darkgreen;
-    border: 5px solid black;
+    border-right: 2px solid black;
 }
 
 .a1-ability-boxes, .a2-ability-boxes, .a3-ability-boxes, .a4-ability-boxes {
@@ -329,6 +330,7 @@ img {
     width: 90%;
     color: red;
     font-size: 30px;
+    font-size: 2.25vw;
     text-align: center;
     margin-bottom: 10px;
 }
@@ -347,5 +349,16 @@ img {
 .class-names {
     text-align: center;
     color: red;
-    font-size: 35px;
+    font-size: 2.5vw;
+}
+
+.level-up {
+    font-size: 30px;
+    color: gold;
+    width: 150px;
+    height: 50px;
+    background-color: grey;
+    text-align: center;
+    position: absolute;
+    z-index: 4;
 }

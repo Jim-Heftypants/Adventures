@@ -9,6 +9,7 @@ function slowFade(element, action = null) { let op = 80; let timerDown = setInte
 
 window.addEventListener('load', () => {
     // const abilityBoxes = document.getElementsByClassName('inner-ability-div');
+    // console.log(document.getElementById('a1-hp-left'));
 
     const gameTag = document.getElementById('game-tag');
     gameTag.style.opacity = 0;
