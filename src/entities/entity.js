@@ -43,6 +43,7 @@ class Entity { // this. is selectedChar
         this.container;
         this.hpContainerLeft;
         this.hpContainerRight;
+        this.attackOverlay;
 
         this.currentAction;
         this.currentAnimation;
@@ -80,6 +81,7 @@ class Entity { // this. is selectedChar
         this.hotkey = document.getElementById(this.imgName + '-keybind').value;
         this.hpContainerLeft = document.getElementById(this.imgName + '-hp-left');
         this.hpContainerRight = document.getElementById(this.imgName + '-hp-right');
+        this.attackOverlay = document.getElementById(this.imgName + '-effect-overlay');
         if (this.allied) {
             this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
         }
@@ -307,6 +309,26 @@ class Entity { // this. is selectedChar
         }
     }
 
+    setOverlay(targetChar) {
+        this.attackOverlay.style.top = (targetChar.pos[1] + 40) + 'px';
+        this.attackOverlay.style.left = targetChar.pos[0] + 'px';
+        this.attackOverlay.style.width = targetChar.img.width;
+        this.attackOverlay.style.height = targetChar.img.height;
+        this.attackOverlay.style.display = '';
+        const selectedChar = this;
+        const clearTime = Math.floor(this.as / 2);
+        let timeCheck = 0;
+        let stackInterval = setInterval(() => {
+            selectedChar.attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
+            selectedChar.attackOverlay.style.left = targetChar.pos[0] + 'px';
+            timeCheck += 20;
+            if (timeCheck >= clearTime || targetChar.img.style.display === 'none') {
+                clearInterval(stackInterval);
+                selectedChar.attackOverlay.style.display = 'none';
+            }
+        }, 20);
+    }
+
     beginAttack(targetChar) {
         // make some kind of animation start
         this.clearIntervals();
@@ -337,6 +359,9 @@ class Entity { // this. is selectedChar
                 return;
             } else {
                 targetChar.hp -= (selectedChar.dmg * 15 / targetChar.defense);
+                if (selectedChar.attackOverlay) {
+                    selectedChar.setOverlay(targetChar);
+                }
                 if (targetChar.hp > targetChar.baseHP) { targetChar.hp = targetChar.baseHP; }
                 if (!targetChar.allied && selectedChar.allied && targetChar.baseDMG > 0 && selectedChar.defense > targetChar.target.defense) {
                     targetChar.target = selectedChar;

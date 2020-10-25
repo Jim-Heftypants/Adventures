@@ -54,7 +54,7 @@ p, h1 {
     position: absolute;
     font-size: 30px;
     left: 10px;
-    top: 22px;
+    top: 40px;
     color: crimson;
 }
 
@@ -156,7 +156,7 @@ p, h1 {
     width: 270px;
     height: 270px;
     opacity: 60%;
-    font-size: 7vh;
+    font-size: 70px;
     color: purple;
     word-wrap: break-word;
 }
@@ -245,6 +245,12 @@ p, h1 {
     z-index: 2;
 }
 
+#full-keybind-container{
+    height: 100%;
+    width: 100%;
+    font-size: 4vw;
+}
+
 #keybindings-container {
     display: flex;
     flex-direction: row;
@@ -252,46 +258,42 @@ p, h1 {
     width: 100%;
     height: 80%;
     color: red;
-    font-size: 60px;
-    /* font-size: 3.5vw; */
+    /* font-size: 60px; */
 }
 
 #ability-keybinds, #ally-keybinds, #enemy-keybinds {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
     margin-left: auto;
     margin-right: auto;
 }
 
 .keybind-div {
     display: flex;
+    margin: auto;
 }
 
 .keybind-input {
-    margin-top: 65px;
-    /* margin-top: 3vw; */
-    width: 40px;
-    /* width: 3.5vw; */
-    height: 60px;
-    /* height: 4vw; */
-    font-size: 50px;
-    /* font-size: 3.3vw; */
+    width: 3.5vw;
+    height: 4vw;
+    font-size: 3.5vw;
     text-align: center;
 }
 
 #keybindings-rules {
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
     width: 90%;
+    height: 20%;
     color: red;
-    font-size: 60px;
-    /* font-size: 3.5vw; */
     text-align: center;
     border-bottom: 5px solid black;
 }
 
 #keybindings-rules p {
-    position: relative;
-    top: 0;
-    margin: 0;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 #all-characters-ability-container {
@@ -445,4 +447,16 @@ p, h1 {
     width: 180px;
     height: 240px;
     margin: auto;
+}
+
+
+
+
+.heal-overlay {
+    position: absolute;
+    height: 200px;
+    width: 150px;
+    opacity: 30%;
+    background-color: mediumaquamarine;
+    z-index: 20;
 }

@@ -513,6 +513,7 @@ var Entity = /*#__PURE__*/function () {
     this.container;
     this.hpContainerLeft;
     this.hpContainerRight;
+    this.attackOverlay;
     this.currentAction;
     this.currentAnimation;
     this.imgCycle = 0;
@@ -547,6 +548,7 @@ var Entity = /*#__PURE__*/function () {
       this.hotkey = document.getElementById(this.imgName + '-keybind').value;
       this.hpContainerLeft = document.getElementById(this.imgName + '-hp-left');
       this.hpContainerRight = document.getElementById(this.imgName + '-hp-right');
+      this.attackOverlay = document.getElementById(this.imgName + '-effect-overlay');
 
       if (this.allied) {
         this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
@@ -866,6 +868,28 @@ var Entity = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "setOverlay",
+    value: function setOverlay(targetChar) {
+      this.attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
+      this.attackOverlay.style.left = targetChar.pos[0] + 'px';
+      this.attackOverlay.style.width = targetChar.img.width;
+      this.attackOverlay.style.height = targetChar.img.height;
+      this.attackOverlay.style.display = '';
+      var selectedChar = this;
+      var clearTime = Math.floor(this.as / 2);
+      var timeCheck = 0;
+      var stackInterval = setInterval(function () {
+        selectedChar.attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
+        selectedChar.attackOverlay.style.left = targetChar.pos[0] + 'px';
+        timeCheck += 20;
+
+        if (timeCheck >= clearTime || targetChar.img.style.display === 'none') {
+          clearInterval(stackInterval);
+          selectedChar.attackOverlay.style.display = 'none';
+        }
+      }, 20);
+    }
+  }, {
     key: "beginAttack",
     value: function beginAttack(targetChar) {
       var _this4 = this;
@@ -908,6 +932,10 @@ var Entity = /*#__PURE__*/function () {
           return;
         } else {
           targetChar.hp -= selectedChar.dmg * 15 / targetChar.defense;
+
+          if (selectedChar.attackOverlay) {
+            selectedChar.setOverlay(targetChar);
+          }
 
           if (targetChar.hp > targetChar.baseHP) {
             targetChar.hp = targetChar.baseHP;
