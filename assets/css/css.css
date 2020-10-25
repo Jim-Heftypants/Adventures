@@ -3,6 +3,10 @@ img {
     height: 200px;
 }
 
+p, h1 {
+    margin-block-start:0; margin-block-end:0; margin-inline-start:0; margin-inline-end:0;
+}
+
 #full-container {
     display: flex;
     border: 5px solid black;
@@ -90,8 +94,7 @@ img {
     margin: auto;
     width: 550px;
     padding: 15px;
-    margin-top: 2%;
-    top: 2%;
+    margin-top: 1.5%;
     z-index: 2;
     color: rgb(22, 141, 195);
     background-color: rgb(143, 75, 143);
@@ -222,37 +225,13 @@ img {
     background-color: red;
 }
 
-#warrior-base-img, #rogue-base-img, #cleric-base-img, #wizard-base-img {
-    margin-top: 60px;
-    position: relative;
-    width: 180px;
-    height: 240px;
-    z-index: 2;
-}
-
-#warrior-base-img {
-    left: 32%;
-}
-
-#rogue-base-img {
-    left: 27%;
-}
-
-#wizard-base-img {
-    left: 22%;
-}
-
-#cleric-base-img {
-    left: 37%;
-}
-
 #game-tag-container {
     width: 100%;
     z-index: 2;
 }
 
 #game-tag {
-    top: 10%;
+    margin-top: 20%;
     margin-left: auto;
     margin-right: auto;
     font-size: 180px;
@@ -372,4 +351,98 @@ img {
 
 #fireblast-div {
     background-color: red;
+}
+
+#heroes-stats-full-container {
+    background-color: grey;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: lightblue;
+}
+
+#heroes-stats-container {
+    display: flex;
+    align-content: space-between;
+    width: 100%;
+    height: 55%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+}
+
+.hero-stats {
+    width: 45%;
+    height: 100%;
+    background-color: rosybrown;
+    display: flex;
+    border: 3px solid indigo;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stats-img-div {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.stats-img {
+    height: 20vw;
+    width: 15vw;
+}
+
+.stats-container {
+    height: 100%;
+    width: 60%;
+    font-size: 50px;
+    color: seagreen;
+    text-align: center;
+}
+
+.hero-stat {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#stats-selectors {
+    height: 25%;
+    width: 100%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    display: flex;
+    align-content: space-between;
+    background-color: hotpink;
+}
+
+.stat-selector {
+    width: 20%;
+    height: 100%;
+    background-color: indigo;
+    /* border: 2px solid green; */
+    cursor: pointer;
+    margin: auto;
+    font-size: 70px;
+    text-align: center;
+    color: magenta;
+}
+
+.stat-selector-name {
+    margin-top: 50px;
+    margin-bottom: auto;
+}
+
+#title-screen-chars {
+    margin-top: 60px;
+    position: relative;
+    display: flex;
+    align-content: space-between;
+    z-index: 2;
+}
+
+.title-screen-char {
+    width: 180px;
+    height: 240px;
+    margin: auto;
 }

@@ -15,9 +15,7 @@ window.addEventListener('load', () => {
     gameTag.style.opacity = 0;
     gameTag.style.display = '';
     
-    const wiz = document.getElementById('wizard-base-img');const ro = document.getElementById('rogue-base-img');
-    const war = document.getElementById('warrior-base-img');const cle = document.getElementById('cleric-base-img');
-    const charArr = [wiz, ro, war, cle];
+    const charsDisp = document.getElementById('title-screen-chars');
     // const controlsContainer = document.getElementsByClassName('controls-display')[0];
     const closeButton = document.getElementsByClassName('close')[0];
     const hButtons = document.getElementsByClassName('h-button');
@@ -25,6 +23,7 @@ window.addEventListener('load', () => {
     // const controlsButton = document.getElementById('game-controls-button');
     const keybindContainer = document.getElementById('full-keybind-container');
     const levelButtonContainer = document.getElementById('level-button-container');
+    const statsContainer = document.getElementById('heroes-stats-full-container');
     const levelButtons = document.getElementsByClassName('level-button');
     const backgroundImage = document.getElementById('background-image');
     const titleBackground = document.getElementById('title');
@@ -54,10 +53,9 @@ window.addEventListener('load', () => {
             // controlsButton.style.display = '';
             levelButtonContainer.style.display = 'none';
             keybindContainer.style.display = 'none';
+            statsContainer.style.display = 'none';
             closeButton.style.display = 'none';
-            for (let i = 0; i < 4; i++) {
-                charArr[i].style.display = '';
-            }
+            charsDisp.style.display = '';
             backgroundImage.src = titleBackground.src;
             backgroundImage.style.opacity = 100;
             backgroundImage.style.display = '';
@@ -67,9 +65,7 @@ window.addEventListener('load', () => {
             levelButtons[i].addEventListener('click', () => { 
                 closeButton.style.display = 'none';
                 // closeButton.removeEventListener('click', closeAction);
-                for (let i = 0; i < 4; i++) {
-                    charArr[i].style.display = 'none';
-                }
+                charsDisp.style.display = 'none';
                 backgroundImage.style.display = 'none';
                 loadLevel(i); 
             })
@@ -77,24 +73,25 @@ window.addEventListener('load', () => {
         levelButtons[0].style.opacity = 100;
         levelButtons[0].style.cursor = 'pointer';
         closeButton.addEventListener('click', closeAction)
-        hButtons[0].addEventListener('click', () => {
+        let hButtonPartialAction = () => {
             for (let i = 0; i < hButtons.length; i++) { hButtons[i].style.display = 'none'; }
-            levelButtonContainer.style.display = '';
             closeButton.style.display = '';
-            for (let i = 0; i < 4; i++) {
-                charArr[i].style.display = 'none';
-            }
+            charsDisp.style.display = 'none';
             backgroundImage.style.display = 'none';
+        }
+        hButtons[0].addEventListener('click', () => {
+            hButtonPartialAction();
+            levelButtonContainer.style.display = '';
         })
         hButtons[1].addEventListener('click', () => {
-            for (let i = 0; i < hButtons.length; i++) { hButtons[i].style.display = 'none'; }
+            hButtonPartialAction();
             keybindContainer.style.display = '';
-            closeButton.style.display = '';
-            for (let i = 0; i < 4; i++) {
-                charArr[i].style.display = 'none';
-            }
-            backgroundImage.style.display = 'none';
         })
+        hButtons[2].addEventListener('click', () => {
+            hButtonPartialAction();
+            statsContainer.style.display = '';
+        })
+
     }
     slowFade(gameTag, secondAction);
 })

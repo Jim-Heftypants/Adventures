@@ -7,6 +7,7 @@ let levelHasEnded = false;
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
 let maxLevelNumber = 7;
+let characters = levels[maxLevelNumber].characterList;
 
 let selectedChar;
 
@@ -19,6 +20,107 @@ let livingChars = {};
 let currentAbilityBoxes;
 
 let hotkeys = {};
+
+window.addEventListener('load', () => {
+    let statChar1;
+    let statChar2;
+    const heroStatcontainer = document.getElementById('heroes-button');
+    const heroStatsBlocks = document.getElementsByClassName('hero-stats');
+    const heroNameplateSelectors = document.getElementsByClassName('stat-selector');
+    const statSelectorNames = document.getElementsByClassName('stat-selector-name');
+    const statImages = document.getElementsByClassName('stats-img');
+    heroStatcontainer.addEventListener('click', () => {
+        for (let i = 0; i < statImages.length; i++) {
+            if (statImages[i].style.display !== 'none') {
+                let char; if (i === 0) { char = statChar1; } else { char = statChar2; }
+                const statImg = document.getElementById(`stats-img-${i + 1}`)
+                const nameStat = document.getElementById(`stats-name-${i + 1}`);
+                const levelStat = document.getElementById(`stats-level-${i + 1}`);
+                const hpStat = document.getElementById(`stats-hp-${i + 1}`);
+                const dmgStat = document.getElementById(`stats-dmg-${i + 1}`);
+                const defenseStat = document.getElementById(`stats-defense-${i + 1}`);
+                statImg.src = char.baseImg.src;
+                nameStat.innerHTML = `Level: ${char.level}`;
+                levelStat.innerHTML = char.klass;
+                hpStat.innerHTML = `Max HP: ${char.baseHP}`;
+                dmgStat.innerHTML = `Damage: ${char.baseDMG}`
+                defenseStat.innerHTML = `Defense: ${char.baseDefense}`;
+            }
+        }
+    })
+    let shouldSwap = false;
+    let statCharSelected = null;
+    function swapStatDisp(e) {
+        if (!shouldSwap) { return; }
+        // console.log('swapping now');
+        e.currentTarget.style.border = '3px solid indigo';
+        e.currentTarget.style.cursor = 'default';
+        for (let j = 0; j < heroStatsBlocks.length; j++) {
+            heroStatsBlocks[j].removeEventListener("mouseover", addBlueBorder);
+            heroStatsBlocks[j].removeEventListener("mouseleave", removeBlueBorder);
+        }
+        const charIndex = statCharSelected.id.substr(1, 1);
+        const char = characters[charIndex-1];
+        
+        statCharSelected.style.border = 'none';
+        statCharSelected = 'none';
+        
+        const tarId = e.target.id;
+        const sideNum = tarId.substr(tarId.length - 1, 1);
+        if (sideNum == 1) {
+            statChar1 = char;
+        } else {
+            statChar2 = char;
+        }
+        const statImg = document.getElementById(`stats-img-${sideNum}`)
+        const nameStat = document.getElementById(`stats-name-${sideNum}`);
+        const levelStat = document.getElementById(`stats-level-${sideNum}`);
+        const hpStat = document.getElementById(`stats-hp-${sideNum}`);
+        const dmgStat = document.getElementById(`stats-dmg-${sideNum}`);
+        const defenseStat = document.getElementById(`stats-defense-${sideNum}`);
+        if (statImg.style.display === 'none') { statImg.style.display = ''; }
+        statImg.src = char.baseImg.src;
+        nameStat.innerHTML = `Level: ${char.level}`;
+        levelStat.innerHTML = char.klass;
+        hpStat.innerHTML = `Max HP: ${char.baseHP}`;
+        dmgStat.innerHTML = `Damage: ${char.baseDMG}`
+        defenseStat.innerHTML = `Defense: ${char.baseDefense}`;
+
+        shouldSwap = false;
+    }
+    function addBlueBorder(e) {
+        e.currentTarget.style.border = '6px solid blue';
+        e.currentTarget.style.cursor = 'pointer';
+    } function removeBlueBorder(e) {
+        e.currentTarget.style.border = '3px solid indigo';
+        e.currentTarget.style.cursor = 'default';
+    }
+    function initiateStatSwap(e) {
+        // console.log('swap initiated');
+        if (shouldSwap) {
+            if (e.currentTarget === statCharSelected) { return; }
+            statCharSelected.style.border = 'none';
+            statCharSelected = e.currentTarget;
+            e.currentTarget.style.border = '4px solid blue';
+        } else {
+            statCharSelected = e.currentTarget;
+            statCharSelected.style.border = '4px solid blue';
+            for (let j = 0; j < heroStatsBlocks.length; j++) {
+                heroStatsBlocks[j].addEventListener("mouseover", addBlueBorder);
+                heroStatsBlocks[j].addEventListener("mouseleave", removeBlueBorder);
+            }
+            shouldSwap = true;
+        }
+    }
+    for (let j = 0; j < heroStatsBlocks.length; j++) { heroStatsBlocks[j].addEventListener("click", swapStatDisp); }
+    for (let i = 0; i < heroNameplateSelectors.length; i++) { heroNameplateSelectors[i].addEventListener('click', initiateStatSwap); }
+    for (let i = 0; i < statSelectorNames.length; i++) {
+        if (characters[i]) {
+            statSelectorNames[i].innerHTML = characters[i].klass;
+        }
+    }
+})
+
  
 function addDeathListener(entity) {
     entity.observer = new MutationObserver(function(mutations) {

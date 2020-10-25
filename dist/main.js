@@ -1159,11 +1159,7 @@ window.addEventListener('load', function () {
   var gameTag = document.getElementById('game-tag');
   gameTag.style.opacity = 0;
   gameTag.style.display = '';
-  var wiz = document.getElementById('wizard-base-img');
-  var ro = document.getElementById('rogue-base-img');
-  var war = document.getElementById('warrior-base-img');
-  var cle = document.getElementById('cleric-base-img');
-  var charArr = [wiz, ro, war, cle]; // const controlsContainer = document.getElementsByClassName('controls-display')[0];
+  var charsDisp = document.getElementById('title-screen-chars'); // const controlsContainer = document.getElementsByClassName('controls-display')[0];
 
   var closeButton = document.getElementsByClassName('close')[0];
   var hButtons = document.getElementsByClassName('h-button'); // const startGameButton = document.getElementById('start-game-button');
@@ -1171,6 +1167,7 @@ window.addEventListener('load', function () {
 
   var keybindContainer = document.getElementById('full-keybind-container');
   var levelButtonContainer = document.getElementById('level-button-container');
+  var statsContainer = document.getElementById('heroes-stats-full-container');
   var levelButtons = document.getElementsByClassName('level-button');
   var backgroundImage = document.getElementById('background-image');
   var titleBackground = document.getElementById('title');
@@ -1212,12 +1209,9 @@ window.addEventListener('load', function () {
 
       levelButtonContainer.style.display = 'none';
       keybindContainer.style.display = 'none';
+      statsContainer.style.display = 'none';
       closeButton.style.display = 'none';
-
-      for (var _i2 = 0; _i2 < 4; _i2++) {
-        charArr[_i2].style.display = '';
-      }
-
+      charsDisp.style.display = '';
       backgroundImage.src = titleBackground.src;
       backgroundImage.style.opacity = 100;
       backgroundImage.style.display = '';
@@ -1225,53 +1219,45 @@ window.addEventListener('load', function () {
 
     closeAction();
 
-    var _loop2 = function _loop2(_i3) {
-      levelButtons[_i3].addEventListener('click', function () {
+    var _loop2 = function _loop2(_i2) {
+      levelButtons[_i2].addEventListener('click', function () {
         closeButton.style.display = 'none'; // closeButton.removeEventListener('click', closeAction);
 
-        for (var _i8 = 0; _i8 < 4; _i8++) {
-          charArr[_i8].style.display = 'none';
-        }
-
+        charsDisp.style.display = 'none';
         backgroundImage.style.display = 'none';
-        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i3);
+        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i2);
       });
     };
 
-    for (var _i3 = 0; _i3 < levelButtons.length; _i3++) {
-      _loop2(_i3);
+    for (var _i2 = 0; _i2 < levelButtons.length; _i2++) {
+      _loop2(_i2);
     }
 
     levelButtons[0].style.opacity = 100;
     levelButtons[0].style.cursor = 'pointer';
     closeButton.addEventListener('click', closeAction);
-    hButtons[0].addEventListener('click', function () {
-      for (var _i4 = 0; _i4 < hButtons.length; _i4++) {
-        hButtons[_i4].style.display = 'none';
+
+    var hButtonPartialAction = function hButtonPartialAction() {
+      for (var _i3 = 0; _i3 < hButtons.length; _i3++) {
+        hButtons[_i3].style.display = 'none';
       }
 
-      levelButtonContainer.style.display = '';
       closeButton.style.display = '';
-
-      for (var _i5 = 0; _i5 < 4; _i5++) {
-        charArr[_i5].style.display = 'none';
-      }
-
+      charsDisp.style.display = 'none';
       backgroundImage.style.display = 'none';
+    };
+
+    hButtons[0].addEventListener('click', function () {
+      hButtonPartialAction();
+      levelButtonContainer.style.display = '';
     });
     hButtons[1].addEventListener('click', function () {
-      for (var _i6 = 0; _i6 < hButtons.length; _i6++) {
-        hButtons[_i6].style.display = 'none';
-      }
-
+      hButtonPartialAction();
       keybindContainer.style.display = '';
-      closeButton.style.display = '';
-
-      for (var _i7 = 0; _i7 < 4; _i7++) {
-        charArr[_i7].style.display = 'none';
-      }
-
-      backgroundImage.style.display = 'none';
+    });
+    hButtons[2].addEventListener('click', function () {
+      hButtonPartialAction();
+      statsContainer.style.display = '';
     });
   }
 
@@ -1473,6 +1459,7 @@ var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
 var maxLevelNumber = 7;
+var characters = levels[maxLevelNumber].characterList;
 var selectedChar;
 var countToReach = 0;
 var moveFinishCount = 0;
@@ -1480,6 +1467,137 @@ var livingEnemies = {};
 var livingChars = {};
 var currentAbilityBoxes;
 var hotkeys = {};
+window.addEventListener('load', function () {
+  var statChar1;
+  var statChar2;
+  var heroStatcontainer = document.getElementById('heroes-button');
+  var heroStatsBlocks = document.getElementsByClassName('hero-stats');
+  var heroNameplateSelectors = document.getElementsByClassName('stat-selector');
+  var statSelectorNames = document.getElementsByClassName('stat-selector-name');
+  var statImages = document.getElementsByClassName('stats-img');
+  heroStatcontainer.addEventListener('click', function () {
+    for (var i = 0; i < statImages.length; i++) {
+      if (statImages[i].style.display !== 'none') {
+        var _char = void 0;
+
+        if (i === 0) {
+          _char = statChar1;
+        } else {
+          _char = statChar2;
+        }
+
+        var statImg = document.getElementById("stats-img-".concat(i + 1));
+        var nameStat = document.getElementById("stats-name-".concat(i + 1));
+        var levelStat = document.getElementById("stats-level-".concat(i + 1));
+        var hpStat = document.getElementById("stats-hp-".concat(i + 1));
+        var dmgStat = document.getElementById("stats-dmg-".concat(i + 1));
+        var defenseStat = document.getElementById("stats-defense-".concat(i + 1));
+        statImg.src = _char.baseImg.src;
+        nameStat.innerHTML = "Level: ".concat(_char.level);
+        levelStat.innerHTML = _char.klass;
+        hpStat.innerHTML = "Max HP: ".concat(_char.baseHP);
+        dmgStat.innerHTML = "Damage: ".concat(_char.baseDMG);
+        defenseStat.innerHTML = "Defense: ".concat(_char.baseDefense);
+      }
+    }
+  });
+  var shouldSwap = false;
+  var statCharSelected = null;
+
+  function swapStatDisp(e) {
+    if (!shouldSwap) {
+      return;
+    } // console.log('swapping now');
+
+
+    e.currentTarget.style.border = '3px solid indigo';
+    e.currentTarget.style.cursor = 'default';
+
+    for (var j = 0; j < heroStatsBlocks.length; j++) {
+      heroStatsBlocks[j].removeEventListener("mouseover", addBlueBorder);
+      heroStatsBlocks[j].removeEventListener("mouseleave", removeBlueBorder);
+    }
+
+    var charIndex = statCharSelected.id.substr(1, 1);
+    var _char2 = characters[charIndex - 1];
+    statCharSelected.style.border = 'none';
+    statCharSelected = 'none';
+    var tarId = e.target.id;
+    var sideNum = tarId.substr(tarId.length - 1, 1);
+
+    if (sideNum == 1) {
+      statChar1 = _char2;
+    } else {
+      statChar2 = _char2;
+    }
+
+    var statImg = document.getElementById("stats-img-".concat(sideNum));
+    var nameStat = document.getElementById("stats-name-".concat(sideNum));
+    var levelStat = document.getElementById("stats-level-".concat(sideNum));
+    var hpStat = document.getElementById("stats-hp-".concat(sideNum));
+    var dmgStat = document.getElementById("stats-dmg-".concat(sideNum));
+    var defenseStat = document.getElementById("stats-defense-".concat(sideNum));
+
+    if (statImg.style.display === 'none') {
+      statImg.style.display = '';
+    }
+
+    statImg.src = _char2.baseImg.src;
+    nameStat.innerHTML = "Level: ".concat(_char2.level);
+    levelStat.innerHTML = _char2.klass;
+    hpStat.innerHTML = "Max HP: ".concat(_char2.baseHP);
+    dmgStat.innerHTML = "Damage: ".concat(_char2.baseDMG);
+    defenseStat.innerHTML = "Defense: ".concat(_char2.baseDefense);
+    shouldSwap = false;
+  }
+
+  function addBlueBorder(e) {
+    e.currentTarget.style.border = '6px solid blue';
+    e.currentTarget.style.cursor = 'pointer';
+  }
+
+  function removeBlueBorder(e) {
+    e.currentTarget.style.border = '3px solid indigo';
+    e.currentTarget.style.cursor = 'default';
+  }
+
+  function initiateStatSwap(e) {
+    // console.log('swap initiated');
+    if (shouldSwap) {
+      if (e.currentTarget === statCharSelected) {
+        return;
+      }
+
+      statCharSelected.style.border = 'none';
+      statCharSelected = e.currentTarget;
+      e.currentTarget.style.border = '4px solid blue';
+    } else {
+      statCharSelected = e.currentTarget;
+      statCharSelected.style.border = '4px solid blue';
+
+      for (var j = 0; j < heroStatsBlocks.length; j++) {
+        heroStatsBlocks[j].addEventListener("mouseover", addBlueBorder);
+        heroStatsBlocks[j].addEventListener("mouseleave", removeBlueBorder);
+      }
+
+      shouldSwap = true;
+    }
+  }
+
+  for (var j = 0; j < heroStatsBlocks.length; j++) {
+    heroStatsBlocks[j].addEventListener("click", swapStatDisp);
+  }
+
+  for (var i = 0; i < heroNameplateSelectors.length; i++) {
+    heroNameplateSelectors[i].addEventListener('click', initiateStatSwap);
+  }
+
+  for (var _i = 0; _i < statSelectorNames.length; _i++) {
+    if (characters[_i]) {
+      statSelectorNames[_i].innerHTML = characters[_i].klass;
+    }
+  }
+});
 
 function addDeathListener(entity) {
   entity.observer = new MutationObserver(function (mutations) {
@@ -1509,12 +1627,12 @@ function addDeathListener(entity) {
   });
 }
 
-function createXPObserver(_char) {
-  _char.xpObserver = new MutationObserver(function (mutations) {
+function createXPObserver(_char3) {
+  _char3.xpObserver = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutationRecord) {
-      if (_char.observationToken && mutationRecord.target.style.border === '5px solid gold') {
+      if (_char3.observationToken && mutationRecord.target.style.border === '5px solid gold') {
         moveFinishCount++;
-        _char.observationToken = false; // char.xpObserver.disconnect();
+        _char3.observationToken = false; // char.xpObserver.disconnect();
 
         if (moveFinishCount === countToReach) {
           addCharXP();
@@ -1786,11 +1904,11 @@ function setInitialTargets(chars, enemies) {
   }
 }
 
-function setAvailableAbilities(_char2) {
-  var abilities = document.getElementsByClassName(_char2.imgName + '-ability-boxes');
+function setAvailableAbilities(_char4) {
+  var abilities = document.getElementsByClassName(_char4.imgName + '-ability-boxes');
 
   for (var i = 0; i < abilities.length; i++) {
-    if (i < _char2.abilities.length) {
+    if (i < _char4.abilities.length) {
       abilities[i].style.display = '';
     } else {
       abilities[i].style.display = 'none';
@@ -1863,37 +1981,37 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     _loop3(i);
   }
 
-  var _loop4 = function _loop4(_i) {
-    if (!enemiesArr[_i].observer) {
-      addEntityEvents(enemiesArr[_i], enemiesArr, charactersArr);
+  var _loop4 = function _loop4(_i2) {
+    if (!enemiesArr[_i2].observer) {
+      addEntityEvents(enemiesArr[_i2], enemiesArr, charactersArr);
     }
 
-    livingEnemies[enemiesArr[_i].imgName] = enemiesArr[_i];
-    enemiesArr[_i].container.style.top = enemiesArr[_i].pos[1] + 'px';
-    enemiesArr[_i].container.style.left = enemiesArr[_i].pos[0] + 'px';
-    enemiesArr[_i].container.style.opacity = 0;
-    enemiesArr[_i].container.style.display = '';
-    var hpBar = document.getElementById("".concat(enemiesArr[_i].imgName, "-hp-bar"));
+    livingEnemies[enemiesArr[_i2].imgName] = enemiesArr[_i2];
+    enemiesArr[_i2].container.style.top = enemiesArr[_i2].pos[1] + 'px';
+    enemiesArr[_i2].container.style.left = enemiesArr[_i2].pos[0] + 'px';
+    enemiesArr[_i2].container.style.opacity = 0;
+    enemiesArr[_i2].container.style.display = '';
+    var hpBar = document.getElementById("".concat(enemiesArr[_i2].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
-    var hotkeyInput = document.getElementById("e".concat(_i + 1, "-keybind"));
-    enemiesArr[_i].hotkeyDisplay.innerHTML = hotkeyInput.value;
-    hotkeys[hotkeyInput.value] = enemiesArr[_i];
+    var hotkeyInput = document.getElementById("e".concat(_i2 + 1, "-keybind"));
+    enemiesArr[_i2].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = enemiesArr[_i2];
 
-    enemiesArr[_i].container.addEventListener('click', enemyClickEvents);
+    enemiesArr[_i2].container.addEventListener('click', enemyClickEvents);
 
-    enemiesArr[_i].img.src = enemiesArr[_i].baseImg.src;
+    enemiesArr[_i2].img.src = enemiesArr[_i2].baseImg.src;
 
     var action = function action() {
-      return enemiesArr[_i].autoAttack(enemiesArr[_i].target);
+      return enemiesArr[_i2].autoAttack(enemiesArr[_i2].target);
     };
 
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i].container, action); // begin attacking target
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i2].container, action); // begin attacking target
 
-    observerObserve(enemiesArr[_i]);
+    observerObserve(enemiesArr[_i2]);
   };
 
-  for (var _i = 0; _i < enemiesArr.length; _i++) {
-    _loop4(_i);
+  for (var _i2 = 0; _i2 < enemiesArr.length; _i2++) {
+    _loop4(_i2);
   } // console.log("hotkeys: ", hotkeys);
 
 }
@@ -1928,42 +2046,42 @@ function endGame(charsList, enemyList) {
   var allCharsList = levels[currentLevelNumber].characterList;
   var allEnemyList = levels[currentLevelNumber].enemyList;
 
-  for (var _i2 = 0; _i2 < allCharsList.length; _i2++) {
-    allCharsList[_i2].observer.disconnect();
+  for (var _i3 = 0; _i3 < allCharsList.length; _i3++) {
+    allCharsList[_i3].observer.disconnect();
 
-    if (allCharsList[_i2].currentAction) {
-      clearInterval(allCharsList[_i2].currentAction);
+    if (allCharsList[_i3].currentAction) {
+      clearInterval(allCharsList[_i3].currentAction);
     }
 
-    if (allCharsList[_i2].currentAnimation) {
-      clearInterval(allCharsList[_i2].currentAnimation);
+    if (allCharsList[_i3].currentAnimation) {
+      clearInterval(allCharsList[_i3].currentAnimation);
     }
 
-    allCharsList[_i2].isAttacking = false;
-    allCharsList[_i2].target = null;
+    allCharsList[_i3].isAttacking = false;
+    allCharsList[_i3].target = null;
 
-    allCharsList[_i2].container.removeEventListener('click', allyClickEvents);
+    allCharsList[_i3].container.removeEventListener('click', allyClickEvents);
 
-    allCharsList[_i2].img.src = allCharsList[_i2].baseImg.src;
+    allCharsList[_i3].img.src = allCharsList[_i3].baseImg.src;
   }
 
-  for (var _i3 = 0; _i3 < allEnemyList.length; _i3++) {
-    allEnemyList[_i3].observer.disconnect();
+  for (var _i4 = 0; _i4 < allEnemyList.length; _i4++) {
+    allEnemyList[_i4].observer.disconnect();
 
-    if (allEnemyList[_i3].currentAction) {
-      clearInterval(allEnemyList[_i3].currentAction);
+    if (allEnemyList[_i4].currentAction) {
+      clearInterval(allEnemyList[_i4].currentAction);
     }
 
-    if (allEnemyList[_i3].currentAnimation) {
-      clearInterval(allEnemyList[_i3].currentAnimation);
+    if (allEnemyList[_i4].currentAnimation) {
+      clearInterval(allEnemyList[_i4].currentAnimation);
     }
 
-    allEnemyList[_i3].isAttacking = false;
-    allEnemyList[_i3].target = null;
+    allEnemyList[_i4].isAttacking = false;
+    allEnemyList[_i4].target = null;
 
-    allEnemyList[_i3].container.removeEventListener('click', enemyClickEvents);
+    allEnemyList[_i4].container.removeEventListener('click', enemyClickEvents);
 
-    allEnemyList[_i3].img.src = allEnemyList[_i3].baseImg.src;
+    allEnemyList[_i4].img.src = allEnemyList[_i4].baseImg.src;
   }
 
   if (charsList.length > 0) {
@@ -1972,18 +2090,18 @@ function endGame(charsList, enemyList) {
     var backgroundImg = document.getElementById('background-image');
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
 
-    for (var _i4 = 0; _i4 < enemyList.length; _i4++) {
-      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i4].container);
+    for (var _i5 = 0; _i5 < enemyList.length; _i5++) {
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i5].container);
     }
 
     fadeOutGame(false);
   }
 }
 
-function xpObserverObserve(_char3) {
-  _char3.observationToken = true;
+function xpObserverObserve(_char5) {
+  _char5.observationToken = true;
 
-  _char3.xpObserver.observe(_char3.img, {
+  _char5.xpObserver.observe(_char5.img, {
     attributes: true,
     attributeFilter: ['style']
   });
@@ -2033,28 +2151,28 @@ function addCharXP() {
     if (timeCount === 60) {
       clearInterval(xpInterval);
 
-      for (var _i5 = 0; _i5 < c.length; _i5++) {
-        c[_i5].xp = Math.ceil(c[_i5].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+      for (var _i6 = 0; _i6 < c.length; _i6++) {
+        c[_i6].xp = Math.ceil(c[_i6].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
 
-        c[_i5].container.style.border = 'none';
-        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i5].container);
+        c[_i6].container.style.border = 'none';
+        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i6].container);
       }
 
       var backgroundImg = document.getElementById('background-image');
       Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
     }
 
-    for (var _i6 = 0; _i6 < c.length; _i6++) {
-      c[_i6].xp += xpPerInterval;
+    for (var _i7 = 0; _i7 < c.length; _i7++) {
+      c[_i7].xp += xpPerInterval;
 
-      if (c[_i6].xp > c[_i6].nextLevelXP) {
-        c[_i6].levelUp();
+      if (c[_i7].xp > c[_i7].nextLevelXP) {
+        c[_i7].levelUp();
       }
 
-      var _xpPercent = Math.floor(c[_i6].xp / c[_i6].nextLevelXP * 100);
+      var _xpPercent = Math.floor(c[_i7].xp / c[_i7].nextLevelXP * 100);
 
-      c[_i6].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
-      c[_i6].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
+      c[_i7].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
+      c[_i7].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
     }
 
     timeCount++;
@@ -2135,16 +2253,16 @@ function resetGame(won) {
     levChars[i].setHpBars();
   }
 
-  for (var _i7 = 0; _i7 < levEnems.length; _i7++) {
-    levEnems[_i7].hp = levEnems[_i7].baseHP;
-    levEnems[_i7].dmg = levEnems[_i7].baseDMG;
-    levEnems[_i7].defense = levEnems[_i7].baseDefense;
-    levEnems[_i7].pos[0] = levEnems[_i7].basePos[0];
-    levEnems[_i7].pos[1] = levEnems[_i7].basePos[1];
-    levEnems[_i7].container.style.top = levEnems[_i7].pos[1] + 'px';
-    levEnems[_i7].container.style.left = levEnems[_i7].pos[0] + 'px';
+  for (var _i8 = 0; _i8 < levEnems.length; _i8++) {
+    levEnems[_i8].hp = levEnems[_i8].baseHP;
+    levEnems[_i8].dmg = levEnems[_i8].baseDMG;
+    levEnems[_i8].defense = levEnems[_i8].baseDefense;
+    levEnems[_i8].pos[0] = levEnems[_i8].basePos[0];
+    levEnems[_i8].pos[1] = levEnems[_i8].basePos[1];
+    levEnems[_i8].container.style.top = levEnems[_i8].pos[1] + 'px';
+    levEnems[_i8].container.style.left = levEnems[_i8].pos[0] + 'px';
 
-    levEnems[_i7].setHpBars();
+    levEnems[_i8].setHpBars();
   }
 }
 
