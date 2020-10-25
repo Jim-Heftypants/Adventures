@@ -117,7 +117,7 @@ var groupHeal = function groupHeal(entity) {
 };
 
 var powerSwing = function powerSwing(entity) {
-  if (!entity.target || !entity.withinAttackRange(entity.target)) {
+  if (!entity.target || !entity.withinAttackRange(entity.target) || entity.target.hp < 0) {
     entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
 
     document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
@@ -136,7 +136,7 @@ var powerSwing = function powerSwing(entity) {
 };
 
 var poisonDagger = function poisonDagger(entity) {
-  if (!entity.target || !entity.withinAttackRange(entity.target)) {
+  if (!entity.target || !entity.withinAttackRange(entity.target) || entity.target.hp < 0) {
     entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
 
     document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
@@ -165,21 +165,25 @@ var poisonDagger = function poisonDagger(entity) {
 };
 
 var meteor = function meteor(entity) {
-  if (!entity.target) {
+  if (!entity.target || entity.target.hp < 0) {
     entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
 
     document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
     return false;
   }
 
-  entity.target.hp -= 25;
-  entity.target.setHpBars();
-  setBorder(entity);
+  var fireblastDiv = document.getElementById('fireblast-div');
+  spellTrack(fireblastDiv, entity, entity.target, function (entity, img) {
+    console.log('entity: ', entity, " img: ", img);
+    img.style.display = 'none';
+    entity.target.hp -= 25;
+    entity.target.setHpBars();
+    setBorder(entity);
 
-  if (entity.target.hp <= 0) {
-    entity.killEntitiy(entity.target);
-  }
-
+    if (entity.target.hp <= 0) {
+      entity.killEntitiy(entity.target);
+    }
+  });
   return 10;
 };
 
@@ -207,6 +211,85 @@ var warriorAbilities = [powerSwing];
 var clericAbilities = [groupHeal];
 var wizardAbilities = [meteor];
 var rogueAbilities = [poisonDagger];
+
+function spellTrack(img, entity, target, action) {
+  // console.log('img: ', img, ' entity: ', entity, ' target: ', target, ' action: ', action);
+  var pos = entity.pos.slice();
+  pos[0] += entity.img.width / 2;
+  pos[1] += entity.img.height / 2;
+  img.style.top = Math.floor(pos[1]) + 'px';
+  img.style.left = Math.floor(pos[0]) + 'px';
+  img.style.display = '';
+  var targetImg = target.img;
+  var interval = setInterval(function () {
+    return move();
+  }, 20);
+
+  function move() {
+    if (img.style.display === 'none' || target.container.style.display === 'none') {
+      clearInterval(interval);
+      img.style.display = 'none'; // console.log('no target to hit with: ', img);
+
+      return;
+    }
+
+    var targetPos = target.pos.slice();
+    targetPos[0] += targetImg.width / 2;
+    targetPos[1] += targetImg.height / 2;
+
+    if (imagesTouching(img, pos, targetImg, targetPos)) {
+      console.log('images touching');
+      clearInterval(interval);
+      action(entity, img);
+    } else {
+      var posChange = vectorToScalar(pos, targetPos);
+      pos[0] += posChange[0];
+      pos[1] += posChange[1];
+      img.style.top = Math.floor(pos[1]) + 'px';
+      img.style.left = Math.floor(pos[0]) + 'px';
+    }
+  }
+}
+
+function imagesTouching(img, pos, targetImg, targetPos) {
+  if (pos[0] < targetPos[0] && pos[0] + img.offsetWidth > targetPos[0] || pos[0] < targetPos[0] + targetImg.width && pos[0] + img.offsetWidth > targetPos[0] + targetImg.width) {
+    console.log('passed width check');
+    return true;
+  }
+
+  if (pos[1] < targetPos[1] && pos[1] + img.offsetHeight > targetPos[1] || pos[1] < targetPos[1] + targetImg.height && pos[1] + img.offsetHeight > targetPos[1] + targetImg.height) {
+    console.log('height check passed');
+    return true;
+  }
+
+  return false;
+}
+
+function vectorToScalar(pos, endPos) {
+  var ms = 15;
+  var deltaX = pos[0] - endPos[0];
+  var deltaY = pos[1] - endPos[1];
+
+  if (Math.abs(deltaX) + Math.abs(deltaY) === 0) {
+    return [0, 0];
+  }
+
+  var xChange = -1 * ms * (deltaX / (Math.abs(deltaX) + Math.abs(deltaY)));
+  var yChange = -1 * ms * (deltaY / (Math.abs(deltaY) + Math.abs(deltaX)));
+
+  if (xChange === 0 || xChange === -0) {
+    xChange = 0; // const numRepeats = Math.abs(Math.floor(deltaY / yChange)); // not needed for a track system
+
+    return [xChange, yChange];
+  }
+
+  if (yChange === -0) {
+    yChange = 0;
+  } // const numRepeats = Math.abs(Math.floor(deltaX / xChange));
+
+
+  return [xChange, yChange];
+}
 
 /***/ }),
 
@@ -606,24 +689,19 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "withinAttackRange",
     value: function withinAttackRange(target) {
-      // console.log('this in withinAttackRange: ', this);
       if (this.range === 'infinite') {
         return true;
-      } // rectangle box for melee
-
+      }
 
       var widthAddition = Math.floor(this.img.width / 2 + target.img.width / 2);
 
       if (this.pos[0] > target.pos[0] - widthAddition - this.range && this.pos[0] < target.pos[0] + widthAddition + this.range) {
-        var heightAddition = Math.floor(this.img.height / 4); // console.log("this pos: ", this.pos);
-        // console.log("target pos: ", target.pos);
+        var heightAddition = Math.floor(this.img.height / 4);
 
         if (this.pos[1] > target.pos[1] - heightAddition && this.pos[1] < target.pos[1] + heightAddition) {
-          // console.log('within melee range');
           return true;
         }
-      } // console.log('outside of range');
-
+      }
 
       return false;
     }
@@ -737,6 +815,16 @@ var Entity = /*#__PURE__*/function () {
       }, 20);
 
       function move(self) {
+        if (self.target.container.style.display === 'none') {
+          self.clearIntervals();
+
+          if (!self.allied) {
+            self.setTargetAndAttack();
+          }
+
+          return;
+        }
+
         if (self.withinAttackRange(self.target)) {
           clearInterval(self.currentAction);
           self.autoAttack(self.target); // console.log('auto attack called from track');
@@ -1356,14 +1444,14 @@ var actionEight = function actionEight() {
   applyMod(enemiesArr[7][3], 70, false);
 };
 
-var levelOne = new Level('One', enemiesArr[0], 25, "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0]]);
-var levelTwo = new Level('Two', enemiesArr[1], 50, "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1]]);
-var levelThree = new Level('Three', enemiesArr[2], 75, "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2]]);
-var levelFour = new Level('Four', enemiesArr[3], 100, "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", firstFourActions, _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"]);
-var levelFive = new Level('Five', enemiesArr[4], 150, "The tutorial levels are over. Time for more of a challenge", actionFive);
-var levelSix = new Level('Six', enemiesArr[5], 200, "Wizards and Clerics", actionSix);
-var levelSeven = new Level('Seven', enemiesArr[6], 250, "All melee", actionSeven);
-var levelEight = new Level('Eight', enemiesArr[7], 350, "Fight yourself", actionEight);
+var levelOne = new Level('One', enemiesArr[0], 20, "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0]]);
+var levelTwo = new Level('Two', enemiesArr[1], 80, "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1]]);
+var levelThree = new Level('Three', enemiesArr[2], 120, "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2]]);
+var levelFour = new Level('Four', enemiesArr[3], 240, "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", firstFourActions, _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"]);
+var levelFive = new Level('Five', enemiesArr[4], 300, "The tutorial levels are over. Time for more of a challenge", actionFive);
+var levelSix = new Level('Six', enemiesArr[5], 375, "Wizards and Clerics", actionSix);
+var levelSeven = new Level('Seven', enemiesArr[6], 450, "All melee", actionSeven);
+var levelEight = new Level('Eight', enemiesArr[7], 700, "Fight yourself", actionEight);
 
 /***/ }),
 
@@ -1384,7 +1472,7 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
-var maxLevelNumber = 0;
+var maxLevelNumber = 7;
 var selectedChar;
 var countToReach = 0;
 var moveFinishCount = 0;
@@ -1831,43 +1919,51 @@ function endGame(charsList, enemyList) {
   var deSelectButton = document.getElementById('test');
   deSelectButton.style.display = 'none';
   deSelect();
+  var projectiles = document.getElementsByClassName('projectile');
+
+  for (var i = 0; i < projectiles.length; i++) {
+    projectiles[i].display = 'none';
+  }
+
   var allCharsList = levels[currentLevelNumber].characterList;
   var allEnemyList = levels[currentLevelNumber].enemyList;
 
-  for (var i = 0; i < allCharsList.length; i++) {
-    allCharsList[i].observer.disconnect();
+  for (var _i2 = 0; _i2 < allCharsList.length; _i2++) {
+    allCharsList[_i2].observer.disconnect();
 
-    if (allCharsList[i].currentAction) {
-      clearInterval(allCharsList[i].currentAction);
+    if (allCharsList[_i2].currentAction) {
+      clearInterval(allCharsList[_i2].currentAction);
     }
 
-    if (allCharsList[i].currentAnimation) {
-      clearInterval(allCharsList[i].currentAnimation);
+    if (allCharsList[_i2].currentAnimation) {
+      clearInterval(allCharsList[_i2].currentAnimation);
     }
 
-    allCharsList[i].isAttacking = false;
-    allCharsList[i].target = null;
-    allCharsList[i].container.removeEventListener('click', allyClickEvents);
-    allCharsList[i].img.src = allCharsList[i].baseImg.src;
+    allCharsList[_i2].isAttacking = false;
+    allCharsList[_i2].target = null;
+
+    allCharsList[_i2].container.removeEventListener('click', allyClickEvents);
+
+    allCharsList[_i2].img.src = allCharsList[_i2].baseImg.src;
   }
 
-  for (var _i2 = 0; _i2 < allEnemyList.length; _i2++) {
-    allEnemyList[_i2].observer.disconnect();
+  for (var _i3 = 0; _i3 < allEnemyList.length; _i3++) {
+    allEnemyList[_i3].observer.disconnect();
 
-    if (allEnemyList[_i2].currentAction) {
-      clearInterval(allEnemyList[_i2].currentAction);
+    if (allEnemyList[_i3].currentAction) {
+      clearInterval(allEnemyList[_i3].currentAction);
     }
 
-    if (allEnemyList[_i2].currentAnimation) {
-      clearInterval(allEnemyList[_i2].currentAnimation);
+    if (allEnemyList[_i3].currentAnimation) {
+      clearInterval(allEnemyList[_i3].currentAnimation);
     }
 
-    allEnemyList[_i2].isAttacking = false;
-    allEnemyList[_i2].target = null;
+    allEnemyList[_i3].isAttacking = false;
+    allEnemyList[_i3].target = null;
 
-    allEnemyList[_i2].container.removeEventListener('click', enemyClickEvents);
+    allEnemyList[_i3].container.removeEventListener('click', enemyClickEvents);
 
-    allEnemyList[_i2].img.src = allEnemyList[_i2].baseImg.src;
+    allEnemyList[_i3].img.src = allEnemyList[_i3].baseImg.src;
   }
 
   if (charsList.length > 0) {
@@ -1876,8 +1972,8 @@ function endGame(charsList, enemyList) {
     var backgroundImg = document.getElementById('background-image');
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
 
-    for (var _i3 = 0; _i3 < enemyList.length; _i3++) {
-      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i3].container);
+    for (var _i4 = 0; _i4 < enemyList.length; _i4++) {
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i4].container);
     }
 
     fadeOutGame(false);
@@ -1937,28 +2033,28 @@ function addCharXP() {
     if (timeCount === 60) {
       clearInterval(xpInterval);
 
-      for (var _i4 = 0; _i4 < c.length; _i4++) {
-        c[_i4].xp = Math.ceil(c[_i4].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+      for (var _i5 = 0; _i5 < c.length; _i5++) {
+        c[_i5].xp = Math.ceil(c[_i5].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
 
-        c[_i4].container.style.border = 'none';
-        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i4].container);
+        c[_i5].container.style.border = 'none';
+        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i5].container);
       }
 
       var backgroundImg = document.getElementById('background-image');
       Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
     }
 
-    for (var _i5 = 0; _i5 < c.length; _i5++) {
-      c[_i5].xp += xpPerInterval;
+    for (var _i6 = 0; _i6 < c.length; _i6++) {
+      c[_i6].xp += xpPerInterval;
 
-      if (c[_i5].xp > c[_i5].nextLevelXP) {
-        c[_i5].levelUp();
+      if (c[_i6].xp > c[_i6].nextLevelXP) {
+        c[_i6].levelUp();
       }
 
-      var _xpPercent = Math.floor(c[_i5].xp / c[_i5].nextLevelXP * 100);
+      var _xpPercent = Math.floor(c[_i6].xp / c[_i6].nextLevelXP * 100);
 
-      c[_i5].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
-      c[_i5].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
+      c[_i6].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
+      c[_i6].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
     }
 
     timeCount++;
@@ -2039,16 +2135,16 @@ function resetGame(won) {
     levChars[i].setHpBars();
   }
 
-  for (var _i6 = 0; _i6 < levEnems.length; _i6++) {
-    levEnems[_i6].hp = levEnems[_i6].baseHP;
-    levEnems[_i6].dmg = levEnems[_i6].baseDMG;
-    levEnems[_i6].defense = levEnems[_i6].baseDefense;
-    levEnems[_i6].pos[0] = levEnems[_i6].basePos[0];
-    levEnems[_i6].pos[1] = levEnems[_i6].basePos[1];
-    levEnems[_i6].container.style.top = levEnems[_i6].pos[1] + 'px';
-    levEnems[_i6].container.style.left = levEnems[_i6].pos[0] + 'px';
+  for (var _i7 = 0; _i7 < levEnems.length; _i7++) {
+    levEnems[_i7].hp = levEnems[_i7].baseHP;
+    levEnems[_i7].dmg = levEnems[_i7].baseDMG;
+    levEnems[_i7].defense = levEnems[_i7].baseDefense;
+    levEnems[_i7].pos[0] = levEnems[_i7].basePos[0];
+    levEnems[_i7].pos[1] = levEnems[_i7].basePos[1];
+    levEnems[_i7].container.style.top = levEnems[_i7].pos[1] + 'px';
+    levEnems[_i7].container.style.left = levEnems[_i7].pos[0] + 'px';
 
-    levEnems[_i6].setHpBars();
+    levEnems[_i7].setHpBars();
   }
 }
 

@@ -135,21 +135,21 @@ const actionEight = () => {
     applyMod(enemiesArr[7][3], 70, false);
 }
 
-export const levelOne = new Level('One', enemiesArr[0], 25, 
+export const levelOne = new Level('One', enemiesArr[0], 20, 
     "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.",
     firstFourActions, [charactersArr[0]]);
-export const levelTwo = new Level('Two', enemiesArr[1], 50,
+export const levelTwo = new Level('Two', enemiesArr[1], 80,
     "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.",
     firstFourActions, [charactersArr[0], charactersArr[1]]);
-export const levelThree = new Level('Three', enemiesArr[2], 75,
+export const levelThree = new Level('Three', enemiesArr[2], 120,
     "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.",
     firstFourActions, [charactersArr[0], charactersArr[1], charactersArr[2]]);
-export const levelFour = new Level('Four', enemiesArr[3], 100,
+export const levelFour = new Level('Four', enemiesArr[3], 240,
     "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.",
     firstFourActions, charactersArr);
-export const levelFive = new Level('Five', enemiesArr[4],  150,
+export const levelFive = new Level('Five', enemiesArr[4],  300,
     "The tutorial levels are over. Time for more of a challenge",
     actionFive);
-export const levelSix = new Level('Six', enemiesArr[5], 200, "Wizards and Clerics", actionSix);
-export const levelSeven = new Level('Seven', enemiesArr[6], 250, "All melee", actionSeven);
-export const levelEight = new Level('Eight', enemiesArr[7], 350, "Fight yourself", actionEight);
+export const levelSix = new Level('Six', enemiesArr[5], 375, "Wizards and Clerics", actionSix);
+export const levelSeven = new Level('Seven', enemiesArr[6], 450, "All melee", actionSeven);
+export const levelEight = new Level('Eight', enemiesArr[7], 700, "Fight yourself", actionEight);

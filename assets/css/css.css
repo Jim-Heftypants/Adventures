@@ -362,3 +362,14 @@ img {
     position: absolute;
     z-index: 4;
 }
+
+.projectile {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    z-index: 15;
+}
+
+#fireblast-div {
+    background-color: red;
+}

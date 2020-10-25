@@ -6,7 +6,7 @@ let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
-let maxLevelNumber = 0;
+let maxLevelNumber = 7;
 
 let selectedChar;
 
@@ -399,6 +399,10 @@ function endGame(charsList, enemyList) {
     const deSelectButton = document.getElementById('test');
     deSelectButton.style.display = 'none';
     deSelect();
+    const projectiles = document.getElementsByClassName('projectile');
+    for (let i = 0; i < projectiles.length; i++) {
+        projectiles[i].display = 'none';
+    }
     const allCharsList = levels[currentLevelNumber].characterList;
     const allEnemyList = levels[currentLevelNumber].enemyList;
     for (let i = 0; i < allCharsList.length; i++) {

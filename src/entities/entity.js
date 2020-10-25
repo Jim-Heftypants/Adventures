@@ -182,20 +182,14 @@ class Entity { // this. is selectedChar
     }
 
     withinAttackRange(target) {
-        // console.log('this in withinAttackRange: ', this);
         if (this.range === 'infinite') { return true; }
-        // rectangle box for melee
         const widthAddition = Math.floor((this.img.width / 2) + (target.img.width / 2));
         if (this.pos[0] > target.pos[0] - widthAddition - this.range && this.pos[0] < target.pos[0] + widthAddition + this.range) {
             const heightAddition = Math.floor(this.img.height / 4);
-            // console.log("this pos: ", this.pos);
-            // console.log("target pos: ", target.pos);
             if (this.pos[1] > target.pos[1] - heightAddition && this.pos[1] < target.pos[1] + heightAddition) {
-                // console.log('within melee range');
                 return true;
             }
         }
-        // console.log('outside of range');
         return false;
     }
 
@@ -280,6 +274,13 @@ class Entity { // this. is selectedChar
         const checker = difference + Math.floor(bigDiv.offsetWidth);
         this.currentAction = setInterval(() => move(this), 20);
         function move(self) {
+            if (self.target.container.style.display === 'none') {
+                self.clearIntervals();
+                if (!self.allied) {
+                    self.setTargetAndAttack()
+                }
+                return;
+            }
             if (self.withinAttackRange(self.target)) {
                 clearInterval(self.currentAction);
                 self.autoAttack(self.target);
