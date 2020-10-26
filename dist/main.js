@@ -1569,7 +1569,7 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
-var maxLevelNumber = 7;
+var maxLevelNumber = 0;
 var characters = levels[maxLevelNumber].characterList;
 var selectedChar;
 var countToReach = 0;
