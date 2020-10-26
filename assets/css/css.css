@@ -460,3 +460,9 @@ p, h1 {
     background-color: mediumaquamarine;
     z-index: 20;
 }
+
+.wizard-attack-effect {
+    position: absolute;
+    border: 2px solid purple;
+    z-index: 20;
+}

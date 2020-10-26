@@ -90,15 +90,13 @@
 /*!***********************************!*\
   !*** ./src/entities/abilities.js ***!
   \***********************************/
-/*! exports provided: warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities */
+/*! exports provided: allAbilities, specialAttackEffects */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "warriorAbilities", function() { return warriorAbilities; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clericAbilities", function() { return clericAbilities; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "wizardAbilities", function() { return wizardAbilities; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rogueAbilities", function() { return rogueAbilities; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "allAbilities", function() { return allAbilities; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "specialAttackEffects", function() { return specialAttackEffects; });
 var groupHeal = function groupHeal(entity) {
   for (var i = 0; i < entity.allies.length; i++) {
     if (entity.allies[i].hp > 0) {
@@ -108,6 +106,7 @@ var groupHeal = function groupHeal(entity) {
         entity.allies[i].hp = 100;
       }
 
+      entity.setOverlay(entity.allies[i]);
       entity.allies[i].setHpBars();
       setBorder(entity);
     }
@@ -211,6 +210,67 @@ var warriorAbilities = [powerSwing];
 var clericAbilities = [groupHeal];
 var wizardAbilities = [meteor];
 var rogueAbilities = [poisonDagger];
+var allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
+
+var lightningAutoAttack = function lightningAutoAttack(entity) {
+  var effectDiv = document.getElementById(entity.imgName + '-extra-effect');
+  var pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
+  drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width / 2, entity.target.pos[1] + entity.target.img.height / 2, effectDiv);
+  effectDiv.style.display = '';
+  var maxTime = Math.floor(entity.as / 8);
+  setTimeout(function () {
+    effectDiv.style.display = 'none';
+  }, maxTime);
+};
+
+var specialAttackEffects = [lightningAutoAttack];
+
+function createLineElement(x, y, length, angle, img) {
+  var styles = 'width: ' + length + 'px; ' + 'height: 0px; ' + '-moz-transform: rotate(' + angle + 'rad); ' + '-webkit-transform: rotate(' + angle + 'rad); ' + '-o-transform: rotate(' + angle + 'rad); ' + '-ms-transform: rotate(' + angle + 'rad); ' + 'position: absolute; ' + 'top: ' + y + 'px; ' + 'left: ' + x + 'px; ';
+  img.setAttribute('style', styles);
+}
+
+function drawLine(x1, y1, x2, y2, img) {
+  var a = x1 - x2,
+      b = y1 - y2,
+      c = Math.sqrt(a * a + b * b);
+  var sx = (x1 + x2) / 2,
+      sy = (y1 + y2) / 2;
+  var x = sx - c / 2,
+      y = sy;
+  var alpha = Math.PI - Math.atan2(-b, a);
+  createLineElement(x, y, c, alpha, img);
+} // function linedraw(entity, img) {
+//     const pos = entity.pos.slice();
+//     pos[0] += entity.img.width / 2; pos[1] += entity.img.height / 2;
+//     const targetPos = entity.target.pos.slice();
+//     targetPos[0] += entity.target.img.width / 2; targetPos[1] += entity.target.img.height / 2;
+//     const arcTan = Math.atan((pos[1] - targetPos[1]) / (targetPos[0] - pos[0]));
+//     let angle =  arcTan * 180 / Math.PI;
+//     if (pos[0] < targetPos[0] && pos[1] > targetPos[1]) {
+//         // neg angle
+//         img.style.top = Math.floor(pos[1]) + 'px';
+//         img.style.left = Math.floor(pos[0]) + 'px';
+//     } else if (pos[0] > targetPos[0] && pos[1] > targetPos[1]) {
+//         // pos angle
+//         img.style.top = Math.floor(pos[1]) + 'px';
+//         img.style.left = Math.floor(targetPos[0]) + 'px';
+//     } else if (pos[0] < targetPos[0] && pos[1] < targetPos[1]) {
+//         // pos angle
+//         img.style.top = Math.floor(targetPos[1]) + 'px';
+//         img.style.left = Math.floor(pos[0]) + 'px';
+//     } else {
+//         // neg angle
+//         img.style.top = Math.floor(targetPos[1]) + 'px';
+//         img.style.left = Math.floor(targetPos[0]) + 'px';
+//     }
+//     console.log('angle: ', angle);
+//     const length = Math.floor(Math.sqrt((pos[0] - targetPos[0]) * (pos[0] - targetPos[0]) + (pos[1] - targetPos[1]) * (pos[1] - targetPos[1])));
+//     console.log('length: ', length);
+//     img.style.width = length + 'px';
+//     img.style.transform = "rotate(" + (-angle) + "deg)";
+// }
+
 
 function spellTrack(img, entity, target, action) {
   // console.log('img: ', img, ' entity: ', entity, ' target: ', target, ' action: ', action);
@@ -310,14 +370,17 @@ __webpack_require__.r(__webpack_exports__);
 var abilityList = Object.values(_abilities_js__WEBPACK_IMPORTED_MODULE_1__); // console.log('ab array list', abilityObj)
 // console.log(abilityList[0]);
 
-var warriorAbilities = abilityList[0];
-var clericAbilities = abilityList[1];
-var wizardAbilities = abilityList[2];
-var rogueAbilities = abilityList[3];
+var charAbilities = abilityList[0];
+var warriorAbilities = charAbilities[0];
+var clericAbilities = charAbilities[1];
+var wizardAbilities = charAbilities[2];
+var rogueAbilities = charAbilities[3];
 var waAbNames = ['Heroic Strike'];
 var cAbNames = ['Prayer of Healing'];
 var wiAbNames = ['Fire Blast'];
 var rAbNames = ['Poison Shiv'];
+var specialAttackEffects = abilityList[1];
+var wizardAttackEffect = specialAttackEffects[0];
 /*
 className
 range
@@ -334,14 +397,14 @@ defense
 
 var tutorialWarrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 8, true, "a1", [450, 500], 20, warriorAbilities, waAbNames);
 var tutorialCleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [200, 300], 10, clericAbilities, cAbNames);
-var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [200, 600], 12, wizardAbilities, wiAbNames);
+var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [200, 600], 12, wizardAbilities, wiAbNames, wizardAttackEffect);
 var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 8, true, "a4", [900, 200], 16, rogueAbilities, rAbNames); // tank
 
 var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, warriorAbilities, waAbNames); // heals
 
 var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 10, clericAbilities, cAbNames); // rdps
 
-var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames); // mdps
+var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames, wizardAttackEffect); // mdps
 
 var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, rogueAbilities, rAbNames); // export const tutorialChars = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue];
 
@@ -368,7 +431,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "level2", function() { return level2; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "doppelganger", function() { return doppelganger; });
 /* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity.js */ "./src/entities/entity.js");
+/* harmony import */ var _abilities_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./abilities.js */ "./src/entities/abilities.js");
 
+
+var abilityList = Object.values(_abilities_js__WEBPACK_IMPORTED_MODULE_1__);
+var specialAttackEffects = abilityList[1];
+var wizardAttackEffect = specialAttackEffects[0];
 /*
 className
 range
@@ -383,12 +451,12 @@ defense
 */
 // rdps
 
-var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8);
-var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8);
-var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8);
-var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8); // fix
+var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8, wizardAttackEffect);
+var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8, wizardAttackEffect);
+var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8, wizardAttackEffect);
+var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8, wizardAttackEffect); // fix
 
-var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12); // heals
+var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12, wizardAttackEffect); // heals
 
 var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -7, false, "e2", [1000, 300], 8);
 var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -8, false, "e2", [1000, 100], 8);
@@ -461,6 +529,7 @@ var Entity = /*#__PURE__*/function () {
     var defense = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0;
     var abilities = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : [];
     var abilityNames = arguments.length > 11 && arguments[11] !== undefined ? arguments[11] : [];
+    var extraAttackAnimation = arguments.length > 12 && arguments[12] !== undefined ? arguments[12] : null;
 
     _classCallCheck(this, Entity);
 
@@ -518,6 +587,7 @@ var Entity = /*#__PURE__*/function () {
     this.currentAnimation;
     this.imgCycle = 0;
     this.isAttacking = false;
+    this.extraAttackAnimation = extraAttackAnimation;
     this.target;
     this.allies;
     this.enemies;
@@ -672,8 +742,8 @@ var Entity = /*#__PURE__*/function () {
             pos[0] = 15;
           }
 
-          if (pos[1] + Math.floor(self.img.height) > 800) {
-            pos[1] = 800 - Math.floor(self.img.height);
+          if (pos[1] + Math.floor(self.img.height) > 850) {
+            pos[1] = 850 - Math.floor(self.img.height);
           }
 
           if (pos[1] < 15) {
@@ -721,21 +791,6 @@ var Entity = /*#__PURE__*/function () {
 
       entity.hp = -100;
       entity.container.style.display = "none";
-    }
-  }, {
-    key: "animateAttack",
-    value: function animateAttack() {
-      if (this.attackImages) {
-        if (this.target.pos[0] < this.pos[0]) {
-          this.img.style.transform = "scaleX(-1)";
-        } else {
-          this.img.style.transform = "scaleX(1)";
-        }
-
-        this.imgCycle += 1;
-        this.imgCycle = this.imgCycle % 4;
-        this.img.src = this.attackImages[this.imgCycle].src;
-      }
     }
   }, {
     key: "setHpBars",
@@ -872,8 +927,8 @@ var Entity = /*#__PURE__*/function () {
     value: function setOverlay(targetChar) {
       this.attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
       this.attackOverlay.style.left = targetChar.pos[0] + 'px';
-      this.attackOverlay.style.width = targetChar.img.width;
-      this.attackOverlay.style.height = targetChar.img.height;
+      this.attackOverlay.style.width = targetChar.img.width + 'px';
+      this.attackOverlay.style.height = targetChar.img.height + 'px';
       this.attackOverlay.style.display = '';
       var selectedChar = this;
       var clearTime = Math.floor(this.as / 2);
@@ -910,87 +965,109 @@ var Entity = /*#__PURE__*/function () {
 
       this.currentAnimation = setInterval(function () {
         return _this4.animateAttack(_this4);
-      }, Math.floor(this.as / 4));
-      this.currentAction = setInterval(function () {
-        return attack(_this4);
-      }, this.as);
-
-      function attack(selectedChar) {
-        if (targetChar.hp <= 0) {
-          selectedChar.clearIntervals();
-
-          if (!selectedChar.allied) {
-            // chose another hero to attack
-            selectedChar.setTargetAndAttack(); // maybe add something in for player to auto target upon deaths ?
-          }
-
-          return;
+      }, Math.floor(this.as / 4)); // this.currentAction = setInterval(() => attack(this), this.as);
+    }
+  }, {
+    key: "animateAttack",
+    value: function animateAttack() {
+      if (this.attackImages) {
+        if (this.target.pos[0] < this.pos[0]) {
+          this.img.style.transform = "scaleX(-1)";
+        } else {
+          this.img.style.transform = "scaleX(1)";
         }
 
-        if (!selectedChar.withinAttackRange(targetChar)) {
-          selectedChar.trackTarget();
-          return;
-        } else {
-          targetChar.hp -= selectedChar.dmg * 15 / targetChar.defense;
+        this.imgCycle += 1;
 
-          if (selectedChar.attackOverlay) {
-            selectedChar.setOverlay(targetChar);
+        if (this.imgCycle === 3) {
+          if (this.extraAttackAnimation) {
+            this.extraAttackAnimation(this);
           }
 
-          if (targetChar.hp > targetChar.baseHP) {
-            targetChar.hp = targetChar.baseHP;
+          this.attack();
+        }
+
+        this.imgCycle = this.imgCycle % 4;
+        this.img.src = this.attackImages[this.imgCycle].src;
+      }
+    }
+  }, {
+    key: "attack",
+    value: function attack() {
+      var _this5 = this;
+
+      if (!this.target || this.target.hp <= 0) {
+        this.clearIntervals();
+
+        if (!this.allied) {
+          // chose another hero to attack
+          this.setTargetAndAttack(); // maybe add something in for player to auto target upon deaths ?
+        }
+
+        return;
+      }
+
+      if (!this.withinAttackRange(this.target)) {
+        this.trackTarget();
+        return;
+      } else {
+        this.target.hp -= this.dmg * 15 / this.target.defense;
+
+        if (this.attackOverlay) {
+          this.setOverlay(this.target);
+        }
+
+        if (this.target.hp > this.target.baseHP) {
+          this.target.hp = this.target.baseHP;
+        }
+
+        if (!this.target.allied && this.allied && this.target.baseDMG > 0 && this.defense > this.target.target.defense) {
+          this.target.target = this;
+          this.target.clearIntervals();
+          this.target.autoAttack(this.target.target);
+        }
+
+        this.target.setHpBars();
+
+        if (this.target.hp <= 0) {
+          this.clearIntervals(); // console.log(this.target, ' hp ', this.target.hp);
+
+          this.killEntitiy(this.target);
+
+          if (!this.allied) {
+            // chose another hero to attack
+            this.setTargetAndAttack();
+          }
+        } // console.log("border style: ", this.target.img.style.border);
+
+
+        if (this.target.img.style.border !== "5px solid gold") {
+          if (this.baseDMG > 0) {
+            this.target.img.style.border = "3px solid red";
+          } else {
+            this.target.img.style.border = "3px solid green";
           }
 
-          if (!targetChar.allied && selectedChar.allied && targetChar.baseDMG > 0 && selectedChar.defense > targetChar.target.defense) {
-            targetChar.target = selectedChar;
-            targetChar.clearIntervals();
-            targetChar.autoAttack(targetChar.target);
-          }
-
-          targetChar.setHpBars();
-
-          if (targetChar.hp <= 0) {
-            selectedChar.clearIntervals(); // console.log(targetChar, ' hp ', targetChar.hp);
-
-            selectedChar.killEntitiy(targetChar);
-
-            if (!selectedChar.allied) {
-              // chose another hero to attack
-              selectedChar.setTargetAndAttack();
+          setTimeout(function () {
+            if (_this5.target && _this5.target.img.style.border !== "5px solid gold") {
+              _this5.target.img.style.border = "none";
             }
-          } // console.log("border style: ", targetChar.img.style.border);
+          }, 500);
+        }
 
+        if (this.range !== 'infinite' && this.charactersStacked()) {
+          this.movingOutTheWay = true;
+          var addition = Math.floor(this.img.width / 2);
 
-          if (targetChar.img.style.border !== "5px solid gold") {
-            if (selectedChar.baseDMG > 0) {
-              targetChar.img.style.border = "3px solid red";
-            } else {
-              targetChar.img.style.border = "3px solid green";
-            }
+          if (this.img.style.transform === "scaleX(-1)") {
+            // move to left side of target
+            this.img.style.transform = "scaleX(1)"; // - (addition / 4)
 
-            var borderInterval = setInterval(function () {
-              if (targetChar.img.style.border !== "5px solid gold") {
-                targetChar.img.style.border = "none";
-              }
-
-              clearInterval(borderInterval);
-            }, 500);
-          }
-
-          if (selectedChar.range !== 'infinite' && selectedChar.charactersStacked()) {
-            selectedChar.movingOutTheWay = true;
-            var addition = Math.floor(selectedChar.img.width / 2);
-
-            if (selectedChar.img.style.transform === "scaleX(-1)") {
-              // move to left side of target
-              selectedChar.img.style.transform = "scaleX(1)"; // - (addition / 4)
-
-              selectedChar.move([targetChar.pos[0] + addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
-            } else {
-              // move to right side of target;
-              selectedChar.img.style.transform = "scaleX(-1)";
-              selectedChar.move([targetChar.pos[0] + 5 * addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar);
-            }
+            this.move([this.target.pos[0] + addition, this.target.pos[1] + Math.floor(this.target.img.height * 3 / 4)], this.target);
+          } else {
+            // move to right side of target;
+            this.img.style.transform = "scaleX(-1)";
+            this.move([this.target.pos[0] + 5 * addition, this.target.pos[1] + Math.floor(this.target.img.height * 3 / 4)], this.target);
           }
         }
       }
@@ -1028,7 +1105,7 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "useAbility",
     value: function useAbility(n) {
-      var _this5 = this;
+      var _this6 = this;
 
       if (!this.abilityAvailable[n] || this.abilities.length === 0) {
         return;
@@ -1051,7 +1128,7 @@ var Entity = /*#__PURE__*/function () {
 
       colorFade(innerBoxes[n], cdTime, [255, 0, 0], [0, 0, 255]);
       var CDTimer = setInterval(function () {
-        _this5.abilityAvailable[n] = true; // console.log(this.imgName, ' ability ', n, ' off CD');
+        _this6.abilityAvailable[n] = true; // console.log(this.imgName, ' ability ', n, ' off CD');
 
         clearInterval(CDTimer);
       }, cdTime * 1000);

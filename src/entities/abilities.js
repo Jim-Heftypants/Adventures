@@ -3,6 +3,7 @@ const groupHeal = (entity) => {
         if (entity.allies[i].hp > 0) {
             entity.allies[i].hp += 20;
             if (entity.allies[i].hp > 100) { entity.allies[i].hp = 100; }
+            entity.setOverlay(entity.allies[i]);
             entity.allies[i].setHpBars();
             setBorder(entity);
         }
@@ -88,12 +89,83 @@ function setBorder(entity) {
     }
 }
 
-export const warriorAbilities = [powerSwing];
-export const clericAbilities = [groupHeal];
-export const wizardAbilities = [meteor];
-export const rogueAbilities = [poisonDagger];
+const warriorAbilities = [powerSwing];
+const clericAbilities = [groupHeal];
+const wizardAbilities = [meteor];
+const rogueAbilities = [poisonDagger];
+export const allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
 
 
+const lightningAutoAttack = (entity) => {
+    const effectDiv = document.getElementById(entity.imgName + '-extra-effect');
+    const pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
+    drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width/2, entity.target.pos[1] + entity.target.img.height/2, effectDiv);
+    effectDiv.style.display = '';
+    const maxTime = Math.floor(entity.as / 8);
+    setTimeout(() => { effectDiv.style.display = 'none'; }, maxTime);
+}
+
+export const specialAttackEffects = [lightningAutoAttack];
+
+function createLineElement(x, y, length, angle, img) {
+    var styles = 'width: ' + length + 'px; '
+        + 'height: 0px; '
+        + '-moz-transform: rotate(' + angle + 'rad); '
+        + '-webkit-transform: rotate(' + angle + 'rad); '
+        + '-o-transform: rotate(' + angle + 'rad); '
+        + '-ms-transform: rotate(' + angle + 'rad); '
+        + 'position: absolute; '
+        + 'top: ' + y + 'px; '
+        + 'left: ' + x + 'px; ';
+    img.setAttribute('style', styles);
+}
+
+function drawLine(x1, y1, x2, y2, img) {
+    const a = x1 - x2,
+        b = y1 - y2,
+        c = Math.sqrt(a * a + b * b);
+
+    const sx = (x1 + x2) / 2,
+        sy = (y1 + y2) / 2;
+
+    const x = sx - c / 2,
+        y = sy;
+
+    const alpha = Math.PI - Math.atan2(-b, a);
+
+    createLineElement(x, y, c, alpha, img);
+}
+
+// function linedraw(entity, img) {
+//     const pos = entity.pos.slice();
+//     pos[0] += entity.img.width / 2; pos[1] += entity.img.height / 2;
+//     const targetPos = entity.target.pos.slice();
+//     targetPos[0] += entity.target.img.width / 2; targetPos[1] += entity.target.img.height / 2;
+//     const arcTan = Math.atan((pos[1] - targetPos[1]) / (targetPos[0] - pos[0]));
+//     let angle =  arcTan * 180 / Math.PI;
+//     if (pos[0] < targetPos[0] && pos[1] > targetPos[1]) {
+//         // neg angle
+//         img.style.top = Math.floor(pos[1]) + 'px';
+//         img.style.left = Math.floor(pos[0]) + 'px';
+//     } else if (pos[0] > targetPos[0] && pos[1] > targetPos[1]) {
+//         // pos angle
+//         img.style.top = Math.floor(pos[1]) + 'px';
+//         img.style.left = Math.floor(targetPos[0]) + 'px';
+//     } else if (pos[0] < targetPos[0] && pos[1] < targetPos[1]) {
+//         // pos angle
+//         img.style.top = Math.floor(targetPos[1]) + 'px';
+//         img.style.left = Math.floor(pos[0]) + 'px';
+//     } else {
+//         // neg angle
+//         img.style.top = Math.floor(targetPos[1]) + 'px';
+//         img.style.left = Math.floor(targetPos[0]) + 'px';
+//     }
+//     console.log('angle: ', angle);
+//     const length = Math.floor(Math.sqrt((pos[0] - targetPos[0]) * (pos[0] - targetPos[0]) + (pos[1] - targetPos[1]) * (pos[1] - targetPos[1])));
+//     console.log('length: ', length);
+//     img.style.width = length + 'px';
+//     img.style.transform = "rotate(" + (-angle) + "deg)";
+// }
 
 function spellTrack(img, entity, target, action) {
     // console.log('img: ', img, ' entity: ', entity, ' target: ', target, ' action: ', action);

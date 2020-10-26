@@ -1,4 +1,10 @@
 import classCreator from './entity.js';
+import * as abilityObj from './abilities.js';
+
+const abilityList = Object.values(abilityObj);
+
+const specialAttackEffects = abilityList[1];
+const wizardAttackEffect = specialAttackEffects[0];
 
 /*
 className
@@ -14,11 +20,11 @@ defense
 */
 
 // rdps
-const tutorialWizard = new classCreator('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8);
-const ghettoWizard = new classCreator('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8);
-const wizard2 = new classCreator('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8);
-const wizard3 = new classCreator('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8); // fix
-const EWizard = new classCreator('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12);
+const tutorialWizard = new classCreator('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8, wizardAttackEffect);
+const ghettoWizard = new classCreator('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8, wizardAttackEffect);
+const wizard2 = new classCreator('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8, wizardAttackEffect);
+const wizard3 = new classCreator('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8, wizardAttackEffect); // fix
+const EWizard = new classCreator('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12, wizardAttackEffect);
 
 // heals
 const tutorialCleric = new classCreator('ECleric', 'infinite', 60, 10, 2000, -7, false, "e2", [1000, 300], 8)

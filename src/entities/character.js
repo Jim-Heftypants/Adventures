@@ -5,15 +5,19 @@ import * as abilityObj from './abilities.js';
 const abilityList = Object.values(abilityObj);
 // console.log('ab array list', abilityObj)
 // console.log(abilityList[0]);
-const warriorAbilities = abilityList[0];
-const clericAbilities = abilityList[1];
-const wizardAbilities = abilityList[2];
-const rogueAbilities = abilityList[3];
+const charAbilities = abilityList[0];
+const warriorAbilities = charAbilities[0];
+const clericAbilities = charAbilities[1];
+const wizardAbilities = charAbilities[2];
+const rogueAbilities = charAbilities[3];
 
 const waAbNames = ['Heroic Strike'];
 const cAbNames = ['Prayer of Healing'];
 const wiAbNames = ['Fire Blast'];
 const rAbNames = ['Poison Shiv'];
+
+const specialAttackEffects = abilityList[1];
+const wizardAttackEffect = specialAttackEffects[0];
 
 /*
 className
@@ -31,7 +35,7 @@ defense
 // tutorials
 const tutorialWarrior = new classCreator('Warrior', 10, 100, 10, 1000, 8, true, "a1", [450, 500], 20, warriorAbilities, waAbNames);
 const tutorialCleric = new classCreator('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [200, 300], 10, clericAbilities, cAbNames);
-const tutorialWizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [200, 600], 12, wizardAbilities, wiAbNames);
+const tutorialWizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [200, 600], 12, wizardAbilities, wiAbNames, wizardAttackEffect);
 const tutorialRogue = new classCreator("Rogue", 10, 100, 10, 800, 8, true, "a4", [900, 200], 16, rogueAbilities, rAbNames);
 
 // tank
@@ -41,7 +45,7 @@ const Warrior = new classCreator('Warrior', 10, 100, 10, 1000, 10, true, "a1", [
 const Cleric = new classCreator('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 10, clericAbilities, cAbNames);
 
 // rdps
-const Wizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames);
+const Wizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames, wizardAttackEffect);
 
 // mdps
 const Rogue = new classCreator("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, rogueAbilities, rAbNames)

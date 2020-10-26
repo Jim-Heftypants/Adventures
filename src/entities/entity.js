@@ -1,5 +1,6 @@
 class Entity { // this. is selectedChar
-    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0, abilities=[], abilityNames=[]) {
+    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0,
+                 abilities=[], abilityNames=[], extraAttackAnimation=null) {
         this.klass = klass;
 
         this.range = range;
@@ -49,6 +50,7 @@ class Entity { // this. is selectedChar
         this.currentAnimation;
         this.imgCycle = 0;
         this.isAttacking = false;
+        this.extraAttackAnimation = extraAttackAnimation;
 
         this.target;
 
@@ -171,7 +173,7 @@ class Entity { // this. is selectedChar
                 pos[0] += posChange[0]; pos[1] += posChange[1];
                 if (pos[0] + Math.floor((3 * self.img.width) / 2) + 50 > checker) { pos[0] = checker - (Math.floor((3 * self.img.width) / 2) + 50);}
                 if (pos[0] < 15) {pos[0] = 15;}
-                if (pos[1] + Math.floor(self.img.height) > 800) { pos[1] = 800 - Math.floor(self.img.height);}
+                if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height);}
                 if (pos[1] < 15) {pos[1] = 15;}
                 // console.log('posChange: ', posChange);
                 // console.log('pos: ', pos);
@@ -203,19 +205,6 @@ class Entity { // this. is selectedChar
         if (entity.abilityContainer) { entity.abilityContainer.style.display = 'none'; }
         entity.hp = -100;
         entity.container.style.display = "none";
-    }
-
-    animateAttack() {
-        if (this.attackImages) {
-            if (this.target.pos[0] < this.pos[0]) {
-                this.img.style.transform = "scaleX(-1)";
-            } else {
-                this.img.style.transform = "scaleX(1)";
-            }
-            this.imgCycle += 1;
-            this.imgCycle = this.imgCycle % 4;
-            this.img.src = this.attackImages[this.imgCycle].src;
-        }
     }
 
     setHpBars() {
@@ -312,8 +301,8 @@ class Entity { // this. is selectedChar
     setOverlay(targetChar) {
         this.attackOverlay.style.top = (targetChar.pos[1] + 40) + 'px';
         this.attackOverlay.style.left = targetChar.pos[0] + 'px';
-        this.attackOverlay.style.width = targetChar.img.width;
-        this.attackOverlay.style.height = targetChar.img.height;
+        this.attackOverlay.style.width = targetChar.img.width + 'px';
+        this.attackOverlay.style.height = targetChar.img.height + 'px';
         this.attackOverlay.style.display = '';
         const selectedChar = this;
         const clearTime = Math.floor(this.as / 2);
@@ -343,68 +332,87 @@ class Entity { // this. is selectedChar
             }
         }
         this.currentAnimation = setInterval(() => this.animateAttack(this), Math.floor(this.as / 4))
-        this.currentAction = setInterval(() => attack(this), this.as);
-        function attack(selectedChar) {
-            if (targetChar.hp <= 0) {
-                selectedChar.clearIntervals();
-                if (!selectedChar.allied) {
-                    // chose another hero to attack
-                    selectedChar.setTargetAndAttack();
-                    // maybe add something in for player to auto target upon deaths ?
-                }
-                return;
-            }
-            if (!selectedChar.withinAttackRange(targetChar)) {
-                selectedChar.trackTarget();
-                return;
+        // this.currentAction = setInterval(() => attack(this), this.as);
+    }
+
+    animateAttack() {
+        if (this.attackImages) {
+            if (this.target.pos[0] < this.pos[0]) {
+                this.img.style.transform = "scaleX(-1)";
             } else {
-                targetChar.hp -= (selectedChar.dmg * 15 / targetChar.defense);
-                if (selectedChar.attackOverlay) {
-                    selectedChar.setOverlay(targetChar);
+                this.img.style.transform = "scaleX(1)";
+            }
+            this.imgCycle += 1;
+            if (this.imgCycle === 3) {
+                if (this.extraAttackAnimation) {
+                    this.extraAttackAnimation(this);
                 }
-                if (targetChar.hp > targetChar.baseHP) { targetChar.hp = targetChar.baseHP; }
-                if (!targetChar.allied && selectedChar.allied && targetChar.baseDMG > 0 && selectedChar.defense > targetChar.target.defense) {
-                    targetChar.target = selectedChar;
-                    targetChar.clearIntervals();
-                    targetChar.autoAttack(targetChar.target);
+                this.attack();
+            }
+            this.imgCycle = this.imgCycle % 4;
+            this.img.src = this.attackImages[this.imgCycle].src;
+        }
+    }
+
+    attack() {
+        if (!this.target || this.target.hp <= 0) {
+            this.clearIntervals();
+            if (!this.allied) {
+                // chose another hero to attack
+                this.setTargetAndAttack();
+                // maybe add something in for player to auto target upon deaths ?
+            }
+            return;
+        }
+        if (!this.withinAttackRange(this.target)) {
+            this.trackTarget();
+            return;
+        } else {
+            this.target.hp -= (this.dmg * 15 / this.target.defense);
+            if (this.attackOverlay) {
+                this.setOverlay(this.target);
+            }
+            if (this.target.hp > this.target.baseHP) { this.target.hp = this.target.baseHP; }
+            if (!this.target.allied && this.allied && this.target.baseDMG > 0 && this.defense > this.target.target.defense) {
+                this.target.target = this;
+                this.target.clearIntervals();
+                this.target.autoAttack(this.target.target);
+            }
+            this.target.setHpBars();
+
+            if (this.target.hp <= 0) {
+                this.clearIntervals();
+                // console.log(this.target, ' hp ', this.target.hp);
+                this.killEntitiy(this.target);
+                if (!this.allied) {
+                    // chose another hero to attack
+                    this.setTargetAndAttack();
                 }
-                targetChar.setHpBars();
-                
-                if (targetChar.hp <= 0) {
-                    selectedChar.clearIntervals();
-                    // console.log(targetChar, ' hp ', targetChar.hp);
-                    selectedChar.killEntitiy(targetChar);
-                    if (!selectedChar.allied) {
-                        // chose another hero to attack
-                        selectedChar.setTargetAndAttack();
+            }
+            // console.log("border style: ", this.target.img.style.border);
+            if (this.target.img.style.border !== "5px solid gold") {
+                if (this.baseDMG > 0) {
+                    this.target.img.style.border = "3px solid red";
+                } else {
+                    this.target.img.style.border = "3px solid green";
+                }
+                setTimeout(() => {
+                    if (this.target && this.target.img.style.border !== "5px solid gold") {
+                        this.target.img.style.border = "none";
                     }
-                }
-                // console.log("border style: ", targetChar.img.style.border);
-                if (targetChar.img.style.border !== "5px solid gold") {
-                    if (selectedChar.baseDMG > 0) {
-                        targetChar.img.style.border = "3px solid red";
-                    } else {
-                        targetChar.img.style.border = "3px solid green";
-                    }
-                    let borderInterval = setInterval(() => {
-                        if (targetChar.img.style.border !== "5px solid gold") {
-                            targetChar.img.style.border = "none";
-                        }
-                        clearInterval(borderInterval);
-                    }, 500);
-                }
-                if (selectedChar.range !== 'infinite' && selectedChar.charactersStacked()) {
-                    selectedChar.movingOutTheWay = true;
-                    const addition = Math.floor(selectedChar.img.width / 2);
-                    if (selectedChar.img.style.transform === "scaleX(-1)") {
-                        // move to left side of target
-                        selectedChar.img.style.transform = "scaleX(1)";// - (addition / 4)
-                        selectedChar.move([targetChar.pos[0] + addition, targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
-                    } else {
-                        // move to right side of target;
-                        selectedChar.img.style.transform = "scaleX(-1)";
-                        selectedChar.move([targetChar.pos[0] + (5 * addition), targetChar.pos[1] + Math.floor(targetChar.img.height * 3 / 4)], targetChar)
-                    }
+                }, 500);
+            }
+            if (this.range !== 'infinite' && this.charactersStacked()) {
+                this.movingOutTheWay = true;
+                const addition = Math.floor(this.img.width / 2);
+                if (this.img.style.transform === "scaleX(-1)") {
+                    // move to left side of target
+                    this.img.style.transform = "scaleX(1)";// - (addition / 4)
+                    this.move([this.target.pos[0] + addition, this.target.pos[1] + Math.floor(this.target.img.height * 3 / 4)], this.target)
+                } else {
+                    // move to right side of target;
+                    this.img.style.transform = "scaleX(-1)";
+                    this.move([this.target.pos[0] + (5 * addition), this.target.pos[1] + Math.floor(this.target.img.height * 3 / 4)], this.target)
                 }
             }
         }
