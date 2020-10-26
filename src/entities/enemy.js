@@ -17,14 +17,17 @@ false
 img
 pos
 defense
+ab
+abNames
+specialEffect
 */
 
 // rdps
-const tutorialWizard = new classCreator('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8, wizardAttackEffect);
-const ghettoWizard = new classCreator('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8, wizardAttackEffect);
-const wizard2 = new classCreator('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8, wizardAttackEffect);
-const wizard3 = new classCreator('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8, wizardAttackEffect); // fix
-const EWizard = new classCreator('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12, wizardAttackEffect);
+const tutorialWizard = new classCreator('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8, null, null, wizardAttackEffect);
+const ghettoWizard = new classCreator('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8, null, null, wizardAttackEffect);
+const wizard2 = new classCreator('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8, null, null, wizardAttackEffect);
+const wizard3 = new classCreator('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8, null, null, wizardAttackEffect); // fix
+const EWizard = new classCreator('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12, null, null, wizardAttackEffect);
 
 // heals
 const tutorialCleric = new classCreator('ECleric', 'infinite', 60, 10, 2000, -7, false, "e2", [1000, 300], 8)

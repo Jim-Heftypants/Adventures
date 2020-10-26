@@ -30,6 +30,9 @@ true
 imgName
 pos
 defense
+ab
+abNames
+specialEffect
 */
 
 // tutorials
