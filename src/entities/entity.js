@@ -395,7 +395,7 @@ class Entity { // this. is selectedChar
                     this.target.img.style.border = "3px solid red";
                 } else {
                     this.target.img.style.border = "3px solid green";
-                }
+                } 
                 setTimeout(() => {
                     if (this.target && this.target.img.style.border !== "5px solid gold") {
                         this.target.img.style.border = "none";
