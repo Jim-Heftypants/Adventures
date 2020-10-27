@@ -364,20 +364,42 @@ p, h1 {
     background-color: lightblue;
 }
 
-#heroes-stats-container {
+
+#heroes-stats-container, #heroes-stats-ability-container {
     display: flex;
     align-content: space-between;
     width: 100%;
-    height: 55%;
-    margin-top: 5%;
-    margin-bottom: 5%;
+    height: 20%;
+}
+
+#heroes-stats-container {
+    height: 45%;
+    margin-bottom: 3%;
+}
+
+#hero-stats-ability-container-1, #hero-stats-ability-container-2 {
+    width: 45%;
+    height: 100%;
+    display: flex;
+    border: 3px solid black;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stat-ability-div-1, .stat-ability-div-2 {
+    width: 18%;
+    height: 72%;
+    border: 5px solid green;
+    background-color: blue;
+    cursor: pointer;
+    margin: auto;
 }
 
 .hero-stats {
     width: 45%;
     height: 100%;
-    background-color: rosybrown;
     display: flex;
+    background-color: rosybrown;
     border: 3px solid indigo;
     margin-left: auto;
     margin-right: auto;
@@ -411,8 +433,8 @@ p, h1 {
 #stats-selectors {
     height: 25%;
     width: 100%;
-    padding-top: 5%;
-    padding-bottom: 5%;
+    padding-top: 4%;
+    padding-bottom: 4%;
     display: flex;
     align-content: space-between;
     background-color: hotpink;
@@ -449,7 +471,50 @@ p, h1 {
     margin: auto;
 }
 
+.ability-description-shader {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: grey;
+    opacity: 90%;
+    z-index: 49;
+}
 
+.ability-description-div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+    z-index: 50;
+    pointer-events: none;
+}
+
+#close-ability-description-button {
+    z-index: 51;
+}
+
+.ability-description-title {
+    font-size: 90px;
+    color: red;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: 5%;
+}
+
+.ability-description {
+    font-size: 60px;
+    color: royalblue;
+    text-align: center;
+}
+
+.ability-description:first-child {
+    margin-top: 5%;
+}
+.ability-description:last-child {
+    margin-bottom: auto;
+}
 
 
 .a-heal-overlay, .e-heal-overlay {

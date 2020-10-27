@@ -17,7 +17,7 @@ window.addEventListener('load', () => {
     
     const charsDisp = document.getElementById('title-screen-chars');
     // const controlsContainer = document.getElementsByClassName('controls-display')[0];
-    const closeButton = document.getElementsByClassName('close')[0];
+    const closeButton = document.getElementById('close-button');
     const hButtons = document.getElementsByClassName('h-button');
     // const startGameButton = document.getElementById('start-game-button');
     // const controlsButton = document.getElementById('game-controls-button');

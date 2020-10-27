@@ -100,7 +100,7 @@ __webpack_require__.r(__webpack_exports__);
 var groupHeal = function groupHeal(entity) {
   for (var i = 0; i < entity.allies.length; i++) {
     if (entity.allies[i].hp > 0) {
-      entity.allies[i].hp += 20;
+      entity.allies[i].hp += entity.dmg * 2;
 
       if (entity.allies[i].hp > 100) {
         entity.allies[i].hp = 100;
@@ -123,7 +123,8 @@ var powerSwing = function powerSwing(entity) {
     return false;
   }
 
-  entity.target.hp -= 20;
+  entity.target.hp -= Math.ceil(entity.dmg * 1.5);
+  knockbackTarget(entity, 50);
   entity.target.setHpBars();
   setBorder(entity);
 
@@ -216,18 +217,38 @@ var lightningAutoAttack = function lightningAutoAttack(entity) {
   var effectDiv = document.getElementById(entity.imgName + '-extra-effect');
   var pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
   drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width / 2, entity.target.pos[1] + entity.target.img.height / 2, effectDiv);
-  effectDiv.style.display = '';
-  var maxTime = Math.floor(entity.as / 8);
-  setTimeout(function () {
-    effectDiv.style.display = 'none';
-  }, maxTime);
+
+  if (effectDiv) {
+    effectDiv.style.display = '';
+    var maxTime = Math.floor(entity.as / 8);
+    setTimeout(function () {
+      effectDiv.style.display = 'none';
+    }, maxTime);
+  }
 };
 
 var specialAttackEffects = [lightningAutoAttack];
 
+function knockbackTarget(entity, distance) {
+  var dX = entity.target.pos[0] - entity.pos[0];
+  var dY = entity.target.pos[1] - entity.pos[1];
+  var hypotenuse = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
+  var xRatio = dX / hypotenuse;
+  var yRatio = dY / hypotenuse;
+  var xRight = distance * xRatio;
+  var yDown = distance * yRatio;
+  entity.target.pos[0] += Math.floor(xRight);
+  entity.target.pos[1] += Math.floor(yDown);
+  entity.target.style.left = entity.target.pos[0] + 'px';
+  entity.target.style.top = entity.target.pos[1] + 'px';
+}
+
 function createLineElement(x, y, length, angle, img) {
   var styles = 'width: ' + length + 'px; ' + 'height: 0px; ' + '-moz-transform: rotate(' + angle + 'rad); ' + '-webkit-transform: rotate(' + angle + 'rad); ' + '-o-transform: rotate(' + angle + 'rad); ' + '-ms-transform: rotate(' + angle + 'rad); ' + 'position: absolute; ' + 'top: ' + y + 'px; ' + 'left: ' + x + 'px; ';
-  img.setAttribute('style', styles);
+
+  if (img) {
+    img.setAttribute('style', styles);
+  }
 }
 
 function drawLine(x1, y1, x2, y2, img) {
@@ -240,37 +261,7 @@ function drawLine(x1, y1, x2, y2, img) {
       y = sy;
   var alpha = Math.PI - Math.atan2(-b, a);
   createLineElement(x, y, c, alpha, img);
-} // function linedraw(entity, img) {
-//     const pos = entity.pos.slice();
-//     pos[0] += entity.img.width / 2; pos[1] += entity.img.height / 2;
-//     const targetPos = entity.target.pos.slice();
-//     targetPos[0] += entity.target.img.width / 2; targetPos[1] += entity.target.img.height / 2;
-//     const arcTan = Math.atan((pos[1] - targetPos[1]) / (targetPos[0] - pos[0]));
-//     let angle =  arcTan * 180 / Math.PI;
-//     if (pos[0] < targetPos[0] && pos[1] > targetPos[1]) {
-//         // neg angle
-//         img.style.top = Math.floor(pos[1]) + 'px';
-//         img.style.left = Math.floor(pos[0]) + 'px';
-//     } else if (pos[0] > targetPos[0] && pos[1] > targetPos[1]) {
-//         // pos angle
-//         img.style.top = Math.floor(pos[1]) + 'px';
-//         img.style.left = Math.floor(targetPos[0]) + 'px';
-//     } else if (pos[0] < targetPos[0] && pos[1] < targetPos[1]) {
-//         // pos angle
-//         img.style.top = Math.floor(targetPos[1]) + 'px';
-//         img.style.left = Math.floor(pos[0]) + 'px';
-//     } else {
-//         // neg angle
-//         img.style.top = Math.floor(targetPos[1]) + 'px';
-//         img.style.left = Math.floor(targetPos[0]) + 'px';
-//     }
-//     console.log('angle: ', angle);
-//     const length = Math.floor(Math.sqrt((pos[0] - targetPos[0]) * (pos[0] - targetPos[0]) + (pos[1] - targetPos[1]) * (pos[1] - targetPos[1])));
-//     console.log('length: ', length);
-//     img.style.width = length + 'px';
-//     img.style.transform = "rotate(" + (-angle) + "deg)";
-// }
-
+}
 
 function spellTrack(img, entity, target, action) {
   // console.log('img: ', img, ' entity: ', entity, ' target: ', target, ' action: ', action);
@@ -645,20 +636,32 @@ var Entity = /*#__PURE__*/function () {
       this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
 
       switch (this.level) {
-        case 5:
-          this.abilities.push(this.allAbilities[0]);
+        case 2:
+          if (this.allAbilities[0]) {
+            this.abilities.push(this.allAbilities[0]);
+          }
+
           break;
 
         case 10:
-          this.abilities.push(this.allAbilities[1]);
+          if (this.allAbilities[1]) {
+            this.abilities.push(this.allAbilities[1]);
+          }
+
           break;
 
         case 15:
-          this.abilities.push(this.allAbilities[2]);
+          if (this.allAbilities[2]) {
+            this.abilities.push(this.allAbilities[2]);
+          }
+
           break;
 
         case 20:
-          this.abilities.push(this.allAbilities[3]);
+          if (this.allAbilities[3]) {
+            this.abilities.push(this.allAbilities[3]);
+          }
+
           break;
       }
     }
@@ -845,7 +848,7 @@ var Entity = /*#__PURE__*/function () {
     key: "charactersStacked",
     value: function charactersStacked() {
       for (var i = 0; i < this.allies.length; i++) {
-        if (!this.allies[i].movingOutTheWay) {
+        if (!this.allies[i].movingOutTheWay && !(this.allies[i].img.style.display === 'none')) {
           var widthAddition = Math.floor(this.img.width / 2);
 
           if (this.pos[0] > this.allies[i].pos[0] - widthAddition && this.pos[0] < this.allies[i].pos[0] + widthAddition) {
@@ -1272,7 +1275,7 @@ window.addEventListener('load', function () {
   gameTag.style.display = '';
   var charsDisp = document.getElementById('title-screen-chars'); // const controlsContainer = document.getElementsByClassName('controls-display')[0];
 
-  var closeButton = document.getElementsByClassName('close')[0];
+  var closeButton = document.getElementById('close-button');
   var hButtons = document.getElementsByClassName('h-button'); // const startGameButton = document.getElementById('start-game-button');
   // const controlsButton = document.getElementById('game-controls-button');
 
@@ -1581,34 +1584,90 @@ var hotkeys = {};
 window.addEventListener('load', function () {
   var statChar1;
   var statChar2;
+  var currentShowingAbilityDescription;
   var heroStatcontainer = document.getElementById('heroes-button');
   var heroStatsBlocks = document.getElementsByClassName('hero-stats');
   var heroNameplateSelectors = document.getElementsByClassName('stat-selector');
   var statSelectorNames = document.getElementsByClassName('stat-selector-name');
   var statImages = document.getElementsByClassName('stats-img');
+  var statAbilities1 = document.getElementsByClassName('stat-ability-div-1');
+  var statAbilities2 = document.getElementsByClassName('stat-ability-div-2');
+  var abDescShader = document.getElementsByClassName('ability-description-shader')[0];
+  abDescShader.addEventListener('click', function () {
+    currentShowingAbilityDescription.style.display = 'none';
+    currentShowingAbilityDescription = null;
+    abDescShader.style.display = 'none';
+  });
+
+  function showAbilityDescription(side, num) {
+    var statAbs;
+    var hero;
+
+    if (side === 1) {
+      statAbs = statAbilities1;
+      hero = statChar1;
+    } else {
+      statAbs = statAbilities2;
+      hero = statChar2;
+    }
+
+    currentShowingAbilityDescription = document.getElementById(hero.klass + '-ability-' + num + '-description-div');
+    currentShowingAbilityDescription.style.display = '';
+    abDescShader.style.display = '';
+  }
+
+  var _loop = function _loop(i) {
+    statAbilities1[i].addEventListener('click', function () {
+      return showAbilityDescription(1, i + 1);
+    });
+    statAbilities2[i].addEventListener('click', function () {
+      return showAbilityDescription(2, i + 1);
+    });
+  };
+
+  for (var i = 0; i < statAbilities1.length; i++) {
+    _loop(i);
+  }
+
   heroStatcontainer.addEventListener('click', function () {
-    for (var i = 0; i < statImages.length; i++) {
-      if (statImages[i].style.display !== 'none') {
+    for (var _i = 0; _i < statImages.length; _i++) {
+      if (statImages[_i].style.display !== 'none') {
         var _char = void 0;
 
-        if (i === 0) {
+        if (_i === 0) {
           _char = statChar1;
         } else {
           _char = statChar2;
         }
 
-        var statImg = document.getElementById("stats-img-".concat(i + 1));
-        var nameStat = document.getElementById("stats-name-".concat(i + 1));
-        var levelStat = document.getElementById("stats-level-".concat(i + 1));
-        var hpStat = document.getElementById("stats-hp-".concat(i + 1));
-        var dmgStat = document.getElementById("stats-dmg-".concat(i + 1));
-        var defenseStat = document.getElementById("stats-defense-".concat(i + 1));
+        var statImg = document.getElementById("stats-img-".concat(_i + 1));
+        var nameStat = document.getElementById("stats-name-".concat(_i + 1));
+        var levelStat = document.getElementById("stats-level-".concat(_i + 1));
+        var hpStat = document.getElementById("stats-hp-".concat(_i + 1));
+        var dmgStat = document.getElementById("stats-dmg-".concat(_i + 1));
+        var defenseStat = document.getElementById("stats-defense-".concat(_i + 1));
         statImg.src = _char.baseImg.src;
         nameStat.innerHTML = "Level: ".concat(_char.level);
         levelStat.innerHTML = _char.klass;
         hpStat.innerHTML = "Max HP: ".concat(_char.baseHP);
         dmgStat.innerHTML = "Damage: ".concat(_char.baseDMG);
         defenseStat.innerHTML = "Defense: ".concat(_char.baseDefense);
+
+        for (var j = 0; j < statAbilities1.length; j++) {
+          if (_char.abilities[j]) {
+            if (_i === 0) {
+              statAbilities1[j].style.display = '';
+            } else {
+              statAbilities2[j].style.display = '';
+            }
+          } else {
+            if (_i === 0) {
+              statAbilities1[j].style.display = 'none';
+            } else {
+              statAbilities2[j].style.display = 'none';
+            }
+          }
+        }
       }
     }
   });
@@ -1633,6 +1692,23 @@ window.addEventListener('load', function () {
     var _char2 = characters[charIndex - 1];
     statCharSelected.style.border = 'none';
     statCharSelected = 'none';
+
+    for (var _j = 0; _j < statAbilities1.length; _j++) {
+      if (_char2.abilities[_j]) {
+        if (parseInt(charIndex) === 1) {
+          statAbilities1[_j].style.display = '';
+        } else {
+          statAbilities2[_j].style.display = '';
+        }
+      } else {
+        if (parseInt(charIndex) === 1) {
+          statAbilities1[_j].style.display = 'none';
+        } else {
+          statAbilities2[_j].style.display = 'none';
+        }
+      }
+    }
+
     var tarId = e.target.id;
     var sideNum = tarId.substr(tarId.length - 1, 1);
 
@@ -1656,8 +1732,8 @@ window.addEventListener('load', function () {
     statImg.src = _char2.baseImg.src;
     nameStat.innerHTML = "Level: ".concat(_char2.level);
     levelStat.innerHTML = _char2.klass;
-    hpStat.innerHTML = "Max HP: ".concat(_char2.baseHP);
-    dmgStat.innerHTML = "Damage: ".concat(_char2.baseDMG);
+    hpStat.innerHTML = "Health: ".concat(_char2.baseHP);
+    dmgStat.innerHTML = "Power: ".concat(Math.abs(_char2.baseDMG));
     defenseStat.innerHTML = "Defense: ".concat(_char2.baseDefense);
     shouldSwap = false;
   }
@@ -1699,13 +1775,13 @@ window.addEventListener('load', function () {
     heroStatsBlocks[j].addEventListener("click", swapStatDisp);
   }
 
-  for (var i = 0; i < heroNameplateSelectors.length; i++) {
-    heroNameplateSelectors[i].addEventListener('click', initiateStatSwap);
+  for (var _i2 = 0; _i2 < heroNameplateSelectors.length; _i2++) {
+    heroNameplateSelectors[_i2].addEventListener('click', initiateStatSwap);
   }
 
-  for (var _i = 0; _i < statSelectorNames.length; _i++) {
-    if (characters[_i]) {
-      statSelectorNames[_i].innerHTML = characters[_i].klass;
+  for (var _i3 = 0; _i3 < statSelectorNames.length; _i3++) {
+    if (characters[_i3]) {
+      statSelectorNames[_i3].innerHTML = characters[_i3].klass;
     }
   }
 });
@@ -1903,20 +1979,20 @@ function setAbilityBoxes() {
   abilityBoxes.push(document.getElementsByClassName('a3-inner-ability-divs'));
   abilityBoxes.push(document.getElementsByClassName('a4-inner-ability-divs'));
 
-  var _loop = function _loop(i) {
-    var _loop2 = function _loop2(j) {
+  var _loop2 = function _loop2(i) {
+    var _loop3 = function _loop3(j) {
       abilityBoxes[i][j].addEventListener('click', function () {
         return abilityClick([i + 1, j]);
       });
     };
 
     for (var j = 0; j < abilityBoxes[i].length; j++) {
-      _loop2(j);
+      _loop3(j);
     }
   };
 
   for (var i = 0; i < abilityBoxes.length; i++) {
-    _loop(i);
+    _loop2(i);
   }
 }
 
@@ -2047,7 +2123,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   backgroundImg.style.display = '';
   Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(backgroundImg);
 
-  var _loop3 = function _loop3(i) {
+  var _loop4 = function _loop4(i) {
     if (!charactersArr[i].observer) {
       addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
     }
@@ -2089,40 +2165,40 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   };
 
   for (var i = 0; i < charactersArr.length; i++) {
-    _loop3(i);
+    _loop4(i);
   }
 
-  var _loop4 = function _loop4(_i2) {
-    if (!enemiesArr[_i2].observer) {
-      addEntityEvents(enemiesArr[_i2], enemiesArr, charactersArr);
+  var _loop5 = function _loop5(_i4) {
+    if (!enemiesArr[_i4].observer) {
+      addEntityEvents(enemiesArr[_i4], enemiesArr, charactersArr);
     }
 
-    livingEnemies[enemiesArr[_i2].imgName] = enemiesArr[_i2];
-    enemiesArr[_i2].container.style.top = enemiesArr[_i2].pos[1] + 'px';
-    enemiesArr[_i2].container.style.left = enemiesArr[_i2].pos[0] + 'px';
-    enemiesArr[_i2].container.style.opacity = 0;
-    enemiesArr[_i2].container.style.display = '';
-    var hpBar = document.getElementById("".concat(enemiesArr[_i2].imgName, "-hp-bar"));
+    livingEnemies[enemiesArr[_i4].imgName] = enemiesArr[_i4];
+    enemiesArr[_i4].container.style.top = enemiesArr[_i4].pos[1] + 'px';
+    enemiesArr[_i4].container.style.left = enemiesArr[_i4].pos[0] + 'px';
+    enemiesArr[_i4].container.style.opacity = 0;
+    enemiesArr[_i4].container.style.display = '';
+    var hpBar = document.getElementById("".concat(enemiesArr[_i4].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
-    var hotkeyInput = document.getElementById("e".concat(_i2 + 1, "-keybind"));
-    enemiesArr[_i2].hotkeyDisplay.innerHTML = hotkeyInput.value;
-    hotkeys[hotkeyInput.value] = enemiesArr[_i2];
+    var hotkeyInput = document.getElementById("e".concat(_i4 + 1, "-keybind"));
+    enemiesArr[_i4].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = enemiesArr[_i4];
 
-    enemiesArr[_i2].container.addEventListener('click', enemyClickEvents);
+    enemiesArr[_i4].container.addEventListener('click', enemyClickEvents);
 
-    enemiesArr[_i2].img.src = enemiesArr[_i2].baseImg.src;
+    enemiesArr[_i4].img.src = enemiesArr[_i4].baseImg.src;
 
     var action = function action() {
-      return enemiesArr[_i2].autoAttack(enemiesArr[_i2].target);
+      return enemiesArr[_i4].autoAttack(enemiesArr[_i4].target);
     };
 
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i2].container, action); // begin attacking target
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i4].container, action); // begin attacking target
 
-    observerObserve(enemiesArr[_i2]);
+    observerObserve(enemiesArr[_i4]);
   };
 
-  for (var _i2 = 0; _i2 < enemiesArr.length; _i2++) {
-    _loop4(_i2);
+  for (var _i4 = 0; _i4 < enemiesArr.length; _i4++) {
+    _loop5(_i4);
   } // console.log("hotkeys: ", hotkeys);
 
 }
@@ -2157,42 +2233,42 @@ function endGame(charsList, enemyList) {
   var allCharsList = levels[currentLevelNumber].characterList;
   var allEnemyList = levels[currentLevelNumber].enemyList;
 
-  for (var _i3 = 0; _i3 < allCharsList.length; _i3++) {
-    allCharsList[_i3].observer.disconnect();
+  for (var _i5 = 0; _i5 < allCharsList.length; _i5++) {
+    allCharsList[_i5].observer.disconnect();
 
-    if (allCharsList[_i3].currentAction) {
-      clearInterval(allCharsList[_i3].currentAction);
+    if (allCharsList[_i5].currentAction) {
+      clearInterval(allCharsList[_i5].currentAction);
     }
 
-    if (allCharsList[_i3].currentAnimation) {
-      clearInterval(allCharsList[_i3].currentAnimation);
+    if (allCharsList[_i5].currentAnimation) {
+      clearInterval(allCharsList[_i5].currentAnimation);
     }
 
-    allCharsList[_i3].isAttacking = false;
-    allCharsList[_i3].target = null;
+    allCharsList[_i5].isAttacking = false;
+    allCharsList[_i5].target = null;
 
-    allCharsList[_i3].container.removeEventListener('click', allyClickEvents);
+    allCharsList[_i5].container.removeEventListener('click', allyClickEvents);
 
-    allCharsList[_i3].img.src = allCharsList[_i3].baseImg.src;
+    allCharsList[_i5].img.src = allCharsList[_i5].baseImg.src;
   }
 
-  for (var _i4 = 0; _i4 < allEnemyList.length; _i4++) {
-    allEnemyList[_i4].observer.disconnect();
+  for (var _i6 = 0; _i6 < allEnemyList.length; _i6++) {
+    allEnemyList[_i6].observer.disconnect();
 
-    if (allEnemyList[_i4].currentAction) {
-      clearInterval(allEnemyList[_i4].currentAction);
+    if (allEnemyList[_i6].currentAction) {
+      clearInterval(allEnemyList[_i6].currentAction);
     }
 
-    if (allEnemyList[_i4].currentAnimation) {
-      clearInterval(allEnemyList[_i4].currentAnimation);
+    if (allEnemyList[_i6].currentAnimation) {
+      clearInterval(allEnemyList[_i6].currentAnimation);
     }
 
-    allEnemyList[_i4].isAttacking = false;
-    allEnemyList[_i4].target = null;
+    allEnemyList[_i6].isAttacking = false;
+    allEnemyList[_i6].target = null;
 
-    allEnemyList[_i4].container.removeEventListener('click', enemyClickEvents);
+    allEnemyList[_i6].container.removeEventListener('click', enemyClickEvents);
 
-    allEnemyList[_i4].img.src = allEnemyList[_i4].baseImg.src;
+    allEnemyList[_i6].img.src = allEnemyList[_i6].baseImg.src;
   }
 
   if (charsList.length > 0) {
@@ -2201,8 +2277,8 @@ function endGame(charsList, enemyList) {
     var backgroundImg = document.getElementById('background-image');
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
 
-    for (var _i5 = 0; _i5 < enemyList.length; _i5++) {
-      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i5].container);
+    for (var _i7 = 0; _i7 < enemyList.length; _i7++) {
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i7].container);
     }
 
     fadeOutGame(false);
@@ -2262,28 +2338,28 @@ function addCharXP() {
     if (timeCount === 60) {
       clearInterval(xpInterval);
 
-      for (var _i6 = 0; _i6 < c.length; _i6++) {
-        c[_i6].xp = Math.ceil(c[_i6].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+      for (var _i8 = 0; _i8 < c.length; _i8++) {
+        c[_i8].xp = Math.ceil(c[_i8].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
 
-        c[_i6].container.style.border = 'none';
-        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i6].container);
+        c[_i8].container.style.border = 'none';
+        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i8].container);
       }
 
       var backgroundImg = document.getElementById('background-image');
       Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
     }
 
-    for (var _i7 = 0; _i7 < c.length; _i7++) {
-      c[_i7].xp += xpPerInterval;
+    for (var _i9 = 0; _i9 < c.length; _i9++) {
+      c[_i9].xp += xpPerInterval;
 
-      if (c[_i7].xp > c[_i7].nextLevelXP) {
-        c[_i7].levelUp();
+      if (c[_i9].xp > c[_i9].nextLevelXP) {
+        c[_i9].levelUp();
       }
 
-      var _xpPercent = Math.floor(c[_i7].xp / c[_i7].nextLevelXP * 100);
+      var _xpPercent = Math.floor(c[_i9].xp / c[_i9].nextLevelXP * 100);
 
-      c[_i7].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
-      c[_i7].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
+      c[_i9].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
+      c[_i9].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
     }
 
     timeCount++;
@@ -2364,16 +2440,16 @@ function resetGame(won) {
     levChars[i].setHpBars();
   }
 
-  for (var _i8 = 0; _i8 < levEnems.length; _i8++) {
-    levEnems[_i8].hp = levEnems[_i8].baseHP;
-    levEnems[_i8].dmg = levEnems[_i8].baseDMG;
-    levEnems[_i8].defense = levEnems[_i8].baseDefense;
-    levEnems[_i8].pos[0] = levEnems[_i8].basePos[0];
-    levEnems[_i8].pos[1] = levEnems[_i8].basePos[1];
-    levEnems[_i8].container.style.top = levEnems[_i8].pos[1] + 'px';
-    levEnems[_i8].container.style.left = levEnems[_i8].pos[0] + 'px';
+  for (var _i10 = 0; _i10 < levEnems.length; _i10++) {
+    levEnems[_i10].hp = levEnems[_i10].baseHP;
+    levEnems[_i10].dmg = levEnems[_i10].baseDMG;
+    levEnems[_i10].defense = levEnems[_i10].baseDefense;
+    levEnems[_i10].pos[0] = levEnems[_i10].basePos[0];
+    levEnems[_i10].pos[1] = levEnems[_i10].basePos[1];
+    levEnems[_i10].container.style.top = levEnems[_i10].pos[1] + 'px';
+    levEnems[_i10].container.style.left = levEnems[_i10].pos[0] + 'px';
 
-    levEnems[_i8].setHpBars();
+    levEnems[_i10].setHpBars();
   }
 }
 

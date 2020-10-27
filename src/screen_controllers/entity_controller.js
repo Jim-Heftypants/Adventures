@@ -24,11 +24,38 @@ let hotkeys = {};
 window.addEventListener('load', () => {
     let statChar1;
     let statChar2;
+    let currentShowingAbilityDescription;
     const heroStatcontainer = document.getElementById('heroes-button');
     const heroStatsBlocks = document.getElementsByClassName('hero-stats');
     const heroNameplateSelectors = document.getElementsByClassName('stat-selector');
     const statSelectorNames = document.getElementsByClassName('stat-selector-name');
     const statImages = document.getElementsByClassName('stats-img');
+    const statAbilities1 = document.getElementsByClassName('stat-ability-div-1');
+    const statAbilities2 = document.getElementsByClassName('stat-ability-div-2');
+    const abDescShader = document.getElementsByClassName('ability-description-shader')[0];
+    abDescShader.addEventListener('click', () => {
+        currentShowingAbilityDescription.style.display = 'none';
+        currentShowingAbilityDescription = null;
+        abDescShader.style.display = 'none';
+    })
+    function showAbilityDescription(side, num) {
+        let statAbs;
+        let hero;
+        if (side === 1) {
+            statAbs = statAbilities1;
+            hero = statChar1;
+        } else {
+            statAbs = statAbilities2;
+            hero = statChar2;
+        }
+        currentShowingAbilityDescription = document.getElementById(hero.klass + '-ability-' + num + '-description-div');
+        currentShowingAbilityDescription.style.display = '';
+        abDescShader.style.display = '';
+    }
+    for (let i = 0; i < statAbilities1.length; i++) {
+        statAbilities1[i].addEventListener('click', () => showAbilityDescription(1, i+1));
+        statAbilities2[i].addEventListener('click', () => showAbilityDescription(2, i+1));
+    }
     heroStatcontainer.addEventListener('click', () => {
         for (let i = 0; i < statImages.length; i++) {
             if (statImages[i].style.display !== 'none') {
@@ -45,6 +72,17 @@ window.addEventListener('load', () => {
                 hpStat.innerHTML = `Max HP: ${char.baseHP}`;
                 dmgStat.innerHTML = `Damage: ${char.baseDMG}`
                 defenseStat.innerHTML = `Defense: ${char.baseDefense}`;
+                for (let j = 0; j < statAbilities1.length; j++) {
+                    if (char.abilities[j]) {
+                        if (i === 0) {
+                            statAbilities1[j].style.display = '';
+                        } else { statAbilities2[j].style.display = ''; }
+                    } else {
+                        if (i === 0) {
+                            statAbilities1[j].style.display = 'none';
+                        } else { statAbilities2[j].style.display = 'none'; }
+                    }
+                }
             }
         }
     })
@@ -64,6 +102,16 @@ window.addEventListener('load', () => {
         
         statCharSelected.style.border = 'none';
         statCharSelected = 'none';
+
+        for (let j = 0; j < statAbilities1.length; j++) {
+            if (char.abilities[j]) {
+                if (parseInt(charIndex) === 1) { statAbilities1[j].style.display = '';
+                } else { statAbilities2[j].style.display = ''; }
+            } else {
+                if (parseInt(charIndex) === 1) { statAbilities1[j].style.display = 'none';
+                } else { statAbilities2[j].style.display = 'none'; }
+            }
+        }
         
         const tarId = e.target.id;
         const sideNum = tarId.substr(tarId.length - 1, 1);
@@ -82,8 +130,8 @@ window.addEventListener('load', () => {
         statImg.src = char.baseImg.src;
         nameStat.innerHTML = `Level: ${char.level}`;
         levelStat.innerHTML = char.klass;
-        hpStat.innerHTML = `Max HP: ${char.baseHP}`;
-        dmgStat.innerHTML = `Damage: ${char.baseDMG}`
+        hpStat.innerHTML = `Health: ${char.baseHP}`;
+        dmgStat.innerHTML = `Power: ${Math.abs(char.baseDMG)}`
         defenseStat.innerHTML = `Defense: ${char.baseDefense}`;
 
         shouldSwap = false;
@@ -120,6 +168,8 @@ window.addEventListener('load', () => {
         }
     }
 })
+
+
 
  
 function addDeathListener(entity) {

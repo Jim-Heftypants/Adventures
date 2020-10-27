@@ -2,7 +2,6 @@ class Entity { // this. is selectedChar
     constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0,
                  abilities=[], abilityNames=[], extraAttackAnimation=null) {
         this.klass = klass;
-
         this.range = range;
         this.trueBaseHp = baseHP;
         this.baseHP = baseHP;
@@ -101,17 +100,25 @@ class Entity { // this. is selectedChar
         this.baseDMG += Math.ceil(this.trueBaseDMG * 0.1);
         this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
         switch (this.level) {
-            case (5):
-                this.abilities.push(this.allAbilities[0]);
+            case (2):
+                if (this.allAbilities[0]) {
+                    this.abilities.push(this.allAbilities[0]);
+                }
                 break;
             case (10):
-                this.abilities.push(this.allAbilities[1]);
+                if (this.allAbilities[1]) {
+                    this.abilities.push(this.allAbilities[1]);
+                }
                 break;
             case (15):
-                this.abilities.push(this.allAbilities[2]);
+                if (this.allAbilities[2]) {
+                    this.abilities.push(this.allAbilities[2]);
+                }
                 break;
             case (20):
-                this.abilities.push(this.allAbilities[3]);
+                if (this.allAbilities[3]) {
+                    this.abilities.push(this.allAbilities[3]);
+                }
                 break;
         }
     }
@@ -242,7 +249,7 @@ class Entity { // this. is selectedChar
 
     charactersStacked() {
         for (let i = 0; i < this.allies.length; i++) {
-            if (!this.allies[i].movingOutTheWay) {                
+            if (!this.allies[i].movingOutTheWay && !(this.allies[i].img.style.display === 'none')) {                
                 const widthAddition = Math.floor(this.img.width / 2);
                 if (this.pos[0] > this.allies[i].pos[0] - widthAddition && this.pos[0] < this.allies[i].pos[0] + widthAddition) {
                     const heightAddition = Math.floor(this.img.height / 2);

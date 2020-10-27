@@ -1,7 +1,7 @@
 const groupHeal = (entity) => {
     for (let i = 0; i < entity.allies.length; i++) {
         if (entity.allies[i].hp > 0) {
-            entity.allies[i].hp += 20;
+            entity.allies[i].hp += entity.dmg * 2;
             if (entity.allies[i].hp > 100) { entity.allies[i].hp = 100; }
             entity.setOverlay(entity.allies[i]);
             entity.allies[i].setHpBars();
@@ -18,7 +18,8 @@ const powerSwing = (entity) => {
         document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
         return false;
     }
-    entity.target.hp -= 20;
+    entity.target.hp -= Math.ceil(entity.dmg * 1.5);
+    knockbackTarget(entity, 50);
     entity.target.setHpBars();
     setBorder(entity);
     if (entity.target.hp <= 0) {
@@ -100,12 +101,28 @@ const lightningAutoAttack = (entity) => {
     const effectDiv = document.getElementById(entity.imgName + '-extra-effect');
     const pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
     drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width/2, entity.target.pos[1] + entity.target.img.height/2, effectDiv);
-    effectDiv.style.display = '';
-    const maxTime = Math.floor(entity.as / 8);
-    setTimeout(() => { effectDiv.style.display = 'none'; }, maxTime);
+    if (effectDiv) {
+        effectDiv.style.display = '';
+        const maxTime = Math.floor(entity.as / 8);
+        setTimeout(() => { effectDiv.style.display = 'none'; }, maxTime);
+    }
 }
 
 export const specialAttackEffects = [lightningAutoAttack];
+
+function knockbackTarget(entity, distance) {
+    const dX = entity.target.pos[0] - entity.pos[0];
+    const dY = entity.target.pos[1] - entity.pos[1];
+    const hypotenuse = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
+    const xRatio = dX / hypotenuse;
+    const yRatio = dY / hypotenuse;
+    const xRight = distance * xRatio;
+    const yDown = distance * yRatio;
+    entity.target.pos[0] += Math.floor(xRight);
+    entity.target.pos[1] += Math.floor(yDown);
+    entity.target.style.left = entity.target.pos[0] + 'px';
+    entity.target.style.top = entity.target.pos[1] + 'px';
+}
 
 function createLineElement(x, y, length, angle, img) {
     var styles = 'width: ' + length + 'px; '
@@ -117,7 +134,9 @@ function createLineElement(x, y, length, angle, img) {
         + 'position: absolute; '
         + 'top: ' + y + 'px; '
         + 'left: ' + x + 'px; ';
-    img.setAttribute('style', styles);
+    if (img) {
+        img.setAttribute('style', styles);
+    }
 }
 
 function drawLine(x1, y1, x2, y2, img) {
@@ -135,37 +154,6 @@ function drawLine(x1, y1, x2, y2, img) {
 
     createLineElement(x, y, c, alpha, img);
 }
-
-// function linedraw(entity, img) {
-//     const pos = entity.pos.slice();
-//     pos[0] += entity.img.width / 2; pos[1] += entity.img.height / 2;
-//     const targetPos = entity.target.pos.slice();
-//     targetPos[0] += entity.target.img.width / 2; targetPos[1] += entity.target.img.height / 2;
-//     const arcTan = Math.atan((pos[1] - targetPos[1]) / (targetPos[0] - pos[0]));
-//     let angle =  arcTan * 180 / Math.PI;
-//     if (pos[0] < targetPos[0] && pos[1] > targetPos[1]) {
-//         // neg angle
-//         img.style.top = Math.floor(pos[1]) + 'px';
-//         img.style.left = Math.floor(pos[0]) + 'px';
-//     } else if (pos[0] > targetPos[0] && pos[1] > targetPos[1]) {
-//         // pos angle
-//         img.style.top = Math.floor(pos[1]) + 'px';
-//         img.style.left = Math.floor(targetPos[0]) + 'px';
-//     } else if (pos[0] < targetPos[0] && pos[1] < targetPos[1]) {
-//         // pos angle
-//         img.style.top = Math.floor(targetPos[1]) + 'px';
-//         img.style.left = Math.floor(pos[0]) + 'px';
-//     } else {
-//         // neg angle
-//         img.style.top = Math.floor(targetPos[1]) + 'px';
-//         img.style.left = Math.floor(targetPos[0]) + 'px';
-//     }
-//     console.log('angle: ', angle);
-//     const length = Math.floor(Math.sqrt((pos[0] - targetPos[0]) * (pos[0] - targetPos[0]) + (pos[1] - targetPos[1]) * (pos[1] - targetPos[1])));
-//     console.log('length: ', length);
-//     img.style.width = length + 'px';
-//     img.style.transform = "rotate(" + (-angle) + "deg)";
-// }
 
 function spellTrack(img, entity, target, action) {
     // console.log('img: ', img, ' entity: ', entity, ' target: ', target, ' action: ', action);
