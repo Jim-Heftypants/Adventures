@@ -1572,7 +1572,7 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
-var maxLevelNumber = 0;
+var maxLevelNumber = 7;
 var characters = levels[maxLevelNumber].characterList;
 var selectedChar;
 var countToReach = 0;
@@ -1600,14 +1600,11 @@ window.addEventListener('load', function () {
   });
 
   function showAbilityDescription(side, num) {
-    var statAbs;
     var hero;
 
     if (side === 1) {
-      statAbs = statAbilities1;
       hero = statChar1;
     } else {
-      statAbs = statAbilities2;
       hero = statChar2;
     }
 
@@ -1682,6 +1679,7 @@ window.addEventListener('load', function () {
 
     e.currentTarget.style.border = '3px solid indigo';
     e.currentTarget.style.cursor = 'default';
+    var sideCheck = e.currentTarget.id.substr(e.currentTarget.id.length - 1);
 
     for (var j = 0; j < heroStatsBlocks.length; j++) {
       heroStatsBlocks[j].removeEventListener("mouseover", addBlueBorder);
@@ -1691,17 +1689,17 @@ window.addEventListener('load', function () {
     var charIndex = statCharSelected.id.substr(1, 1);
     var _char2 = characters[charIndex - 1];
     statCharSelected.style.border = 'none';
-    statCharSelected = 'none';
+    statCharSelected = null;
 
     for (var _j = 0; _j < statAbilities1.length; _j++) {
       if (_char2.abilities[_j]) {
-        if (parseInt(charIndex) === 1) {
+        if (parseInt(sideCheck) === 1) {
           statAbilities1[_j].style.display = '';
         } else {
           statAbilities2[_j].style.display = '';
         }
       } else {
-        if (parseInt(charIndex) === 1) {
+        if (parseInt(sideCheck) === 1) {
           statAbilities1[_j].style.display = 'none';
         } else {
           statAbilities2[_j].style.display = 'none';

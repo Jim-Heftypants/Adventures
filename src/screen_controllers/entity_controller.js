@@ -6,7 +6,7 @@ let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
-let maxLevelNumber = 0;
+let maxLevelNumber = 7;
 let characters = levels[maxLevelNumber].characterList;
 
 let selectedChar;
@@ -39,13 +39,10 @@ window.addEventListener('load', () => {
         abDescShader.style.display = 'none';
     })
     function showAbilityDescription(side, num) {
-        let statAbs;
         let hero;
         if (side === 1) {
-            statAbs = statAbilities1;
             hero = statChar1;
         } else {
-            statAbs = statAbilities2;
             hero = statChar2;
         }
         currentShowingAbilityDescription = document.getElementById(hero.klass + '-ability-' + num + '-description-div');
@@ -93,6 +90,7 @@ window.addEventListener('load', () => {
         // console.log('swapping now');
         e.currentTarget.style.border = '3px solid indigo';
         e.currentTarget.style.cursor = 'default';
+        const sideCheck = e.currentTarget.id.substr(e.currentTarget.id.length-1);
         for (let j = 0; j < heroStatsBlocks.length; j++) {
             heroStatsBlocks[j].removeEventListener("mouseover", addBlueBorder);
             heroStatsBlocks[j].removeEventListener("mouseleave", removeBlueBorder);
@@ -101,14 +99,14 @@ window.addEventListener('load', () => {
         const char = characters[charIndex-1];
         
         statCharSelected.style.border = 'none';
-        statCharSelected = 'none';
+        statCharSelected = null;
 
         for (let j = 0; j < statAbilities1.length; j++) {
             if (char.abilities[j]) {
-                if (parseInt(charIndex) === 1) { statAbilities1[j].style.display = '';
+                if (parseInt(sideCheck) === 1) { statAbilities1[j].style.display = '';
                 } else { statAbilities2[j].style.display = ''; }
             } else {
-                if (parseInt(charIndex) === 1) { statAbilities1[j].style.display = 'none';
+                if (parseInt(sideCheck) === 1) { statAbilities1[j].style.display = 'none';
                 } else { statAbilities2[j].style.display = 'none'; }
             }
         }
