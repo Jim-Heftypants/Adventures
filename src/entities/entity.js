@@ -100,7 +100,7 @@ class Entity { // this. is selectedChar
         this.baseDMG += Math.ceil(this.trueBaseDMG * 0.1);
         this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
         switch (this.level) {
-            case (2):
+            case (5):
                 if (this.allAbilities[0]) {
                     this.abilities.push(this.allAbilities[0]);
                 }
