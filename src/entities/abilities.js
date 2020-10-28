@@ -19,7 +19,7 @@ const powerSwing = (entity) => {
         return false;
     }
     entity.target.hp -= Math.ceil(entity.dmg * 1.5);
-    knockbackTarget(entity, 50);
+    knockbackTarget(entity, 80);
     entity.target.setHpBars();
     setBorder(entity);
     if (entity.target.hp <= 0) {
@@ -38,7 +38,7 @@ const poisonDagger = (entity) => {
     let timer = 0;
     let int = setInterval(() => {
         timer++;
-        entity.target.hp -= 4
+        entity.target.hp -= Math.floor(Math.ceil(entity.dmg * 1.5) / 6);
         entity.target.setHpBars();
         setBorder(entity);
         if (entity.target.hp <= 0) {
@@ -61,9 +61,9 @@ const meteor = (entity) => {
     }
     const fireblastDiv = document.getElementById('fireblast-div');
     spellTrack(fireblastDiv, entity, entity.target, (entity, img) => {
-        console.log('entity: ', entity, " img: ", img);
+        // console.log('entity: ', entity, " img: ", img);
         img.style.display = 'none';
-        entity.target.hp -= 25;
+        entity.target.hp -= Math.ceil(entity.dmg * 1.5);
         entity.target.setHpBars();
         setBorder(entity);
         if (entity.target.hp <= 0) {
@@ -120,8 +120,8 @@ function knockbackTarget(entity, distance) {
     const yDown = distance * yRatio;
     entity.target.pos[0] += Math.floor(xRight);
     entity.target.pos[1] += Math.floor(yDown);
-    entity.target.style.left = entity.target.pos[0] + 'px';
-    entity.target.style.top = entity.target.pos[1] + 'px';
+    entity.target.container.style.left = entity.target.pos[0] + 'px';
+    entity.target.container.style.top = entity.target.pos[1] + 'px';
 }
 
 function createLineElement(x, y, length, angle, img) {
@@ -174,7 +174,7 @@ function spellTrack(img, entity, target, action) {
         const targetPos = target.pos.slice();
         targetPos[0] += targetImg.width/2; targetPos[1] += targetImg.height/2;
         if (imagesTouching(img, pos, targetImg, targetPos)) {
-            console.log('images touching');
+            // console.log('images touching');
             clearInterval(interval);
             action(entity, img);
         } else {
@@ -189,12 +189,12 @@ function spellTrack(img, entity, target, action) {
 function imagesTouching(img, pos, targetImg, targetPos) {
     if ((pos[0] < targetPos[0] && pos[0] + img.offsetWidth > targetPos[0]) ||
         (pos[0] < targetPos[0] + targetImg.width && pos[0] + img.offsetWidth > targetPos[0] + targetImg.width)) {
-        console.log('passed width check');
+        // console.log('passed width check');
         return true;
     }
     if ((pos[1] < targetPos[1] && pos[1] + img.offsetHeight  > targetPos[1]) ||
         (pos[1] < targetPos[1] + targetImg.height && pos[1] + img.offsetHeight  > targetPos[1] + targetImg.height)) {
-        console.log('height check passed');
+        // console.log('height check passed');
         return true;
     }
     return false;

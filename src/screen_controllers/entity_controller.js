@@ -291,7 +291,7 @@ function selectEnemy(entity) {
     if (!selectedChar || selectedChar.hp < 0) {
         selectedChar = null;
         return;
-    } else if ((selectedChar.target === entity && selectedChar.isAttacking) || entity.hp < 0) {
+    } else if ((selectedChar.target === entity && selectedChar.isAttacking) || (entity.hp && entity.hp < 0)) {
         deSelect();
         return;
     }
@@ -378,7 +378,7 @@ function initializeGameOpening() {
             selectedChar.img.style.border = 'none';
             currentAbilityBoxes.style.display = 'none';
             currentAbilityBoxes = null;
-            selectedChar.move([e.x, e.y]);
+            selectedChar.move([e.x, e.y], selectedChar.target);
             selectedChar = null;
         }
     })
@@ -442,6 +442,7 @@ function setInitialTargets(chars, enemies) {
             enemies[i].target = enemies[targetIndex];
         }
         // console.log(enemies[i].imgName, "has target set to", enemies[i].target);
+        // randomizeEnemySpawnLocation(enemies[i]);
     }
 }
 
@@ -456,6 +457,101 @@ function setAvailableAbilities(char) {
     }
 }
 
+function touchingVertically(pos, char, entity) {
+    return ((pos[1] < entity.pos[1] && pos[1] + char.container.offsetHeight > entity.pos[1]) ||
+        (pos[1] < entity.pos[1] + entity.container.offsetHeight && pos[1] + char.container.offsetHeight > entity.pos[1] + entity.container.offsetHeight))
+}
+
+function checkPosBox(pos, char, entity) {
+    if (pos[0] < entity.pos[0] && pos[0] + char.container.offsetWidth > entity.pos[0] && touchingVertically(pos, char, entity)) {
+        return true;
+    }
+    if (pos[0] < entity.pos[0] + entity.container.offsetWidth && pos[0] + char.container.offsetWidth > entity.pos[0] + entity.container.offsetWidth &&
+        touchingVertically(pos, char, entity)) {
+        return true;
+    }
+    return false;
+}
+
+function setRandomSpawn(enemy, checkPositions) {
+    // console.log(checkPositions);
+    let positionFound = false;
+    let position = [0, 0];
+    let p1;
+    let p2;
+    const container = document.getElementById('game-container');
+    const width = Math.floor(container.offsetWidth);
+    const height = Math.floor(container.offsetHeight);
+    while (!positionFound) {
+        positionFound = true;
+        p1 = Math.random() * 0.75; // from 0% to 90%
+        p2 = Math.random() * 0.8; // from 0% to 80%
+        // console.log(p);
+        position = [Math.floor(width * p2), Math.floor(height * p1)];
+        // console.log(position);
+        for (let i = 0; i < checkPositions.length; i++) {
+            if (checkPosBox(position, enemy, checkPositions[i])) {
+                positionFound = false;
+                break;
+            }
+        }
+    }
+    enemy.pos[0] = position[0];
+    enemy.pos[1] = position[1];
+    enemy.container.style.left = enemy.pos[0] + 'px';
+    enemy.container.style.top = enemy.pos[1] + 'px';
+}
+
+// function randomizeEnemySpawnLocation(char) {
+//     const container = document.getElementById('game-container');
+//     const width = Math.floor(container.offsetWidth);
+//     const height = Math.floor(container.offsetHeight);
+//     let p = Math.floor(Math.random() * 1.2 - 0.2); // from -20% to 100%
+//     const side = Math.floor(Math.random() * Math.floor(4));
+//     switch (side) {
+//         case 0:
+//             char.pos[1] = -210; // top
+//             char.pos[0] = Math.floor(p * width);
+//             if (char.range === 'infinite') {
+//                 moveInside(-210, null);
+//             }
+//             break;
+//         case 1:
+//             char.pos[0] = -160; // left
+//             char.pos[1] = Math.floor(p * height);
+//             if (char.range === 'infinite') {
+//                 moveInside(null, -160);
+//             }
+//             break;
+//         case 2:
+//             char.pos[1] = height + 210; // bottom
+//             char.pos[0] = Math.floor(p * width);
+//             if (char.range === 'infinite') {
+//                 moveInside(210, null);
+//             }
+//             break;
+//         case 3:
+//             char.pos[0] = width + 160; // right
+//             char.pos[1] = Math.floor(p * height);
+//             if (char.range === 'infinite') {
+//                 moveInside(null, 160);
+//             }
+//             break;
+//     }
+//     char.container.style.left = char.pos[0] + 'px';
+//     char.container.style.top = char.pos[1] + 'px';
+//     function moveInside(y, x) {
+//         if (x) {
+//             const randomY = Math.floor(Math.floor(Math.random() * 0.7 + 0.1) * height); // 90% cuz height == top
+//             char.move([char.pos[0] - x, randomY], char.target);
+//         } else {
+//             const randomX = Math.floor(Math.floor(Math.random() * 0.7 + 0.1) * width); // 90%
+//             char.move([randomX, char.pos[1] - y], char.target);
+//         }
+//     }
+// }
+
+let boxEntities = [];
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     document.getElementById('return-button').style.display = 'none';
     const deSelectButton = document.getElementById('test');
@@ -482,6 +578,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         charactersArr[i].container.style.left = charactersArr[i].pos[0] + 'px';
         charactersArr[i].container.style.opacity = 0;
         charactersArr[i].container.style.display = '';
+        boxEntities.push(charactersArr[i]);
         const hpBar = document.getElementById(`${charactersArr[i].imgName}-hp-bar`);
         hpBar.style.display = "flex";
         // charactersArr[i].hotkeyDisplay.innerHTML = charactersArr[i].hotkey;
@@ -502,9 +599,14 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
                 abilityNames[j].innerHTML = 'No Ability';
             }
         }
-        const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
+        // const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
+        charactersArr[i].container.addEventListener('click', allyClickEvents);
         charactersArr[i].img.src = charactersArr[i].baseImg.src;
-        fadeIn(charactersArr[i].container, actionEvent);
+        if (charactersArr[i].pos === null) {
+            setRandomSpawn(charactersArr[i], boxEntities.slice());
+        }
+        boxEntities.push(charactersArr[i]);
+        fadeIn(charactersArr[i].container);
         observerObserve(charactersArr[i]);
     }
     for (let i = 0; i < enemiesArr.length; i++) {
@@ -523,6 +625,10 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         hotkeys[hotkeyInput.value] = enemiesArr[i];
         enemiesArr[i].container.addEventListener('click', enemyClickEvents);
         enemiesArr[i].img.src = enemiesArr[i].baseImg.src;
+        if (enemiesArr[i].pos === null) {
+            setRandomSpawn(enemiesArr[i], boxEntities.slice());
+        }
+        boxEntities.push(enemiesArr[i]);
         const action = () => enemiesArr[i].autoAttack(enemiesArr[i].target);
         fadeIn(enemiesArr[i].container, action); // begin attacking target
         observerObserve(enemiesArr[i]);
@@ -539,6 +645,7 @@ function observerObserve(entity) {
 
 
 function endGame(charsList, enemyList) {
+    boxEntities = [];
     hotkeys = {};
     if (currentAbilityBoxes) {
         currentAbilityBoxes.style.display = 'none';
@@ -560,6 +667,7 @@ function endGame(charsList, enemyList) {
         if (allCharsList[i].currentAction) { clearInterval(allCharsList[i].currentAction); }
         if (allCharsList[i].currentAnimation) { clearInterval(allCharsList[i].currentAnimation); }
         allCharsList[i].isAttacking = false;
+        allCharsList[i].isMoving = false;
         allCharsList[i].target = null;
         allCharsList[i].container.removeEventListener('click', allyClickEvents);
         allCharsList[i].img.src = allCharsList[i].baseImg.src;
@@ -569,6 +677,7 @@ function endGame(charsList, enemyList) {
         if (allEnemyList[i].currentAction) { clearInterval(allEnemyList[i].currentAction); }
         if (allEnemyList[i].currentAnimation) { clearInterval(allEnemyList[i].currentAnimation); }
         allEnemyList[i].isAttacking = false;
+        allEnemyList[i].isMoving = false;
         allEnemyList[i].target = null;
         allEnemyList[i].container.removeEventListener('click', enemyClickEvents);
         allEnemyList[i].img.src = allEnemyList[i].baseImg.src;
@@ -595,9 +704,7 @@ function modEndPos() {
     const container = document.getElementById('game-container');
     const width = Math.floor(container.offsetWidth);
     const height = Math.floor(container.offsetHeight);
-    // console.log(width);
     const widthExtra = width - (160 * 4);
-    // console.log(widthExtra);
     return ([Math.floor(widthExtra / 4), Math.floor(height * 0.66), Math.floor(width/10)]);
 }
 

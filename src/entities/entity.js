@@ -49,6 +49,7 @@ class Entity { // this. is selectedChar
         this.currentAnimation;
         this.imgCycle = 0;
         this.isAttacking = false;
+        this.isMoving = false;
         this.extraAttackAnimation = extraAttackAnimation;
 
         this.target;
@@ -100,7 +101,7 @@ class Entity { // this. is selectedChar
         this.baseDMG += Math.ceil(this.trueBaseDMG * 0.1);
         this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
         switch (this.level) {
-            case (5):
+            case (2):
                 if (this.allAbilities[0]) {
                     this.abilities.push(this.allAbilities[0]);
                 }
@@ -147,6 +148,7 @@ class Entity { // this. is selectedChar
     move(endPos, attackOnFinish = false, addXPBar=false) {
         this.movingOutTheWay = true;
         this.clearIntervals();
+        this.isMoving = true;
         endPos[0] = Math.floor(endPos[0] - (this.img.width * (3/2)));
         endPos[1] = Math.floor(endPos[1] - (this.img.height * (3/4)));
         let pos = this.pos;
@@ -164,7 +166,7 @@ class Entity { // this. is selectedChar
         function frame(self) {
             if (posChange[2] === 0) {
             // close animation
-                clearInterval(self.currentAction);
+                self.clearIntervals();
                 self.movingOutTheWay = false;
                 pos[0] = Math.floor(pos[0]); pos[1] = Math.floor(pos[1]);
                 if (attackOnFinish) {
@@ -192,12 +194,12 @@ class Entity { // this. is selectedChar
         }
     }
 
-    withinAttackRange(target) {
+    withinAttackRange() {
         if (this.range === 'infinite') { return true; }
-        const widthAddition = Math.floor((this.img.width / 2) + (target.img.width / 2));
-        if (this.pos[0] > target.pos[0] - widthAddition - this.range && this.pos[0] < target.pos[0] + widthAddition + this.range) {
+        const widthAddition = Math.floor((this.img.width / 2) + (this.target.img.width / 2));
+        if (this.pos[0] > this.target.pos[0] - widthAddition - this.range && this.pos[0] < this.target.pos[0] + widthAddition + this.range) {
             const heightAddition = Math.floor(this.img.height / 4);
-            if (this.pos[1] > target.pos[1] - heightAddition && this.pos[1] < target.pos[1] + heightAddition) {
+            if (this.pos[1] > this.target.pos[1] - heightAddition && this.pos[1] < this.target.pos[1] + heightAddition) {
                 return true;
             }
         }
@@ -325,7 +327,7 @@ class Entity { // this. is selectedChar
         }, 20);
     }
 
-    beginAttack(targetChar) {
+    beginAttack() {
         // make some kind of animation start
         this.clearIntervals();
         this.isAttacking = true;
@@ -375,7 +377,15 @@ class Entity { // this. is selectedChar
             this.trackTarget();
             return;
         } else {
-            this.target.hp -= (this.dmg * 15 / this.target.defense);
+            if (this.dmg > 0) {
+                this.target.hp -= (this.dmg * 15 / this.target.defense);
+                if (!this.target.isMoving && !this.target.isAttacking && this.target.allied && this.target.dmg > 0) {
+                    this.target.target = this;
+                    this.target.autoAttack(this);
+                }
+            } else {
+                this.target.hp -= this.dmg;
+            }
             if (this.attackOverlay) {
                 this.setOverlay(this.target);
             }
@@ -383,7 +393,7 @@ class Entity { // this. is selectedChar
             if (!this.target.allied && this.allied && this.target.baseDMG > 0 && this.defense > this.target.target.defense) {
                 this.target.target = this;
                 this.target.clearIntervals();
-                this.target.autoAttack(this.target.target);
+                this.target.autoAttack(this);
             }
             this.target.setHpBars();
 
@@ -434,7 +444,7 @@ class Entity { // this. is selectedChar
             } else {
                 this.img.style.transform = "scaleX(-1)";
             }
-            this.beginAttack(targetChar);
+            this.beginAttack();
         } else {
             this.trackTarget();
         }
@@ -446,6 +456,7 @@ class Entity { // this. is selectedChar
         this.img.src = this.baseImg.src;
         this.imgCycle = 0;
         this.isAttacking = false;
+        this.isMoving = false;
     }
 
     useAbility(n) {

@@ -124,7 +124,7 @@ var powerSwing = function powerSwing(entity) {
   }
 
   entity.target.hp -= Math.ceil(entity.dmg * 1.5);
-  knockbackTarget(entity, 50);
+  knockbackTarget(entity, 80);
   entity.target.setHpBars();
   setBorder(entity);
 
@@ -147,7 +147,7 @@ var poisonDagger = function poisonDagger(entity) {
 
   var _int = setInterval(function () {
     timer++;
-    entity.target.hp -= 4;
+    entity.target.hp -= Math.floor(Math.ceil(entity.dmg * 1.5) / 6);
     entity.target.setHpBars();
     setBorder(entity);
 
@@ -174,9 +174,9 @@ var meteor = function meteor(entity) {
 
   var fireblastDiv = document.getElementById('fireblast-div');
   spellTrack(fireblastDiv, entity, entity.target, function (entity, img) {
-    console.log('entity: ', entity, " img: ", img);
+    // console.log('entity: ', entity, " img: ", img);
     img.style.display = 'none';
-    entity.target.hp -= 25;
+    entity.target.hp -= Math.ceil(entity.dmg * 1.5);
     entity.target.setHpBars();
     setBorder(entity);
 
@@ -239,8 +239,8 @@ function knockbackTarget(entity, distance) {
   var yDown = distance * yRatio;
   entity.target.pos[0] += Math.floor(xRight);
   entity.target.pos[1] += Math.floor(yDown);
-  entity.target.style.left = entity.target.pos[0] + 'px';
-  entity.target.style.top = entity.target.pos[1] + 'px';
+  entity.target.container.style.left = entity.target.pos[0] + 'px';
+  entity.target.container.style.top = entity.target.pos[1] + 'px';
 }
 
 function createLineElement(x, y, length, angle, img) {
@@ -289,7 +289,7 @@ function spellTrack(img, entity, target, action) {
     targetPos[1] += targetImg.height / 2;
 
     if (imagesTouching(img, pos, targetImg, targetPos)) {
-      console.log('images touching');
+      // console.log('images touching');
       clearInterval(interval);
       action(entity, img);
     } else {
@@ -304,12 +304,12 @@ function spellTrack(img, entity, target, action) {
 
 function imagesTouching(img, pos, targetImg, targetPos) {
   if (pos[0] < targetPos[0] && pos[0] + img.offsetWidth > targetPos[0] || pos[0] < targetPos[0] + targetImg.width && pos[0] + img.offsetWidth > targetPos[0] + targetImg.width) {
-    console.log('passed width check');
+    // console.log('passed width check');
     return true;
   }
 
   if (pos[1] < targetPos[1] && pos[1] + img.offsetHeight > targetPos[1] || pos[1] < targetPos[1] + targetImg.height && pos[1] + img.offsetHeight > targetPos[1] + targetImg.height) {
-    console.log('height check passed');
+    // console.log('height check passed');
     return true;
   }
 
@@ -455,24 +455,24 @@ var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 
 
 var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12, null, null, wizardAttackEffect); // heals
 
-var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -7, false, "e2", [1000, 300], 8);
-var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 60, 10, 2000, -8, false, "e2", [1000, 100], 8);
-var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -11, false, "e2", [1000, 100], 8);
-var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 70, 10, 1750, -11, false, "e4", [300, 400], 8); // fix
+var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 2000, -7, false, "e2", [1000, 300], 8);
+var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 2000, -8, false, "e2", [1000, 100], 8);
+var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1750, -11, false, "e2", [1000, 100], 8);
+var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1750, -11, false, "e4", [300, 400], 8); // fix
 
 var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -8, false, "e2", [1000, 100], 10); // mdps
 
-var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 6, false, "e4", [700, 200], 14);
-var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 8, false, "e4", [700, 200], 14);
-var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 8, false, "e4", [700, 200], 14);
-var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 60, 10, 1200, 8, false, "e2", [500, 500], 14);
+var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 80, 10, 1200, 6, false, "e4", [700, 200], 14);
+var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 80, 10, 1200, 8, false, "e4", [700, 200], 14);
+var rogue2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 80, 10, 1200, 8, false, "e4", [700, 200], 14);
+var rogue3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 80, 10, 1200, 8, false, "e2", [500, 500], 14);
 var ERogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 100, 10, 800, 10, false, "e4", [700, 200], 16); // tank
 
 var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 50, 10, 1000, 1, false, "e1", [650, 500], 20);
 var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 6, false, "e1", [650, 500], 20);
-var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e1", [300, 400], 20);
-var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e1", [300, 400], 20);
-var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 60, 10, 1000, 8, false, "e3", [1000, 100], 20); // fix
+var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 8, false, "e1", [300, 400], 20);
+var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 8, false, "e1", [300, 400], 20);
+var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 8, false, "e3", [1000, 100], 20); // fix
 
 var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 10, false, "e1", [300, 400], 20); // level 1
 
@@ -584,6 +584,7 @@ var Entity = /*#__PURE__*/function () {
     this.currentAnimation;
     this.imgCycle = 0;
     this.isAttacking = false;
+    this.isMoving = false;
     this.extraAttackAnimation = extraAttackAnimation;
     this.target;
     this.allies;
@@ -636,7 +637,7 @@ var Entity = /*#__PURE__*/function () {
       this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
 
       switch (this.level) {
-        case 5:
+        case 2:
           if (this.allAbilities[0]) {
             this.abilities.push(this.allAbilities[0]);
           }
@@ -702,6 +703,7 @@ var Entity = /*#__PURE__*/function () {
       var addXPBar = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       this.movingOutTheWay = true;
       this.clearIntervals();
+      this.isMoving = true;
       endPos[0] = Math.floor(endPos[0] - this.img.width * (3 / 2));
       endPos[1] = Math.floor(endPos[1] - this.img.height * (3 / 4));
       var pos = this.pos;
@@ -724,7 +726,7 @@ var Entity = /*#__PURE__*/function () {
       function frame(self) {
         if (posChange[2] === 0) {
           // close animation
-          clearInterval(self.currentAction);
+          self.clearIntervals();
           self.movingOutTheWay = false;
           pos[0] = Math.floor(pos[0]);
           pos[1] = Math.floor(pos[1]);
@@ -769,17 +771,17 @@ var Entity = /*#__PURE__*/function () {
     }
   }, {
     key: "withinAttackRange",
-    value: function withinAttackRange(target) {
+    value: function withinAttackRange() {
       if (this.range === 'infinite') {
         return true;
       }
 
-      var widthAddition = Math.floor(this.img.width / 2 + target.img.width / 2);
+      var widthAddition = Math.floor(this.img.width / 2 + this.target.img.width / 2);
 
-      if (this.pos[0] > target.pos[0] - widthAddition - this.range && this.pos[0] < target.pos[0] + widthAddition + this.range) {
+      if (this.pos[0] > this.target.pos[0] - widthAddition - this.range && this.pos[0] < this.target.pos[0] + widthAddition + this.range) {
         var heightAddition = Math.floor(this.img.height / 4);
 
-        if (this.pos[1] > target.pos[1] - heightAddition && this.pos[1] < target.pos[1] + heightAddition) {
+        if (this.pos[1] > this.target.pos[1] - heightAddition && this.pos[1] < this.target.pos[1] + heightAddition) {
           return true;
         }
       }
@@ -955,7 +957,7 @@ var Entity = /*#__PURE__*/function () {
     }
   }, {
     key: "beginAttack",
-    value: function beginAttack(targetChar) {
+    value: function beginAttack() {
       var _this4 = this;
 
       // make some kind of animation start
@@ -1020,7 +1022,16 @@ var Entity = /*#__PURE__*/function () {
         this.trackTarget();
         return;
       } else {
-        this.target.hp -= this.dmg * 15 / this.target.defense;
+        if (this.dmg > 0) {
+          this.target.hp -= this.dmg * 15 / this.target.defense;
+
+          if (!this.target.isMoving && !this.target.isAttacking && this.target.allied && this.target.dmg > 0) {
+            this.target.target = this;
+            this.target.autoAttack(this);
+          }
+        } else {
+          this.target.hp -= this.dmg;
+        }
 
         if (this.attackOverlay) {
           this.setOverlay(this.target);
@@ -1033,7 +1044,7 @@ var Entity = /*#__PURE__*/function () {
         if (!this.target.allied && this.allied && this.target.baseDMG > 0 && this.defense > this.target.target.defense) {
           this.target.target = this;
           this.target.clearIntervals();
-          this.target.autoAttack(this.target.target);
+          this.target.autoAttack(this);
         }
 
         this.target.setHpBars();
@@ -1097,7 +1108,7 @@ var Entity = /*#__PURE__*/function () {
           this.img.style.transform = "scaleX(-1)";
         }
 
-        this.beginAttack(targetChar);
+        this.beginAttack();
       } else {
         this.trackTarget();
       }
@@ -1110,6 +1121,7 @@ var Entity = /*#__PURE__*/function () {
       this.img.src = this.baseImg.src;
       this.imgCycle = 0;
       this.isAttacking = false;
+      this.isMoving = false;
     }
   }, {
     key: "useAbility",
@@ -1917,7 +1929,7 @@ function selectEnemy(entity) {
   if (!selectedChar || selectedChar.hp < 0) {
     selectedChar = null;
     return;
-  } else if (selectedChar.target === entity && selectedChar.isAttacking || entity.hp < 0) {
+  } else if (selectedChar.target === entity && selectedChar.isAttacking || entity.hp && entity.hp < 0) {
     deSelect();
     return;
   }
@@ -2015,7 +2027,7 @@ function initializeGameOpening() {
       selectedChar.img.style.border = 'none';
       currentAbilityBoxes.style.display = 'none';
       currentAbilityBoxes = null;
-      selectedChar.move([e.x, e.y]);
+      selectedChar.move([e.x, e.y], selectedChar.target);
       selectedChar = null;
     }
   });
@@ -2085,6 +2097,7 @@ function setInitialTargets(chars, enemies) {
 
       enemies[i].target = enemies[_targetIndex];
     } // console.log(enemies[i].imgName, "has target set to", enemies[i].target);
+    // randomizeEnemySpawnLocation(enemies[i]);
 
   }
 }
@@ -2100,6 +2113,105 @@ function setAvailableAbilities(_char4) {
     }
   }
 }
+
+function touchingVertically(pos, _char5, entity) {
+  return pos[1] < entity.pos[1] && pos[1] + _char5.container.offsetHeight > entity.pos[1] || pos[1] < entity.pos[1] + entity.container.offsetHeight && pos[1] + _char5.container.offsetHeight > entity.pos[1] + entity.container.offsetHeight;
+}
+
+function checkPosBox(pos, _char6, entity) {
+  if (pos[0] < entity.pos[0] && pos[0] + _char6.container.offsetWidth > entity.pos[0] && touchingVertically(pos, _char6, entity)) {
+    return true;
+  }
+
+  if (pos[0] < entity.pos[0] + entity.container.offsetWidth && pos[0] + _char6.container.offsetWidth > entity.pos[0] + entity.container.offsetWidth && touchingVertically(pos, _char6, entity)) {
+    return true;
+  }
+
+  return false;
+}
+
+function setRandomSpawn(enemy, checkPositions) {
+  // console.log(checkPositions);
+  var positionFound = false;
+  var position = [0, 0];
+  var p1;
+  var p2;
+  var container = document.getElementById('game-container');
+  var width = Math.floor(container.offsetWidth);
+  var height = Math.floor(container.offsetHeight);
+
+  while (!positionFound) {
+    positionFound = true;
+    p1 = Math.random() * 0.75; // from 0% to 90%
+
+    p2 = Math.random() * 0.8; // from 0% to 80%
+    // console.log(p);
+
+    position = [Math.floor(width * p2), Math.floor(height * p1)]; // console.log(position);
+
+    for (var i = 0; i < checkPositions.length; i++) {
+      if (checkPosBox(position, enemy, checkPositions[i])) {
+        positionFound = false;
+        break;
+      }
+    }
+  }
+
+  enemy.pos[0] = position[0];
+  enemy.pos[1] = position[1];
+  enemy.container.style.left = enemy.pos[0] + 'px';
+  enemy.container.style.top = enemy.pos[1] + 'px';
+} // function randomizeEnemySpawnLocation(char) {
+//     const container = document.getElementById('game-container');
+//     const width = Math.floor(container.offsetWidth);
+//     const height = Math.floor(container.offsetHeight);
+//     let p = Math.floor(Math.random() * 1.2 - 0.2); // from -20% to 100%
+//     const side = Math.floor(Math.random() * Math.floor(4));
+//     switch (side) {
+//         case 0:
+//             char.pos[1] = -210; // top
+//             char.pos[0] = Math.floor(p * width);
+//             if (char.range === 'infinite') {
+//                 moveInside(-210, null);
+//             }
+//             break;
+//         case 1:
+//             char.pos[0] = -160; // left
+//             char.pos[1] = Math.floor(p * height);
+//             if (char.range === 'infinite') {
+//                 moveInside(null, -160);
+//             }
+//             break;
+//         case 2:
+//             char.pos[1] = height + 210; // bottom
+//             char.pos[0] = Math.floor(p * width);
+//             if (char.range === 'infinite') {
+//                 moveInside(210, null);
+//             }
+//             break;
+//         case 3:
+//             char.pos[0] = width + 160; // right
+//             char.pos[1] = Math.floor(p * height);
+//             if (char.range === 'infinite') {
+//                 moveInside(null, 160);
+//             }
+//             break;
+//     }
+//     char.container.style.left = char.pos[0] + 'px';
+//     char.container.style.top = char.pos[1] + 'px';
+//     function moveInside(y, x) {
+//         if (x) {
+//             const randomY = Math.floor(Math.floor(Math.random() * 0.7 + 0.1) * height); // 90% cuz height == top
+//             char.move([char.pos[0] - x, randomY], char.target);
+//         } else {
+//             const randomX = Math.floor(Math.floor(Math.random() * 0.7 + 0.1) * width); // 90%
+//             char.move([randomX, char.pos[1] - y], char.target);
+//         }
+//     }
+// }
+
+
+var boxEntities = [];
 
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   document.getElementById('return-button').style.display = 'none';
@@ -2121,7 +2233,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   backgroundImg.style.display = '';
   Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(backgroundImg);
 
-  var _loop4 = function _loop4(i) {
+  for (var i = 0; i < charactersArr.length; i++) {
     if (!charactersArr[i].observer) {
       addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
     }
@@ -2131,6 +2243,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     charactersArr[i].container.style.left = charactersArr[i].pos[0] + 'px';
     charactersArr[i].container.style.opacity = 0;
     charactersArr[i].container.style.display = '';
+    boxEntities.push(charactersArr[i]);
     var hpBar = document.getElementById("".concat(charactersArr[i].imgName, "-hp-bar"));
     hpBar.style.display = "flex"; // charactersArr[i].hotkeyDisplay.innerHTML = charactersArr[i].hotkey;
     // hotkeys[charactersArr[i].hotkey] = charactersArr[i];
@@ -2151,22 +2264,22 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
       } else {
         abilityNames[j].innerHTML = 'No Ability';
       }
+    } // const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
+
+
+    charactersArr[i].container.addEventListener('click', allyClickEvents);
+    charactersArr[i].img.src = charactersArr[i].baseImg.src;
+
+    if (charactersArr[i].pos === null) {
+      setRandomSpawn(charactersArr[i], boxEntities.slice());
     }
 
-    var actionEvent = function actionEvent() {
-      charactersArr[i].container.addEventListener('click', allyClickEvents);
-    };
-
-    charactersArr[i].img.src = charactersArr[i].baseImg.src;
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[i].container, actionEvent);
+    boxEntities.push(charactersArr[i]);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[i].container);
     observerObserve(charactersArr[i]);
-  };
-
-  for (var i = 0; i < charactersArr.length; i++) {
-    _loop4(i);
   }
 
-  var _loop5 = function _loop5(_i4) {
+  var _loop4 = function _loop4(_i4) {
     if (!enemiesArr[_i4].observer) {
       addEntityEvents(enemiesArr[_i4], enemiesArr, charactersArr);
     }
@@ -2186,6 +2299,12 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
 
     enemiesArr[_i4].img.src = enemiesArr[_i4].baseImg.src;
 
+    if (enemiesArr[_i4].pos === null) {
+      setRandomSpawn(enemiesArr[_i4], boxEntities.slice());
+    }
+
+    boxEntities.push(enemiesArr[_i4]);
+
     var action = function action() {
       return enemiesArr[_i4].autoAttack(enemiesArr[_i4].target);
     };
@@ -2196,7 +2315,7 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   };
 
   for (var _i4 = 0; _i4 < enemiesArr.length; _i4++) {
-    _loop5(_i4);
+    _loop4(_i4);
   } // console.log("hotkeys: ", hotkeys);
 
 }
@@ -2210,6 +2329,7 @@ function observerObserve(entity) {
 }
 
 function endGame(charsList, enemyList) {
+  boxEntities = [];
   hotkeys = {};
 
   if (currentAbilityBoxes) {
@@ -2243,6 +2363,7 @@ function endGame(charsList, enemyList) {
     }
 
     allCharsList[_i5].isAttacking = false;
+    allCharsList[_i5].isMoving = false;
     allCharsList[_i5].target = null;
 
     allCharsList[_i5].container.removeEventListener('click', allyClickEvents);
@@ -2262,6 +2383,7 @@ function endGame(charsList, enemyList) {
     }
 
     allEnemyList[_i6].isAttacking = false;
+    allEnemyList[_i6].isMoving = false;
     allEnemyList[_i6].target = null;
 
     allEnemyList[_i6].container.removeEventListener('click', enemyClickEvents);
@@ -2283,10 +2405,10 @@ function endGame(charsList, enemyList) {
   }
 }
 
-function xpObserverObserve(_char5) {
-  _char5.observationToken = true;
+function xpObserverObserve(_char7) {
+  _char7.observationToken = true;
 
-  _char5.xpObserver.observe(_char5.img, {
+  _char7.xpObserver.observe(_char7.img, {
     attributes: true,
     attributeFilter: ['style']
   });
@@ -2295,10 +2417,8 @@ function xpObserverObserve(_char5) {
 function modEndPos() {
   var container = document.getElementById('game-container');
   var width = Math.floor(container.offsetWidth);
-  var height = Math.floor(container.offsetHeight); // console.log(width);
-
-  var widthExtra = width - 160 * 4; // console.log(widthExtra);
-
+  var height = Math.floor(container.offsetHeight);
+  var widthExtra = width - 160 * 4;
   return [Math.floor(widthExtra / 4), Math.floor(height * 0.66), Math.floor(width / 10)];
 }
 
