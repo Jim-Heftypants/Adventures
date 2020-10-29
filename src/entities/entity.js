@@ -1,6 +1,6 @@
 class Entity { // this. is selectedChar
     constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0,
-                 abilities=[], abilityNames=[], extraAttackAnimation=null) {
+            hasAttackOverlay = null, extraAttackAnimation = null, abilities = [], abilityNames = []) {
         this.klass = klass;
         this.range = range;
         this.trueBaseHp = baseHP;
@@ -26,7 +26,7 @@ class Entity { // this. is selectedChar
         }
 
         this.allAbilities = abilities;
-        this.abilities = [];
+        // this.abilities = abilities; // change on pushed ver
         this.abilityNames = abilityNames;
         this.abilityAvailable = [true, true, true, true];
         this.abilityShouldCast = [false, false, false, false];
@@ -43,7 +43,8 @@ class Entity { // this. is selectedChar
         this.container;
         this.hpContainerLeft;
         this.hpContainerRight;
-        this.attackOverlay;
+
+        this.attackOverlay = hasAttackOverlay;
 
         this.currentAction;
         this.currentAnimation;
@@ -83,7 +84,9 @@ class Entity { // this. is selectedChar
         this.hotkey = document.getElementById(this.imgName + '-keybind').value;
         this.hpContainerLeft = document.getElementById(this.imgName + '-hp-left');
         this.hpContainerRight = document.getElementById(this.imgName + '-hp-right');
-        this.attackOverlay = document.getElementById(this.imgName + '-effect-overlay');
+        if (this.attackOverlay) {
+            this.attackOverlay = [document.getElementById(this.imgName + '-effect-overlay'), this.attackOverlay];
+        }
         if (this.allied) {
             this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
         }
@@ -101,7 +104,7 @@ class Entity { // this. is selectedChar
         this.baseDMG += Math.ceil(this.trueBaseDMG * 0.1);
         this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
         switch (this.level) {
-            case (2):
+            case (5):
                 if (this.allAbilities[0]) {
                     this.abilities.push(this.allAbilities[0]);
                 }
@@ -208,10 +211,16 @@ class Entity { // this. is selectedChar
 
     killEntitiy(entity) {
         // console.log(entity.klass, "killed");
-        clearInterval(entity.currentAction);
-        clearInterval(entity.currentAnimation);
-        entity.img.src = entity.baseImg.src;
+        entity.clearIntervals();
         if (entity.abilityContainer) { entity.abilityContainer.style.display = 'none'; }
+        if (this.allied && this.baseDMG > 0) {
+            for (let i = 0; i < this.allies.length; i++) {
+                if (this.allies[i].target === entity) {
+                    this.allies[i].clearIntervals();
+                    this.allies[i].target = null;
+                }
+            }
+        }
         entity.hp = -100;
         entity.container.style.display = "none";
     }
@@ -266,9 +275,8 @@ class Entity { // this. is selectedChar
     }
 
     trackTarget() { // hot code
-        clearInterval(this.currentAction);
-        clearInterval(this.currentAnimation);
-        this.img.src = this.baseImg.src;
+        this.clearIntervals();
+        this.isMoving = true;
         const bigDiv = document.getElementById('game-container');
         const difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
         const checker = difference + Math.floor(bigDiv.offsetWidth);
@@ -308,21 +316,21 @@ class Entity { // this. is selectedChar
     }
 
     setOverlay(targetChar) {
-        this.attackOverlay.style.top = (targetChar.pos[1] + 40) + 'px';
-        this.attackOverlay.style.left = targetChar.pos[0] + 'px';
-        this.attackOverlay.style.width = targetChar.img.width + 'px';
-        this.attackOverlay.style.height = targetChar.img.height + 'px';
-        this.attackOverlay.style.display = '';
+        this.attackOverlay[0].style.top = (targetChar.pos[1] + 40) + 'px';
+        this.attackOverlay[0].style.left = targetChar.pos[0] + 'px';
+        this.attackOverlay[0].style.width = targetChar.img.width + 'px';
+        this.attackOverlay[0].style.height = targetChar.img.height + 'px';
+        this.attackOverlay[0].style.display = '';
         const selectedChar = this;
         const clearTime = Math.floor(this.as / 2);
         let timeCheck = 0;
         let stackInterval = setInterval(() => {
-            selectedChar.attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
-            selectedChar.attackOverlay.style.left = targetChar.pos[0] + 'px';
+            selectedChar.attackOverlay[0].style.top = targetChar.pos[1] + 40 + 'px';
+            selectedChar.attackOverlay[0].style.left = targetChar.pos[0] + 'px';
             timeCheck += 20;
             if (timeCheck >= clearTime || targetChar.img.style.display === 'none') {
                 clearInterval(stackInterval);
-                selectedChar.attackOverlay.style.display = 'none';
+                selectedChar.attackOverlay[0].style.display = 'none';
             }
         }, 20);
     }
@@ -358,7 +366,7 @@ class Entity { // this. is selectedChar
                 }
                 this.attack();
             }
-            this.imgCycle = this.imgCycle % 4;
+            this.imgCycle = this.imgCycle % this.attackImages.length;
             this.img.src = this.attackImages[this.imgCycle].src;
         }
     }
@@ -387,7 +395,11 @@ class Entity { // this. is selectedChar
                 this.target.hp -= this.dmg;
             }
             if (this.attackOverlay) {
-                this.setOverlay(this.target);
+                if (this.attackOverlay[1] === 1) {
+                    this.setOverlay(this);
+                } else {
+                    this.setOverlay(this.target);
+                }
             }
             if (this.target.hp > this.target.baseHP) { this.target.hp = this.target.baseHP; }
             if (!this.target.allied && this.allied && this.target.baseDMG > 0 && this.defense > this.target.target.defense) {
@@ -398,8 +410,6 @@ class Entity { // this. is selectedChar
             this.target.setHpBars();
 
             if (this.target.hp <= 0) {
-                this.clearIntervals();
-                // console.log(this.target, ' hp ', this.target.hp);
                 this.killEntitiy(this.target);
                 if (!this.allied) {
                     // chose another hero to attack

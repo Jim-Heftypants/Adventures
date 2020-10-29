@@ -6,7 +6,7 @@ let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
-let maxLevelNumber = 7;
+let maxLevelNumber = 0; // change on pushed ver
 let characters = levels[maxLevelNumber].characterList;
 
 let selectedChar;
@@ -378,7 +378,11 @@ function initializeGameOpening() {
             selectedChar.img.style.border = 'none';
             currentAbilityBoxes.style.display = 'none';
             currentAbilityBoxes = null;
-            selectedChar.move([e.x, e.y], selectedChar.target);
+            if (selectedChar.range === 'infinite') {
+                selectedChar.move([e.x, e.y], selectedChar.target);
+            } else {
+                selectedChar.move([e.x, e.y]);
+            }
             selectedChar = null;
         }
     })
@@ -817,6 +821,7 @@ function resetGame(won) {
         levEnems[i].pos[0] = levEnems[i].basePos[0]; levEnems[i].pos[1] = levEnems[i].basePos[1];
         levEnems[i].container.style.top = levEnems[i].pos[1] + 'px';
         levEnems[i].container.style.left = levEnems[i].pos[0] + 'px';
+        levEnems[i].img.style.border = 'none';
         levEnems[i].setHpBars();
     }
 }

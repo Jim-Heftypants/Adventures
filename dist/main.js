@@ -100,7 +100,7 @@ __webpack_require__.r(__webpack_exports__);
 var groupHeal = function groupHeal(entity) {
   for (var i = 0; i < entity.allies.length; i++) {
     if (entity.allies[i].hp > 0) {
-      entity.allies[i].hp += entity.dmg * 2;
+      entity.allies[i].hp -= entity.dmg * 2;
 
       if (entity.allies[i].hp > 100) {
         entity.allies[i].hp = 100;
@@ -176,13 +176,7 @@ var meteor = function meteor(entity) {
   spellTrack(fireblastDiv, entity, entity.target, function (entity, img) {
     // console.log('entity: ', entity, " img: ", img);
     img.style.display = 'none';
-    entity.target.hp -= Math.ceil(entity.dmg * 1.5);
-    entity.target.setHpBars();
-    setBorder(entity);
-
-    if (entity.target.hp <= 0) {
-      entity.killEntitiy(entity.target);
-    }
+    causeAoEEffect(entity, 300, 300);
   });
   return 10;
 };
@@ -214,17 +208,18 @@ var rogueAbilities = [poisonDagger];
 var allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
 
 var lightningAutoAttack = function lightningAutoAttack(entity) {
-  var effectDiv = document.getElementById(entity.imgName + '-extra-effect');
+  // const effectDiv = document.getElementById(entity.imgName + '-extra-effect');
   var pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
-  drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width / 2, entity.target.pos[1] + entity.target.img.height / 2, effectDiv);
 
-  if (effectDiv) {
-    effectDiv.style.display = '';
-    var maxTime = Math.floor(entity.as / 8);
-    setTimeout(function () {
-      effectDiv.style.display = 'none';
-    }, maxTime);
+  if (entity.img.style.transform === "scaleX(-1)") {
+    pos[0] -= 60;
   }
+
+  var div = drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width / 2, entity.target.pos[1] + entity.target.img.height / 2);
+  var maxTime = Math.floor(entity.as / 8);
+  setTimeout(function () {
+    div.remove();
+  }, maxTime);
 };
 
 var specialAttackEffects = [lightningAutoAttack];
@@ -243,15 +238,67 @@ function knockbackTarget(entity, distance) {
   entity.target.container.style.top = entity.target.pos[1] + 'px';
 }
 
-function createLineElement(x, y, length, angle, img) {
-  var styles = 'width: ' + length + 'px; ' + 'height: 0px; ' + '-moz-transform: rotate(' + angle + 'rad); ' + '-webkit-transform: rotate(' + angle + 'rad); ' + '-o-transform: rotate(' + angle + 'rad); ' + '-ms-transform: rotate(' + angle + 'rad); ' + 'position: absolute; ' + 'top: ' + y + 'px; ' + 'left: ' + x + 'px; ';
+function causeAoEEffect(entity, width, height) {
+  var targetCenter = [entity.target.pos[0] + Math.floor(entity.target.img.width / 2), entity.target.pos[1] + Math.floor(entity.target.img.height / 2)];
+  var topLeft1 = [targetCenter[0] - Math.floor(width / 2), targetCenter[1] - Math.floor(height / 2)];
+  var div = document.createElement("div");
+  var leftSetback = (width - entity.target.container.offsetWidth) / 2;
+  var topSetback = (height - entity.target.container.offsetHeight) / 2;
+  div.style.position = "absolute";
+  div.style.left = entity.target.pos[0] - leftSetback + 'px';
+  div.style.top = entity.target.pos[1] - topSetback + 'px';
+  div.style.width = width + "px";
+  div.style.height = height + "px";
+  div.style.background = "red";
+  div.style.zIndex = "8";
+  document.getElementById("game-container").appendChild(div);
+  setTimeout(function () {
+    div.remove();
+  }, 750);
 
-  if (img) {
-    img.setAttribute('style', styles);
+  for (var i = 0; i < entity.enemies.length; i++) {
+    if (entity.enemies[i].container.style.display !== 'none') {
+      if (imagesTouching(topLeft1, [width, height], entity.enemies[i].pos, [entity.enemies[i].img.width, entity.enemies[i].img.height])) {
+        entity.enemies[i].hp -= Math.ceil(entity.dmg * 1.5);
+        entity.enemies[i].setHpBars();
+        setBorder(entity.enemies[i]);
+
+        if (entity.enemies[i].hp <= 0) {
+          entity.killEntitiy(entity.enemies[i]);
+        }
+      }
+    }
   }
 }
 
-function drawLine(x1, y1, x2, y2, img) {
+function imageInside(topLeft1, sizes1, topLeft2, sizes2) {
+  return topLeft1[0] > topLeft2[0] && topLeft1[0] + sizes1[0] < topLeft2[0] + sizes2[0] && topLeft1[1] > topLeft2[1] && topLeft1[1] + sizes1[1] < topLeft2[1] + sizes2[1];
+}
+
+function imagesTochingSide(topLeft1, sizes1, topLeft2, sizes2, i) {
+  return topLeft1[i] < topLeft2[i] && topLeft1[i] + sizes1[i] > topLeft2[i] || topLeft1[i] < topLeft2[i] + sizes2[i] && topLeft1[i] + sizes1[i] > topLeft2[i] + sizes2[i];
+}
+
+function imagesTouching(topLeft1, sizes1, topLeft2, sizes2) {
+  for (var i = 0; i < 2; i++) {
+    if (!imagesTochingSide(topLeft1, sizes1, topLeft2, sizes2, i)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function createLineElement(x, y, length, angle) {
+  var styles = 'width: ' + length + 'px; ' + 'height: 0px; ' + '-moz-transform: rotate(' + angle + 'rad); ' + '-webkit-transform: rotate(' + angle + 'rad); ' + '-o-transform: rotate(' + angle + 'rad); ' + '-ms-transform: rotate(' + angle + 'rad); ' + 'position: absolute; ' + 'top: ' + y + 'px; ' + 'left: ' + x + 'px; ' + 'border: 2px solid purple; ';
+  var div = document.createElement("div");
+  div.setAttribute('style', styles);
+  div.classList.add("extra-attack-effect");
+  document.getElementById("game-container").appendChild(div);
+  return div;
+}
+
+function drawLine(x1, y1, x2, y2) {
   var a = x1 - x2,
       b = y1 - y2,
       c = Math.sqrt(a * a + b * b);
@@ -260,16 +307,16 @@ function drawLine(x1, y1, x2, y2, img) {
   var x = sx - c / 2,
       y = sy;
   var alpha = Math.PI - Math.atan2(-b, a);
-  createLineElement(x, y, c, alpha, img);
+  return createLineElement(x, y, c, alpha);
 }
 
 function spellTrack(img, entity, target, action) {
-  // console.log('img: ', img, ' entity: ', entity, ' target: ', target, ' action: ', action);
-  var pos = entity.pos.slice();
-  pos[0] += entity.img.width / 2;
-  pos[1] += entity.img.height / 2;
-  img.style.top = Math.floor(pos[1]) + 'px';
-  img.style.left = Math.floor(pos[0]) + 'px';
+  // console.log('img: ', img, ' entity: ', entity, ' target: ', target);
+  var changedPos = entity.pos.slice();
+  changedPos[0] += entity.img.width / 2;
+  changedPos[1] += entity.img.height / 2;
+  img.style.top = Math.floor(changedPos[1]) + 'px';
+  img.style.left = Math.floor(changedPos[0]) + 'px';
   img.style.display = '';
   var targetImg = target.img;
   var interval = setInterval(function () {
@@ -284,36 +331,25 @@ function spellTrack(img, entity, target, action) {
       return;
     }
 
-    var targetPos = target.pos.slice();
-    targetPos[0] += targetImg.width / 2;
-    targetPos[1] += targetImg.height / 2;
+    var left = parseInt(img.style.left.replace('px', ''), 10);
+    var top = parseInt(img.style.top.replace('px', ''), 10);
 
-    if (imagesTouching(img, pos, targetImg, targetPos)) {
+    if (imageInside([left, top], [img.offsetWidth, img.offsetHeight], target.pos, [targetImg.width, targetImg.height])) {
       // console.log('images touching');
       clearInterval(interval);
+      img.style.display = 'none';
       action(entity, img);
     } else {
-      var posChange = vectorToScalar(pos, targetPos);
-      pos[0] += posChange[0];
-      pos[1] += posChange[1];
-      img.style.top = Math.floor(pos[1]) + 'px';
-      img.style.left = Math.floor(pos[0]) + 'px';
+      var targetPos = target.pos.slice();
+      targetPos[0] += targetImg.width / 2;
+      targetPos[1] += targetImg.height / 2;
+      var posChange = vectorToScalar(changedPos, targetPos);
+      changedPos[0] += posChange[0];
+      changedPos[1] += posChange[1];
+      img.style.top = Math.floor(changedPos[1]) + 'px';
+      img.style.left = Math.floor(changedPos[0]) + 'px';
     }
   }
-}
-
-function imagesTouching(img, pos, targetImg, targetPos) {
-  if (pos[0] < targetPos[0] && pos[0] + img.offsetWidth > targetPos[0] || pos[0] < targetPos[0] + targetImg.width && pos[0] + img.offsetWidth > targetPos[0] + targetImg.width) {
-    // console.log('passed width check');
-    return true;
-  }
-
-  if (pos[1] < targetPos[1] && pos[1] + img.offsetHeight > targetPos[1] || pos[1] < targetPos[1] + targetImg.height && pos[1] + img.offsetHeight > targetPos[1] + targetImg.height) {
-    // console.log('height check passed');
-    return true;
-  }
-
-  return false;
 }
 
 function vectorToScalar(pos, endPos) {
@@ -366,9 +402,9 @@ var warriorAbilities = charAbilities[0];
 var clericAbilities = charAbilities[1];
 var wizardAbilities = charAbilities[2];
 var rogueAbilities = charAbilities[3];
-var waAbNames = ['Heroic Strike'];
+var waAbNames = ['Concussive Blow'];
 var cAbNames = ['Prayer of Healing'];
-var wiAbNames = ['Fire Blast'];
+var wiAbNames = ['Fire Bomb'];
 var rAbNames = ['Poison Shiv'];
 var specialAttackEffects = abilityList[1];
 var wizardAttackEffect = specialAttackEffects[0];
@@ -383,25 +419,20 @@ true
 imgName
 pos
 defense
+hasOverlay? 1=self 2=target
+specialEffect
 ab
 abNames
-specialEffect
 */
-// tutorials
+// tank
 
-var tutorialWarrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 8, true, "a1", [450, 500], 20, warriorAbilities, waAbNames);
-var tutorialCleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [200, 300], 10, clericAbilities, cAbNames);
-var tutorialWizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [200, 600], 12, wizardAbilities, wiAbNames, wizardAttackEffect);
-var tutorialRogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 8, true, "a4", [900, 200], 16, rogueAbilities, rAbNames); // tank
+var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, null, null, warriorAbilities, waAbNames); // heals
 
-var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, warriorAbilities, waAbNames); // heals
+var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 12, 2, null, clericAbilities, cAbNames); // rdps
 
-var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 10, clericAbilities, cAbNames); // rdps
+var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 14, null, wizardAttackEffect, wizardAbilities, wiAbNames); // mdps
 
-var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames, wizardAttackEffect); // mdps
-
-var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, rogueAbilities, rAbNames); // export const tutorialChars = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue];
-
+var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, null, null, rogueAbilities, rAbNames);
 var charactersArr = [Warrior, Cleric, Wizard, Rogue];
 /* harmony default export */ __webpack_exports__["default"] = (charactersArr);
 
@@ -448,19 +479,18 @@ specialEffect
 */
 // rdps
 
-var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8, null, null, wizardAttackEffect);
-var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8, null, null, wizardAttackEffect);
-var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 8, null, null, wizardAttackEffect);
-var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 8, null, null, wizardAttackEffect); // fix
+var tutorialWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 7, false, 'e3', [1000, 600], 8, null, wizardAttackEffect);
+var ghettoWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 60, 10, 1500, 12, false, 'e3', [500, 500], 8, null, wizardAttackEffect);
+var wizard2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e3', [500, 500], 14, null, wizardAttackEffect);
+var wizard3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 70, 10, 1500, 13, false, 'e1', [700, 200], 14, null, wizardAttackEffect); // fix
 
-var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 12, null, null, wizardAttackEffect); // heals
+var EWizard = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWizard', 'infinite', 100, 10, 2000, 20, false, "e3", [500, 500], 14, null, wizardAttackEffect); // heals
 
-var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 2000, -7, false, "e2", [1000, 300], 8);
-var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 2000, -8, false, "e2", [1000, 100], 8);
-var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1750, -11, false, "e2", [1000, 100], 8);
-var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1750, -11, false, "e4", [300, 400], 8); // fix
-
-var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -8, false, "e2", [1000, 100], 10); // mdps
+var tutorialCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 2000, -7, false, "e2", [1000, 300], 8, 2);
+var dumbCleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 2000, -8, false, "e2", [1000, 100], 8, 2);
+var cleric2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1750, -11, false, "e2", [1000, 100], 12, 2);
+var cleric3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1750, -11, false, "e4", [300, 400], 12, 2);
+var ECleric = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('ECleric', 'infinite', 100, 10, 1500, -8, false, "e2", [1000, 100], 12, 2); // mdps
 
 var tutorialRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 80, 10, 1200, 6, false, "e4", [700, 200], 14);
 var loserRogue = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]("ERogue", 10, 80, 10, 1200, 8, false, "e4", [700, 200], 14);
@@ -472,8 +502,7 @@ var punchingBag = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarri
 var tutorialWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 6, false, "e1", [650, 500], 20);
 var weakWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 8, false, "e1", [300, 400], 20);
 var warrior2 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 8, false, "e1", [300, 400], 20);
-var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 8, false, "e3", [1000, 100], 20); // fix
-
+var warrior3 = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 80, 10, 1000, 8, false, "e3", [1000, 100], 20);
 var EWarrior = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["default"]('EWarrior', 10, 120, 10, 1000, 10, false, "e1", [300, 400], 20); // level 1
 
 var intro = [punchingBag]; // level 2
@@ -524,9 +553,10 @@ var Entity = /*#__PURE__*/function () {
     var img = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : "";
     var pos = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : [0, 0];
     var defense = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0;
-    var abilities = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : [];
-    var abilityNames = arguments.length > 11 && arguments[11] !== undefined ? arguments[11] : [];
-    var extraAttackAnimation = arguments.length > 12 && arguments[12] !== undefined ? arguments[12] : null;
+    var hasAttackOverlay = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : null;
+    var extraAttackAnimation = arguments.length > 11 && arguments[11] !== undefined ? arguments[11] : null;
+    var abilities = arguments.length > 12 && arguments[12] !== undefined ? arguments[12] : [];
+    var abilityNames = arguments.length > 13 && arguments[13] !== undefined ? arguments[13] : [];
 
     _classCallCheck(this, Entity);
 
@@ -559,8 +589,8 @@ var Entity = /*#__PURE__*/function () {
       this.nextLevelXP = 100;
     }
 
-    this.allAbilities = abilities;
-    this.abilities = [];
+    this.allAbilities = abilities; // this.abilities = abilities; // change on pushed ver
+
     this.abilityNames = abilityNames;
     this.abilityAvailable = [true, true, true, true];
     this.abilityShouldCast = [false, false, false, false];
@@ -579,7 +609,7 @@ var Entity = /*#__PURE__*/function () {
     this.container;
     this.hpContainerLeft;
     this.hpContainerRight;
-    this.attackOverlay;
+    this.attackOverlay = hasAttackOverlay;
     this.currentAction;
     this.currentAnimation;
     this.imgCycle = 0;
@@ -616,7 +646,10 @@ var Entity = /*#__PURE__*/function () {
       this.hotkey = document.getElementById(this.imgName + '-keybind').value;
       this.hpContainerLeft = document.getElementById(this.imgName + '-hp-left');
       this.hpContainerRight = document.getElementById(this.imgName + '-hp-right');
-      this.attackOverlay = document.getElementById(this.imgName + '-effect-overlay');
+
+      if (this.attackOverlay) {
+        this.attackOverlay = [document.getElementById(this.imgName + '-effect-overlay'), this.attackOverlay];
+      }
 
       if (this.allied) {
         this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
@@ -637,7 +670,7 @@ var Entity = /*#__PURE__*/function () {
       this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
 
       switch (this.level) {
-        case 2:
+        case 5:
           if (this.allAbilities[0]) {
             this.abilities.push(this.allAbilities[0]);
           }
@@ -792,12 +825,19 @@ var Entity = /*#__PURE__*/function () {
     key: "killEntitiy",
     value: function killEntitiy(entity) {
       // console.log(entity.klass, "killed");
-      clearInterval(entity.currentAction);
-      clearInterval(entity.currentAnimation);
-      entity.img.src = entity.baseImg.src;
+      entity.clearIntervals();
 
       if (entity.abilityContainer) {
         entity.abilityContainer.style.display = 'none';
+      }
+
+      if (this.allied && this.baseDMG > 0) {
+        for (var i = 0; i < this.allies.length; i++) {
+          if (this.allies[i].target === entity) {
+            this.allies[i].clearIntervals();
+            this.allies[i].target = null;
+          }
+        }
       }
 
       entity.hp = -100;
@@ -872,9 +912,8 @@ var Entity = /*#__PURE__*/function () {
       var _this3 = this;
 
       // hot code
-      clearInterval(this.currentAction);
-      clearInterval(this.currentAnimation);
-      this.img.src = this.baseImg.src;
+      this.clearIntervals();
+      this.isMoving = true;
       var bigDiv = document.getElementById('game-container');
       var difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
       var checker = difference + Math.floor(bigDiv.offsetWidth);
@@ -936,22 +975,22 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "setOverlay",
     value: function setOverlay(targetChar) {
-      this.attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
-      this.attackOverlay.style.left = targetChar.pos[0] + 'px';
-      this.attackOverlay.style.width = targetChar.img.width + 'px';
-      this.attackOverlay.style.height = targetChar.img.height + 'px';
-      this.attackOverlay.style.display = '';
+      this.attackOverlay[0].style.top = targetChar.pos[1] + 40 + 'px';
+      this.attackOverlay[0].style.left = targetChar.pos[0] + 'px';
+      this.attackOverlay[0].style.width = targetChar.img.width + 'px';
+      this.attackOverlay[0].style.height = targetChar.img.height + 'px';
+      this.attackOverlay[0].style.display = '';
       var selectedChar = this;
       var clearTime = Math.floor(this.as / 2);
       var timeCheck = 0;
       var stackInterval = setInterval(function () {
-        selectedChar.attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
-        selectedChar.attackOverlay.style.left = targetChar.pos[0] + 'px';
+        selectedChar.attackOverlay[0].style.top = targetChar.pos[1] + 40 + 'px';
+        selectedChar.attackOverlay[0].style.left = targetChar.pos[0] + 'px';
         timeCheck += 20;
 
         if (timeCheck >= clearTime || targetChar.img.style.display === 'none') {
           clearInterval(stackInterval);
-          selectedChar.attackOverlay.style.display = 'none';
+          selectedChar.attackOverlay[0].style.display = 'none';
         }
       }, 20);
     }
@@ -998,7 +1037,7 @@ var Entity = /*#__PURE__*/function () {
           this.attack();
         }
 
-        this.imgCycle = this.imgCycle % 4;
+        this.imgCycle = this.imgCycle % this.attackImages.length;
         this.img.src = this.attackImages[this.imgCycle].src;
       }
     }
@@ -1034,7 +1073,11 @@ var Entity = /*#__PURE__*/function () {
         }
 
         if (this.attackOverlay) {
-          this.setOverlay(this.target);
+          if (this.attackOverlay[1] === 1) {
+            this.setOverlay(this);
+          } else {
+            this.setOverlay(this.target);
+          }
         }
 
         if (this.target.hp > this.target.baseHP) {
@@ -1050,8 +1093,6 @@ var Entity = /*#__PURE__*/function () {
         this.target.setHpBars();
 
         if (this.target.hp <= 0) {
-          this.clearIntervals(); // console.log(this.target, ' hp ', this.target.hp);
-
           this.killEntitiy(this.target);
 
           if (!this.allied) {
@@ -1584,7 +1625,8 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
-var maxLevelNumber = 7;
+var maxLevelNumber = 0; // change on pushed ver
+
 var characters = levels[maxLevelNumber].characterList;
 var selectedChar;
 var countToReach = 0;
@@ -2027,7 +2069,13 @@ function initializeGameOpening() {
       selectedChar.img.style.border = 'none';
       currentAbilityBoxes.style.display = 'none';
       currentAbilityBoxes = null;
-      selectedChar.move([e.x, e.y], selectedChar.target);
+
+      if (selectedChar.range === 'infinite') {
+        selectedChar.move([e.x, e.y], selectedChar.target);
+      } else {
+        selectedChar.move([e.x, e.y]);
+      }
+
       selectedChar = null;
     }
   });
@@ -2566,6 +2614,7 @@ function resetGame(won) {
     levEnems[_i10].pos[1] = levEnems[_i10].basePos[1];
     levEnems[_i10].container.style.top = levEnems[_i10].pos[1] + 'px';
     levEnems[_i10].container.style.left = levEnems[_i10].pos[0] + 'px';
+    levEnems[_i10].img.style.border = 'none';
 
     levEnems[_i10].setHpBars();
   }

@@ -182,10 +182,10 @@
             <div class="ability-description-shader" style="display: none;"></div>
             <div id='Warrior-ability-1-description-div' class="ability-description-div" style="display: none;">
                 <h1 class="ability-description-title">
-                    Heroic Strike
+                    Concussive Blow
                 </h1>
                 <p class="ability-description">
-                    Strike your Target with a powerful sword swing, knocking them back
+                    Strike your Target with the pommel of your sword, stunning them
                 </p>
                 <p class="ability-description">
                     Deals Ability damage equal to your Power x 1.5
@@ -204,7 +204,7 @@
             </div>
             <div id='Wizard-ability-1-description-div' class="ability-description-div" style="display: none;">
                 <h1 class="ability-description-title">
-                    Fire Blast
+                    Fire Bomb
                 </h1>
                 <p class="ability-description">
                     Conjure a powerful orb of fire and launch it at your Target
@@ -291,13 +291,11 @@
             <p id='a4-level-up' class="level-up" style="display: none;">Level Up!</p>
 
             <!-- effect overlays -->
-            <div id='fireblast-div' class="projectile" style="display: none;">
+            <div id='firebomb-div' class="projectile" style="display: none;">
                 <!-- <img src='' alt='fireblast' id='fireblast-img'> -->
             </div>
             <div id='a2-effect-overlay' class="a-heal-overlay" style="display: none;"></div>
             <div id='e2-effect-overlay' class="e-heal-overlay" style="display: none;"></div>
-            <div id='a3-extra-effect' class="wizard-attack-effect" style="display: none;"></div>
-            <div id='e3-extra-effect' class="wizard-attack-effect" style="display: none;"></div>
 
             <div id='title-screen-chars' style="display: none;">
                 <img src="./assets/images/Rogue/Rogue.png" id='rogue-base-img' class="title-screen-char" />
@@ -314,12 +312,7 @@
                 <img src="" alt="something went wrong" class="a1-image-display" />
                 <p id='a1-hotkey-display' class='hotkey-character-display'>1</p>
             </div>
-
-            <img src="./assets/images/Wizard/Wizard.png" alt="Wizard" class="Wizard" style="display: none;" />
-            <img src="assets/images/Wizard/Wizard-attack-1.png" alt="Wizard" class="Wizard" style="display: none;" />
-            <img src="assets/images/Wizard/Wizard-attack-2.png" alt="Wizard" class="Wizard" style="display: none;" />
-            <img src="assets/images/Wizard/Wizard-attack-3.png" alt="Wizard" class="Wizard" style="display: none;" />
-
+            
             <div id="a2-display" class='entity-container' style="position: absolute;">
                 <div id='a2-hp-bar' class="hp-bar-container">
                     <div id='a2-hp-left' class="hp-percentage-left"></div>
@@ -328,12 +321,7 @@
                 <img src="" alt="something went wrong" class="a2-image-display" />
                 <p id='a2-hotkey-display' class='hotkey-character-display'>2</p>
             </div>
-
-            <img src="./assets/images/Rogue/Rogue.png" alt="Rogue" class="Rogue" style="display: none;"/>
-            <img src="./assets/images/Rogue/Rogue-attack-1.png" alt="Rogue" class="Rogue" style="display: none;" />
-            <img src="./assets/images/Rogue/Rogue-attack-2.png" alt="Rogue" class="Rogue" style="display: none;" />
-            <img src="./assets/images/Rogue/Rogue-attack-3.png" alt="Rogue" class="Rogue" style="display: none;" />
-
+            
             <div id="a3-display" class='entity-container' style="position: absolute;">
                 <div id='a3-hp-bar' class="hp-bar-container">
                     <div id='a3-hp-left' class="hp-percentage-left"></div>
@@ -342,12 +330,7 @@
                 <img src="" alt="something went wrong" class="a3-image-display" />
                 <p id='a3-hotkey-display' class='hotkey-character-display'>3</p>
             </div>
-
-            <img src="./assets/images/Warrior/Warrior.png" alt="Warrior" class="Warrior" style="display: none;" />
-            <img src="./assets/images/Warrior/Warrior-attack-1.png" alt="Warrior" class="Warrior" style="display: none;" />
-            <img src="./assets/images/Warrior/Warrior-attack-2.png" alt="Warrior" class="Warrior" style="display: none;" />
-            <img src="./assets/images/Warrior/Warrior-attack-3.png" alt="Warrior" class="Warrior" style="display: none;" />
-
+            
             <div id="a4-display" class='entity-container' style="position: absolute;">
                 <div id='a4-hp-bar' class="hp-bar-container">
                     <div id='a4-hp-left' class="hp-percentage-left"></div>
@@ -357,10 +340,30 @@
                 <p id='a4-hotkey-display' class='hotkey-character-display'>4</p>
             </div>
 
+            <img src="./assets/images/Wizard/Wizard.png" alt="Wizard" class="Wizard" style="display: none;" />
+            <img src="assets/images/Wizard/Wizard-attack-1.png" alt="Wizard" class="Wizard" style="display: none;" />
+            <img src="assets/images/Wizard/Wizard-attack-2.png" alt="Wizard" class="Wizard" style="display: none;" />
+            <img src="assets/images/Wizard/Wizard-attack-3.png" alt="Wizard" class="Wizard" style="display: none;" />
+            
+            <img src="./assets/images/Rogue/Rogue.png" alt="Rogue" class="Rogue" style="display: none;"/>
+            <img src="./assets/images/Rogue/Rogue-attack-1.png" alt="Rogue" class="Rogue" style="display: none;" />
+            <img src="./assets/images/Rogue/Rogue-attack-2.png" alt="Rogue" class="Rogue" style="display: none;" />
+            <img src="./assets/images/Rogue/Rogue-attack-3.png" alt="Rogue" class="Rogue" style="display: none;" />
+
+            <img src="./assets/images/Warrior/Warrior.png" alt="Warrior" class="Warrior" style="display: none;" />
+            <img src="./assets/images/Warrior/Warrior-attack-1.png" alt="Warrior" class="Warrior" style="display: none;" />
+            <img src="./assets/images/Warrior/Warrior-attack-2.png" alt="Warrior" class="Warrior" style="display: none;" />
+            <img src="./assets/images/Warrior/Warrior-attack-3.png" alt="Warrior" class="Warrior" style="display: none;" />
+            
             <img src="./assets/images/Cleric/Cleric.png" alt="Cleric" class="Cleric" style="display: none;" />
             <img src="./assets/images/Cleric/Cleric-attack-1.png" alt="Cleric" class="Cleric" style="display: none;" />
             <img src="./assets/images/Cleric/Cleric-attack-2.png" alt="Cleric" class="Cleric" style="display: none;" />
             <img src="./assets/images/Cleric/Cleric-attack-3.png" alt="Cleric" class="Cleric" style="display: none;" />
+            
+            <img src="./assets/images/Paladin/Paladin.png" alt="Paladin" class="Paladin" style="display: none;" />
+            <img src="./assets/images/Paladin/Paladin-attack-1.png" alt="Paladin" class="Paladin" style="display: none;" />
+            <img src="./assets/images/Paladin/Paladin-attack-2.png" alt="Paladin" class="Paladin" style="display: none;" />
+            <img src="./assets/images/Paladin/Paladin-attack-3.png" alt="Paladin" class="Paladin" style="display: none;" />
 
             <div id="e1-display" class='entity-container' style="position: absolute;">
                 <div id='e1-hp-bar' class="hp-bar-container">
@@ -371,11 +374,6 @@
                 <p id='e1-hotkey-display' class='hotkey-character-display'>5</p>
             </div>
             
-            <img src="./assets/images/EWizard/Wizard.png" alt="Wizard" class="EWizard" style="display: none;" />
-            <img src="assets/images/EWizard/Wizard-attack-1.png" alt="Wizard" class="EWizard" style="display: none;" />
-            <img src="assets/images/EWizard/Wizard-attack-2.png" alt="Wizard" class="EWizard" style="display: none;" />
-            <img src="assets/images/EWizard/Wizard-attack-3.png" alt="Wizard" class="EWizard" style="display: none;" />
-            
             <div id="e2-display" class='entity-container' style="position: absolute;">
                 <div id='e2-hp-bar' class="hp-bar-container">
                     <div id='e2-hp-left' class="hp-percentage-left-e"></div>
@@ -384,11 +382,6 @@
                 <img src="" alt="something went wrong" class="e2-image-display" />
                 <p id='e2-hotkey-display' class='hotkey-character-display'>6</p>
             </div>
-            
-            <img src="./assets/images/ERogue/Rogue.png" alt="Rogue" class="ERogue" style="display: none;" />
-            <img src="./assets/images/ERogue/Rogue-attack-1.png" alt="Rogue" class="ERogue" style="display: none;" />
-            <img src="./assets/images/ERogue/Rogue-attack-2.png" alt="Rogue" class="ERogue" style="display: none;" />
-            <img src="./assets/images/ERogue/Rogue-attack-3.png" alt="Rogue" class="ERogue" style="display: none;" />
             
             <div id="e3-display" class='entity-container' style="position: absolute;">
                 <div id='e3-hp-bar' class="hp-bar-container">
@@ -399,11 +392,6 @@
                 <p id='e3-hotkey-display' class='hotkey-character-display'>7</p>
             </div>
             
-            <img src="./assets/images/EWarrior/Warrior.png" alt="Warrior" class="EWarrior" style="display: none;" />
-            <img src="./assets/images/EWarrior/Warrior-attack-1.png" alt="Warrior" class="EWarrior" style="display: none;" />
-            <img src="./assets/images/EWarrior/Warrior-attack-2.png" alt="Warrior" class="EWarrior" style="display: none;" />
-            <img src="./assets/images/EWarrior/Warrior-attack-3.png" alt="Warrior" class="EWarrior" style="display: none;" />
-            
             <div id="e4-display" class='entity-container' style="position: absolute;">
                 <div id='e4-hp-bar' class="hp-bar-container">
                     <div id='e4-hp-left' class="hp-percentage-left-e"></div>
@@ -413,11 +401,31 @@
                 <p id='e4-hotkey-display' class='hotkey-character-display'>8</p>
             </div>
             
+            <img src="./assets/images/EWizard/Wizard.png" alt="Wizard" class="EWizard" style="display: none;" />
+            <img src="assets/images/EWizard/Wizard-attack-1.png" alt="Wizard" class="EWizard" style="display: none;" />
+            <img src="assets/images/EWizard/Wizard-attack-2.png" alt="Wizard" class="EWizard" style="display: none;" />
+            <img src="assets/images/EWizard/Wizard-attack-3.png" alt="Wizard" class="EWizard" style="display: none;" />
+            
+            <img src="./assets/images/ERogue/Rogue.png" alt="Rogue" class="ERogue" style="display: none;" />
+            <img src="./assets/images/ERogue/Rogue-attack-1.png" alt="Rogue" class="ERogue" style="display: none;" />
+            <img src="./assets/images/ERogue/Rogue-attack-2.png" alt="Rogue" class="ERogue" style="display: none;" />
+            <img src="./assets/images/ERogue/Rogue-attack-3.png" alt="Rogue" class="ERogue" style="display: none;" />
+            
+            <img src="./assets/images/EWarrior/Warrior.png" alt="Warrior" class="EWarrior" style="display: none;" />
+            <img src="./assets/images/EWarrior/Warrior-attack-1.png" alt="Warrior" class="EWarrior" style="display: none;" />
+            <img src="./assets/images/EWarrior/Warrior-attack-2.png" alt="Warrior" class="EWarrior" style="display: none;" />
+            <img src="./assets/images/EWarrior/Warrior-attack-3.png" alt="Warrior" class="EWarrior" style="display: none;" />
+            
             <img src="./assets/images/ECleric/Cleric.png" alt="Cleric" class="ECleric" style="display: none;" />
             <img src="./assets/images/ECleric/Cleric-attack-1.png" alt="Cleric" class="ECleric" style="display: none;" />
             <img src="./assets/images/ECleric/Cleric-attack-2.png" alt="Cleric" class="ECleric" style="display: none;" />
             <img src="./assets/images/ECleric/Cleric-attack-3.png" alt="Cleric" class="ECleric" style="display: none;" />
 
+            <img src="./assets/images/EPaladin/Paladin.png" alt="Paladin" class="EPaladin" style="display: none;" />
+            <img src="./assets/images/EPaladin/Paladin-attack-1.png" alt="Paladin" class="EPaladin" style="display: none;" />
+            <img src="./assets/images/EPaladin/Paladin-attack-2.png" alt="Paladin" class="EPaladin" style="display: none;" />
+            <img src="./assets/images/EPaladin/Paladin-attack-3.png" alt="Paladin" class="EPaladin" style="display: none;" />
+            
         </div>
     </div>
     <a class='links' id='github' rel='hub' target='_blank' href='https://github.com/Jim-Heftypants/Adventures' >Github</a>

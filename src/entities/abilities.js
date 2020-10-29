@@ -1,7 +1,7 @@
 const groupHeal = (entity) => {
     for (let i = 0; i < entity.allies.length; i++) {
         if (entity.allies[i].hp > 0) {
-            entity.allies[i].hp += entity.dmg * 2;
+            entity.allies[i].hp -= entity.dmg * 2;
             if (entity.allies[i].hp > 100) { entity.allies[i].hp = 100; }
             entity.setOverlay(entity.allies[i]);
             entity.allies[i].setHpBars();
@@ -63,12 +63,7 @@ const meteor = (entity) => {
     spellTrack(fireblastDiv, entity, entity.target, (entity, img) => {
         // console.log('entity: ', entity, " img: ", img);
         img.style.display = 'none';
-        entity.target.hp -= Math.ceil(entity.dmg * 1.5);
-        entity.target.setHpBars();
-        setBorder(entity);
-        if (entity.target.hp <= 0) {
-            entity.killEntitiy(entity.target);
-        }
+        causeAoEEffect(entity, 300, 300);
     });
     return 10;
 }
@@ -98,14 +93,14 @@ export const allAbilities = [warriorAbilities, clericAbilities, wizardAbilities,
 
 
 const lightningAutoAttack = (entity) => {
-    const effectDiv = document.getElementById(entity.imgName + '-extra-effect');
-    const pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
-    drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width/2, entity.target.pos[1] + entity.target.img.height/2, effectDiv);
-    if (effectDiv) {
-        effectDiv.style.display = '';
-        const maxTime = Math.floor(entity.as / 8);
-        setTimeout(() => { effectDiv.style.display = 'none'; }, maxTime);
+    // const effectDiv = document.getElementById(entity.imgName + '-extra-effect');
+    let pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
+    if (entity.img.style.transform === "scaleX(-1)") {
+        pos[0] -= 60
     }
+    const div = drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width/2, entity.target.pos[1] + entity.target.img.height/2);
+    const maxTime = Math.floor(entity.as / 8);
+    setTimeout(() => { div.remove(); }, maxTime);
 }
 
 export const specialAttackEffects = [lightningAutoAttack];
@@ -124,7 +119,58 @@ function knockbackTarget(entity, distance) {
     entity.target.container.style.top = entity.target.pos[1] + 'px';
 }
 
-function createLineElement(x, y, length, angle, img) {
+function causeAoEEffect(entity, width, height) {
+    const targetCenter = [entity.target.pos[0] + Math.floor(entity.target.img.width / 2),
+        entity.target.pos[1] + Math.floor(entity.target.img.height/2)];
+    const topLeft1 = [targetCenter[0] - Math.floor(width / 2), targetCenter[1] - Math.floor(height / 2)];
+    const div = document.createElement("div");
+    const leftSetback = (width - entity.target.container.offsetWidth) / 2;
+    const topSetback = (height - entity.target.container.offsetHeight) / 2;
+    div.style.position = "absolute";
+    div.style.left = entity.target.pos[0] - leftSetback + 'px';
+    div.style.top = entity.target.pos[1] - topSetback + 'px';
+    div.style.width = width + "px";
+    div.style.height = height + "px";
+    div.style.background = "red";
+    div.style.zIndex = "8";
+    document.getElementById("game-container").appendChild(div);
+    setTimeout(() => {
+        div.remove();
+    }, 750);
+    for (let i = 0; i < entity.enemies.length; i++) {
+        if (entity.enemies[i].container.style.display !== 'none') {
+            if (imagesTouching(topLeft1, [width, height], entity.enemies[i].pos, [entity.enemies[i].img.width, entity.enemies[i].img.height])) {
+                entity.enemies[i].hp -= Math.ceil(entity.dmg * 1.5);
+                entity.enemies[i].setHpBars();
+                setBorder(entity.enemies[i]);
+                if (entity.enemies[i].hp <= 0) {
+                    entity.killEntitiy(entity.enemies[i]);
+                }
+            }
+        }
+    }
+}
+
+function imageInside(topLeft1, sizes1, topLeft2, sizes2) {
+    return (topLeft1[0] > topLeft2[0] && topLeft1[0] + sizes1[0] < topLeft2[0] + sizes2[0]
+                && topLeft1[1] > topLeft2[1] && topLeft1[1] + sizes1[1] < topLeft2[1] + sizes2[1]);
+}
+
+function imagesTochingSide(topLeft1, sizes1, topLeft2, sizes2, i) {
+    return (topLeft1[i] < topLeft2[i] && topLeft1[i] + sizes1[i] > topLeft2[i]
+        || topLeft1[i] < topLeft2[i] + sizes2[i] && topLeft1[i] + sizes1[i] > topLeft2[i] + sizes2[i]);
+}
+
+function imagesTouching(topLeft1, sizes1, topLeft2, sizes2) {
+    for (let i = 0; i < 2; i++) {
+        if (!imagesTochingSide(topLeft1, sizes1, topLeft2, sizes2, i)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function createLineElement(x, y, length, angle) {
     var styles = 'width: ' + length + 'px; '
         + 'height: 0px; '
         + '-moz-transform: rotate(' + angle + 'rad); '
@@ -133,13 +179,17 @@ function createLineElement(x, y, length, angle, img) {
         + '-ms-transform: rotate(' + angle + 'rad); '
         + 'position: absolute; '
         + 'top: ' + y + 'px; '
-        + 'left: ' + x + 'px; ';
-    if (img) {
-        img.setAttribute('style', styles);
-    }
+        + 'left: ' + x + 'px; '
+        + 'border: 2px solid purple; ';
+    let div = document.createElement("div");
+    div.setAttribute('style', styles);
+    div.classList.add("extra-attack-effect");
+    document.getElementById("game-container").appendChild(div);
+    return div;
+    
 }
 
-function drawLine(x1, y1, x2, y2, img) {
+function drawLine(x1, y1, x2, y2) {
     const a = x1 - x2,
         b = y1 - y2,
         c = Math.sqrt(a * a + b * b);
@@ -152,15 +202,15 @@ function drawLine(x1, y1, x2, y2, img) {
 
     const alpha = Math.PI - Math.atan2(-b, a);
 
-    createLineElement(x, y, c, alpha, img);
+    return createLineElement(x, y, c, alpha);
 }
 
 function spellTrack(img, entity, target, action) {
-    // console.log('img: ', img, ' entity: ', entity, ' target: ', target, ' action: ', action);
-    const pos = entity.pos.slice();
-    pos[0] += entity.img.width/2; pos[1] += entity.img.height/2;
-    img.style.top = Math.floor(pos[1]) + 'px';
-    img.style.left = Math.floor(pos[0]) + 'px';
+    // console.log('img: ', img, ' entity: ', entity, ' target: ', target);
+    const changedPos = entity.pos.slice();
+    changedPos[0] += entity.img.width / 2; changedPos[1] += entity.img.height/2;
+    img.style.top = Math.floor(changedPos[1]) + 'px';
+    img.style.left = Math.floor(changedPos[0]) + 'px';
     img.style.display = '';
     const targetImg = target.img;
     let interval = setInterval(() => move(), 20);
@@ -171,33 +221,22 @@ function spellTrack(img, entity, target, action) {
             // console.log('no target to hit with: ', img);
             return;
         }
-        const targetPos = target.pos.slice();
-        targetPos[0] += targetImg.width/2; targetPos[1] += targetImg.height/2;
-        if (imagesTouching(img, pos, targetImg, targetPos)) {
+        const left = parseInt(img.style.left.replace('px', ''), 10);
+        const top = parseInt(img.style.top.replace('px', ''), 10);
+        if (imageInside([left, top], [img.offsetWidth, img.offsetHeight], target.pos, [targetImg.width, targetImg.height])) {
             // console.log('images touching');
             clearInterval(interval);
+            img.style.display = 'none';
             action(entity, img);
         } else {
-            let posChange = vectorToScalar(pos, targetPos);
-            pos[0] += posChange[0]; pos[1] += posChange[1];
-            img.style.top = Math.floor(pos[1]) + 'px';
-            img.style.left = Math.floor(pos[0]) + 'px';
+            const targetPos = target.pos.slice();
+            targetPos[0] += targetImg.width/2; targetPos[1] += targetImg.height/2;
+            let posChange = vectorToScalar(changedPos, targetPos);
+            changedPos[0] += posChange[0]; changedPos[1] += posChange[1];
+            img.style.top = Math.floor(changedPos[1]) + 'px';
+            img.style.left = Math.floor(changedPos[0]) + 'px';
         }
     }
-}
-
-function imagesTouching(img, pos, targetImg, targetPos) {
-    if ((pos[0] < targetPos[0] && pos[0] + img.offsetWidth > targetPos[0]) ||
-        (pos[0] < targetPos[0] + targetImg.width && pos[0] + img.offsetWidth > targetPos[0] + targetImg.width)) {
-        // console.log('passed width check');
-        return true;
-    }
-    if ((pos[1] < targetPos[1] && pos[1] + img.offsetHeight  > targetPos[1]) ||
-        (pos[1] < targetPos[1] + targetImg.height && pos[1] + img.offsetHeight  > targetPos[1] + targetImg.height)) {
-        // console.log('height check passed');
-        return true;
-    }
-    return false;
 }
 
 function vectorToScalar(pos, endPos) {

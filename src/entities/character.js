@@ -11,9 +11,9 @@ const clericAbilities = charAbilities[1];
 const wizardAbilities = charAbilities[2];
 const rogueAbilities = charAbilities[3];
 
-const waAbNames = ['Heroic Strike'];
+const waAbNames = ['Concussive Blow'];
 const cAbNames = ['Prayer of Healing'];
-const wiAbNames = ['Fire Blast'];
+const wiAbNames = ['Fire Bomb'];
 const rAbNames = ['Poison Shiv'];
 
 const specialAttackEffects = abilityList[1];
@@ -30,29 +30,23 @@ true
 imgName
 pos
 defense
+hasOverlay? 1=self 2=target
+specialEffect
 ab
 abNames
-specialEffect
 */
 
-// tutorials
-const tutorialWarrior = new classCreator('Warrior', 10, 100, 10, 1000, 8, true, "a1", [450, 500], 20, warriorAbilities, waAbNames);
-const tutorialCleric = new classCreator('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [200, 300], 10, clericAbilities, cAbNames);
-const tutorialWizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 16, true, "a3", [200, 600], 12, wizardAbilities, wiAbNames, wizardAttackEffect);
-const tutorialRogue = new classCreator("Rogue", 10, 100, 10, 800, 8, true, "a4", [900, 200], 16, rogueAbilities, rAbNames);
-
 // tank
-const Warrior = new classCreator('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, warriorAbilities, waAbNames);
+const Warrior = new classCreator('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, null, null, warriorAbilities, waAbNames);
 
 // heals
-const Cleric = new classCreator('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 10, clericAbilities, cAbNames);
+const Cleric = new classCreator('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 12, 2, null, clericAbilities, cAbNames);
 
 // rdps
-const Wizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 12, wizardAbilities, wiAbNames, wizardAttackEffect);
+const Wizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 14, null, wizardAttackEffect, wizardAbilities, wiAbNames);
 
 // mdps
-const Rogue = new classCreator("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, rogueAbilities, rAbNames)
+const Rogue = new classCreator("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, null, null, rogueAbilities, rAbNames);
 
-// export const tutorialChars = [tutorialWarrior, tutorialCleric, tutorialWizard, tutorialRogue];
 const charactersArr = [Warrior, Cleric, Wizard, Rogue];
 export default charactersArr;
