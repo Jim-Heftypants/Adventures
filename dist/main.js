@@ -123,15 +123,21 @@ var powerSwing = function powerSwing(entity) {
     return false;
   }
 
-  entity.target.hp -= Math.ceil(entity.dmg * 1.5);
-  knockbackTarget(entity, 80);
+  entity.target.hp -= Math.ceil(entity.dmg * 1.5); // knockbackTarget(entity, 80);
+
   entity.target.setHpBars();
+  entity.target.stunned = true;
+  entity.target.img.src = entity.target.baseImg.src;
+  entity.target.imgCycle = 0;
   setBorder(entity);
 
   if (entity.target.hp <= 0) {
     entity.killEntitiy(entity.target);
   }
 
+  setTimeout(function () {
+    entity.target.stunned = false;
+  }, 2000);
   return 10;
 };
 
@@ -144,6 +150,8 @@ var poisonDagger = function poisonDagger(entity) {
   }
 
   var timer = 0;
+  entity.target.slowed = 50;
+  entity.target.ms -= Math.floor(entity.target.baseMS / 2);
 
   var _int = setInterval(function () {
     timer++;
@@ -158,6 +166,8 @@ var poisonDagger = function poisonDagger(entity) {
 
     if (timer > 5) {
       clearInterval(_int);
+      entity.target.slowed = false;
+      entity.target.ms += Math.floor(entity.target.baseMS / 2);
     }
   }, 500);
 
@@ -591,6 +601,7 @@ var Entity = /*#__PURE__*/function () {
 
     this.allAbilities = abilities; // this.abilities = abilities; // change on pushed ver
 
+    this.abilities = [];
     this.abilityNames = abilityNames;
     this.abilityAvailable = [true, true, true, true];
     this.abilityShouldCast = [false, false, false, false];
@@ -615,7 +626,12 @@ var Entity = /*#__PURE__*/function () {
     this.imgCycle = 0;
     this.isAttacking = false;
     this.isMoving = false;
-    this.extraAttackAnimation = extraAttackAnimation;
+    this.extraAttackAnimation = extraAttackAnimation; // CC effects
+
+    this.stunned = false;
+    this.slowed = false;
+    this.rooted = false;
+    this.feared = false;
     this.target;
     this.allies;
     this.enemies;
@@ -757,48 +773,50 @@ var Entity = /*#__PURE__*/function () {
       }, 20);
 
       function frame(self) {
-        if (posChange[2] === 0) {
-          // close animation
-          self.clearIntervals();
-          self.movingOutTheWay = false;
-          pos[0] = Math.floor(pos[0]);
-          pos[1] = Math.floor(pos[1]);
+        if (!self.stunned && !self.rooted) {
+          if (posChange[2] === 0) {
+            // close animation
+            self.clearIntervals();
+            self.movingOutTheWay = false;
+            pos[0] = Math.floor(pos[0]);
+            pos[1] = Math.floor(pos[1]);
 
-          if (attackOnFinish) {
-            // console.log('self in move end: ', self);
-            self.autoAttack(attackOnFinish); // needs editing
-          } else if (addXPBar) {
-            // console.log('move ended');
-            self.img.style.transform = "scaleX(1)";
-            self.img.style.border = '5px solid gold';
+            if (attackOnFinish) {
+              // console.log('self in move end: ', self);
+              self.autoAttack(attackOnFinish); // needs editing
+            } else if (addXPBar) {
+              // console.log('move ended');
+              self.img.style.transform = "scaleX(1)";
+              self.img.style.border = '5px solid gold';
+            }
+          } else {
+            // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
+            // begin some kind of animation
+            pos[0] += posChange[0];
+            pos[1] += posChange[1];
+
+            if (pos[0] + Math.floor(3 * self.img.width / 2) + 50 > checker) {
+              pos[0] = checker - (Math.floor(3 * self.img.width / 2) + 50);
+            }
+
+            if (pos[0] < 15) {
+              pos[0] = 15;
+            }
+
+            if (pos[1] + Math.floor(self.img.height) > 850) {
+              pos[1] = 850 - Math.floor(self.img.height);
+            }
+
+            if (pos[1] < 15) {
+              pos[1] = 15;
+            } // console.log('posChange: ', posChange);
+            // console.log('pos: ', pos);
+
+
+            self.container.style.top = Math.floor(pos[1]) + 'px';
+            self.container.style.left = Math.floor(pos[0]) + 'px';
+            posChange[2] -= 1;
           }
-        } else {
-          // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
-          // begin some kind of animation
-          pos[0] += posChange[0];
-          pos[1] += posChange[1];
-
-          if (pos[0] + Math.floor(3 * self.img.width / 2) + 50 > checker) {
-            pos[0] = checker - (Math.floor(3 * self.img.width / 2) + 50);
-          }
-
-          if (pos[0] < 15) {
-            pos[0] = 15;
-          }
-
-          if (pos[1] + Math.floor(self.img.height) > 850) {
-            pos[1] = 850 - Math.floor(self.img.height);
-          }
-
-          if (pos[1] < 15) {
-            pos[1] = 15;
-          } // console.log('posChange: ', posChange);
-          // console.log('pos: ', pos);
-
-
-          self.container.style.top = Math.floor(pos[1]) + 'px';
-          self.container.style.left = Math.floor(pos[0]) + 'px';
-          posChange[2] -= 1;
         }
       }
     }
@@ -829,15 +847,6 @@ var Entity = /*#__PURE__*/function () {
 
       if (entity.abilityContainer) {
         entity.abilityContainer.style.display = 'none';
-      }
-
-      if (this.allied && this.baseDMG > 0) {
-        for (var i = 0; i < this.allies.length; i++) {
-          if (this.allies[i].target === entity) {
-            this.allies[i].clearIntervals();
-            this.allies[i].target = null;
-          }
-        }
       }
 
       entity.hp = -100;
@@ -922,53 +931,55 @@ var Entity = /*#__PURE__*/function () {
       }, 20);
 
       function move(self) {
-        if (self.target.container.style.display === 'none') {
-          self.clearIntervals();
+        if (!self.stunned && !self.rooted) {
+          if (self.target.container.style.display === 'none') {
+            self.clearIntervals();
 
-          if (!self.allied) {
-            self.setTargetAndAttack();
+            if (!self.allied) {
+              self.setTargetAndAttack();
+            }
+
+            return;
           }
 
-          return;
-        }
-
-        if (self.withinAttackRange(self.target)) {
-          clearInterval(self.currentAction);
-          self.autoAttack(self.target); // console.log('auto attack called from track');
-        } else {
-          var pos = self.pos;
-          var movePos = self.target.pos.slice();
-
-          if (pos[0] - movePos[0] < 0) {
-            movePos[0] -= self.target.img.width;
-            self.img.style.transform = "scaleX(1)";
+          if (self.withinAttackRange(self.target)) {
+            clearInterval(self.currentAction);
+            self.autoAttack(self.target); // console.log('auto attack called from track');
           } else {
-            movePos[0] += self.target.img.width;
-            self.img.style.transform = "scaleX(-1)";
+            var pos = self.pos;
+            var movePos = self.target.pos.slice();
+
+            if (pos[0] - movePos[0] < 0) {
+              movePos[0] -= self.target.img.width;
+              self.img.style.transform = "scaleX(1)";
+            } else {
+              movePos[0] += self.target.img.width;
+              self.img.style.transform = "scaleX(-1)";
+            }
+
+            var posChange = self.vectorToScalar(movePos);
+            pos[0] += posChange[0];
+            pos[1] += posChange[1];
+
+            if (pos[0] + Math.floor(self.img.width) > checker) {
+              pos[0] = checker - Math.floor(self.img.width);
+            }
+
+            if (pos[0] < 15) {
+              pos[0] = 15;
+            }
+
+            if (pos[1] + Math.floor(self.img.height) > 850) {
+              pos[1] = 850 - Math.floor(self.img.height);
+            }
+
+            if (pos[1] < 15) {
+              pos[1] = 15;
+            }
+
+            self.container.style.top = Math.floor(pos[1]) + 'px';
+            self.container.style.left = Math.floor(pos[0]) + 'px';
           }
-
-          var posChange = self.vectorToScalar(movePos);
-          pos[0] += posChange[0];
-          pos[1] += posChange[1];
-
-          if (pos[0] + Math.floor(self.img.width) > checker) {
-            pos[0] = checker - Math.floor(self.img.width);
-          }
-
-          if (pos[0] < 15) {
-            pos[0] = 15;
-          }
-
-          if (pos[1] + Math.floor(self.img.height) > 850) {
-            pos[1] = 850 - Math.floor(self.img.height);
-          }
-
-          if (pos[1] < 15) {
-            pos[1] = 15;
-          }
-
-          self.container.style.top = Math.floor(pos[1]) + 'px';
-          self.container.style.left = Math.floor(pos[0]) + 'px';
         }
       }
     }
@@ -1015,12 +1026,23 @@ var Entity = /*#__PURE__*/function () {
 
       this.currentAnimation = setInterval(function () {
         return _this4.animateAttack(_this4);
-      }, Math.floor(this.as / 4)); // this.currentAction = setInterval(() => attack(this), this.as);
+      }, Math.floor(this.as / 4));
     }
   }, {
     key: "animateAttack",
     value: function animateAttack() {
-      if (this.attackImages) {
+      if (!this.stunned && this.attackImages) {
+        if (!this.target || this.target.hp <= 0) {
+          this.clearIntervals();
+
+          if (!this.allied) {
+            // chose another hero to attack
+            this.setTargetAndAttack(); // maybe add something in for player to auto target upon deaths ?
+          }
+
+          return;
+        }
+
         if (this.target.pos[0] < this.pos[0]) {
           this.img.style.transform = "scaleX(-1)";
         } else {
@@ -1045,17 +1067,6 @@ var Entity = /*#__PURE__*/function () {
     key: "attack",
     value: function attack() {
       var _this5 = this;
-
-      if (!this.target || this.target.hp <= 0) {
-        this.clearIntervals();
-
-        if (!this.allied) {
-          // chose another hero to attack
-          this.setTargetAndAttack(); // maybe add something in for player to auto target upon deaths ?
-        }
-
-        return;
-      }
 
       if (!this.withinAttackRange(this.target)) {
         this.trackTarget();

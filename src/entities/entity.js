@@ -27,6 +27,7 @@ class Entity { // this. is selectedChar
 
         this.allAbilities = abilities;
         // this.abilities = abilities; // change on pushed ver
+        this.abilities = [];
         this.abilityNames = abilityNames;
         this.abilityAvailable = [true, true, true, true];
         this.abilityShouldCast = [false, false, false, false];
@@ -52,6 +53,12 @@ class Entity { // this. is selectedChar
         this.isAttacking = false;
         this.isMoving = false;
         this.extraAttackAnimation = extraAttackAnimation;
+
+        // CC effects
+        this.stunned = false;
+        this.slowed = false;
+        this.rooted = false;
+        this.feared = false;
 
         this.target;
 
@@ -167,32 +174,34 @@ class Entity { // this. is selectedChar
         }
         this.currentAction = setInterval(() => frame(this), 20);
         function frame(self) {
-            if (posChange[2] === 0) {
-            // close animation
-                self.clearIntervals();
-                self.movingOutTheWay = false;
-                pos[0] = Math.floor(pos[0]); pos[1] = Math.floor(pos[1]);
-                if (attackOnFinish) {
-                    // console.log('self in move end: ', self);
-                    self.autoAttack(attackOnFinish); // needs editing
-                } else if (addXPBar) {
-                    // console.log('move ended');
-                    self.img.style.transform = "scaleX(1)";
-                    self.img.style.border = '5px solid gold';
+            if (!self.stunned && !self.rooted) {
+                if (posChange[2] === 0) {
+                // close animation
+                    self.clearIntervals();
+                    self.movingOutTheWay = false;
+                    pos[0] = Math.floor(pos[0]); pos[1] = Math.floor(pos[1]);
+                    if (attackOnFinish) {
+                        // console.log('self in move end: ', self);
+                        self.autoAttack(attackOnFinish); // needs editing
+                    } else if (addXPBar) {
+                        // console.log('move ended');
+                        self.img.style.transform = "scaleX(1)";
+                        self.img.style.border = '5px solid gold';
+                    }
+                } else { // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
+                // begin some kind of animation
+                    pos[0] += posChange[0]; pos[1] += posChange[1];
+                    if (pos[0] + Math.floor((3 * self.img.width) / 2) + 50 > checker) { pos[0] = checker - (Math.floor((3 * self.img.width) / 2) + 50);}
+                    if (pos[0] < 15) {pos[0] = 15;}
+                    if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height);}
+                    if (pos[1] < 15) {pos[1] = 15;}
+                    // console.log('posChange: ', posChange);
+                    // console.log('pos: ', pos);
+    
+                    self.container.style.top = Math.floor(pos[1]) + 'px';
+                    self.container.style.left = Math.floor(pos[0]) + 'px';
+                    posChange[2] -= 1;
                 }
-            } else { // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
-            // begin some kind of animation
-                pos[0] += posChange[0]; pos[1] += posChange[1];
-                if (pos[0] + Math.floor((3 * self.img.width) / 2) + 50 > checker) { pos[0] = checker - (Math.floor((3 * self.img.width) / 2) + 50);}
-                if (pos[0] < 15) {pos[0] = 15;}
-                if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height);}
-                if (pos[1] < 15) {pos[1] = 15;}
-                // console.log('posChange: ', posChange);
-                // console.log('pos: ', pos);
-
-                self.container.style.top = Math.floor(pos[1]) + 'px';
-                self.container.style.left = Math.floor(pos[0]) + 'px';
-                posChange[2] -= 1;
             }
         }
     }
@@ -213,14 +222,6 @@ class Entity { // this. is selectedChar
         // console.log(entity.klass, "killed");
         entity.clearIntervals();
         if (entity.abilityContainer) { entity.abilityContainer.style.display = 'none'; }
-        if (this.allied && this.baseDMG > 0) {
-            for (let i = 0; i < this.allies.length; i++) {
-                if (this.allies[i].target === entity) {
-                    this.allies[i].clearIntervals();
-                    this.allies[i].target = null;
-                }
-            }
-        }
         entity.hp = -100;
         entity.container.style.display = "none";
     }
@@ -282,35 +283,37 @@ class Entity { // this. is selectedChar
         const checker = difference + Math.floor(bigDiv.offsetWidth);
         this.currentAction = setInterval(() => move(this), 20);
         function move(self) {
-            if (self.target.container.style.display === 'none') {
-                self.clearIntervals();
-                if (!self.allied) {
-                    self.setTargetAndAttack()
+            if (!self.stunned && !self.rooted) {
+                if (self.target.container.style.display === 'none') {
+                    self.clearIntervals();
+                    if (!self.allied) {
+                        self.setTargetAndAttack()
+                    }
+                    return;
                 }
-                return;
-            }
-            if (self.withinAttackRange(self.target)) {
-                clearInterval(self.currentAction);
-                self.autoAttack(self.target);
-                // console.log('auto attack called from track');
-            } else {
-                const pos = self.pos;
-                const movePos = self.target.pos.slice();
-                if (pos[0] - movePos[0] < 0) {
-                    movePos[0] -= self.target.img.width;
-                    self.img.style.transform = "scaleX(1)";
+                if (self.withinAttackRange(self.target)) {
+                    clearInterval(self.currentAction);
+                    self.autoAttack(self.target);
+                    // console.log('auto attack called from track');
                 } else {
-                    movePos[0] += self.target.img.width;
-                    self.img.style.transform = "scaleX(-1)";
+                    const pos = self.pos;
+                    const movePos = self.target.pos.slice();
+                    if (pos[0] - movePos[0] < 0) {
+                        movePos[0] -= self.target.img.width;
+                        self.img.style.transform = "scaleX(1)";
+                    } else {
+                        movePos[0] += self.target.img.width;
+                        self.img.style.transform = "scaleX(-1)";
+                    }
+                    let posChange = self.vectorToScalar(movePos);
+                    pos[0] += posChange[0]; pos[1] += posChange[1];
+                    if (pos[0] + Math.floor(self.img.width) > checker) { pos[0] = checker - Math.floor(self.img.width); }
+                    if (pos[0] < 15) { pos[0] = 15; }
+                    if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height); }
+                    if (pos[1] < 15) { pos[1] = 15; }
+                    self.container.style.top = Math.floor(pos[1]) + 'px';
+                    self.container.style.left = Math.floor(pos[0]) + 'px';
                 }
-                let posChange = self.vectorToScalar(movePos);
-                pos[0] += posChange[0]; pos[1] += posChange[1];
-                if (pos[0] + Math.floor(self.img.width) > checker) { pos[0] = checker - Math.floor(self.img.width); }
-                if (pos[0] < 15) { pos[0] = 15; }
-                if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height); }
-                if (pos[1] < 15) { pos[1] = 15; }
-                self.container.style.top = Math.floor(pos[1]) + 'px';
-                self.container.style.left = Math.floor(pos[0]) + 'px';
             }
         }
     }
@@ -349,11 +352,19 @@ class Entity { // this. is selectedChar
             }
         }
         this.currentAnimation = setInterval(() => this.animateAttack(this), Math.floor(this.as / 4))
-        // this.currentAction = setInterval(() => attack(this), this.as);
     }
 
     animateAttack() {
-        if (this.attackImages) {
+        if (!this.stunned && this.attackImages) {
+            if (!this.target || this.target.hp <= 0) {
+                this.clearIntervals();
+                if (!this.allied) {
+                    // chose another hero to attack
+                    this.setTargetAndAttack();
+                    // maybe add something in for player to auto target upon deaths ?
+                }
+                return;
+            }
             if (this.target.pos[0] < this.pos[0]) {
                 this.img.style.transform = "scaleX(-1)";
             } else {
@@ -372,15 +383,6 @@ class Entity { // this. is selectedChar
     }
 
     attack() {
-        if (!this.target || this.target.hp <= 0) {
-            this.clearIntervals();
-            if (!this.allied) {
-                // chose another hero to attack
-                this.setTargetAndAttack();
-                // maybe add something in for player to auto target upon deaths ?
-            }
-            return;
-        }
         if (!this.withinAttackRange(this.target)) {
             this.trackTarget();
             return;

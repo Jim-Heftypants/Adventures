@@ -19,12 +19,16 @@ const powerSwing = (entity) => {
         return false;
     }
     entity.target.hp -= Math.ceil(entity.dmg * 1.5);
-    knockbackTarget(entity, 80);
+    // knockbackTarget(entity, 80);
     entity.target.setHpBars();
+    entity.target.stunned = true;
+    entity.target.img.src = entity.target.baseImg.src;
+    entity.target.imgCycle = 0;
     setBorder(entity);
     if (entity.target.hp <= 0) {
         entity.killEntitiy(entity.target);
     }
+    setTimeout(() => {entity.target.stunned = false;}, 2000);
     return 10;
 }
 
@@ -36,6 +40,8 @@ const poisonDagger = (entity) => {
         return false;
     }
     let timer = 0;
+    entity.target.slowed = 50;
+    entity.target.ms -= Math.floor(entity.target.baseMS / 2);
     let int = setInterval(() => {
         timer++;
         entity.target.hp -= Math.floor(Math.ceil(entity.dmg * 1.5) / 6);
@@ -47,6 +53,8 @@ const poisonDagger = (entity) => {
         }
         if (timer > 5) {
             clearInterval(int);
+            entity.target.slowed = false;
+            entity.target.ms += Math.floor(entity.target.baseMS / 2);
         }
     }, 500)
     return 10;
