@@ -1638,7 +1638,7 @@ var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
 var maxLevelNumber = 0; // change on pushed ver
 
-var characters = levels[maxLevelNumber].characterList;
+var characters = levels[5].characterList;
 var selectedChar;
 var countToReach = 0;
 var moveFinishCount = 0;

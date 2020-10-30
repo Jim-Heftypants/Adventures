@@ -7,7 +7,7 @@ let levelHasEnded = false;
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
 let maxLevelNumber = 0; // change on pushed ver
-let characters = levels[maxLevelNumber].characterList;
+let characters = levels[5].characterList;
 
 let selectedChar;
 
