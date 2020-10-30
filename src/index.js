@@ -8,6 +8,8 @@ function slowFade(element, action = null) { let op = 80; let timerDown = setInte
 // }
 
 window.addEventListener('load', () => {
+    // document.getElementById('full-container').style.height = document.getElementById('body').offsetHeight + 'px';
+    // document.getElementById('body').style.height = document.getElementById('full-container').offsetHeight + 'px';
     // const abilityBoxes = document.getElementsByClassName('inner-ability-div');
     // console.log(document.getElementById('a1-hp-left'));
 
@@ -23,10 +25,12 @@ window.addEventListener('load', () => {
     // const controlsButton = document.getElementById('game-controls-button');
     const keybindContainer = document.getElementById('full-keybind-container');
     const levelButtonContainer = document.getElementById('level-button-container');
+    const levelButtonHeader = document.getElementById("level-button-container-header");
     const statsContainer = document.getElementById('heroes-stats-full-container');
     const levelButtons = document.getElementsByClassName('level-button');
     const backgroundImage = document.getElementById('background-image');
     const titleBackground = document.getElementById('title');
+    const gameContainer = document.getElementById('game-container');
 
     const keybindInputs = document.getElementsByClassName('keybind-input');
     for (let i = 0; i < keybindInputs.length; i++) {
@@ -51,6 +55,7 @@ window.addEventListener('load', () => {
             // controlsContainer.style.display = 'none';
             for (let i = 0; i < hButtons.length; i++) { hButtons[i].style.display = ''; }
             // controlsButton.style.display = '';
+            levelButtonHeader.style.display = 'none';
             levelButtonContainer.style.display = 'none';
             keybindContainer.style.display = 'none';
             statsContainer.style.display = 'none';
@@ -67,6 +72,9 @@ window.addEventListener('load', () => {
                 // closeButton.removeEventListener('click', closeAction);
                 charsDisp.style.display = 'none';
                 backgroundImage.style.display = 'none';
+                gameContainer.style.height = '88%';
+                document.getElementById('background-image').style.height = '88%';
+                document.getElementById('all-characters-ability-container').style.height = '12%';
                 loadLevel(i); 
             })
         }
@@ -82,6 +90,10 @@ window.addEventListener('load', () => {
         hButtons[0].addEventListener('click', () => {
             hButtonPartialAction();
             levelButtonContainer.style.display = '';
+            levelButtonHeader.style.display = '';
+            for (let i = 0; i < levelButtons.length; i++) {
+                levelButtons[i].style.height = levelButtons[i].offsetWidth + 'px';
+            }
         })
         hButtons[1].addEventListener('click', () => {
             hButtonPartialAction();

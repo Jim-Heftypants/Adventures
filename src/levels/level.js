@@ -136,7 +136,7 @@ const actionEight = () => {
 }
 
 export const levelOne = new Level('One', enemiesArr[0], 20, 
-    "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.",
+    "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character will keep doing it until given a new action.",
     firstFourActions, [charactersArr[0]]);
 export const levelTwo = new Level('Two', enemiesArr[1], 80,
     "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.",

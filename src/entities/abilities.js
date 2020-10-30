@@ -28,7 +28,7 @@ const powerSwing = (entity) => {
     if (entity.target.hp <= 0) {
         entity.killEntitiy(entity.target);
     }
-    setTimeout(() => {entity.target.stunned = false;}, 2000);
+    setTimeout(() => {if (entity.target) { entity.target.stunned = false;}}, 2000);
     return 10;
 }
 
@@ -43,6 +43,10 @@ const poisonDagger = (entity) => {
     entity.target.slowed = 50;
     entity.target.ms -= Math.floor(entity.target.baseMS / 2);
     let int = setInterval(() => {
+        if (!entity.target || entity.target.container.style.display === 'none') {
+            clearInterval(int);
+            return;
+        }
         timer++;
         entity.target.hp -= Math.floor(Math.ceil(entity.dmg * 1.5) / 6);
         entity.target.setHpBars();
@@ -67,7 +71,7 @@ const meteor = (entity) => {
         document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
         return false;
     }
-    const fireblastDiv = document.getElementById('fireblast-div');
+    const fireblastDiv = document.getElementById('firebomb-div');
     spellTrack(fireblastDiv, entity, entity.target, (entity, img) => {
         // console.log('entity: ', entity, " img: ", img);
         img.style.display = 'none';
@@ -77,19 +81,21 @@ const meteor = (entity) => {
 }
 
 function setBorder(entity) {
-    const targetChar = entity.target;
-    if (targetChar.img.style.border !== "5px solid gold") {
-        if (entity.baseDMG > 0) {
-            targetChar.img.style.border = "4px solid red";
-        } else {
-            targetChar.img.style.border = "4px solid green";
-        }
-        let borderInterval = setInterval(() => {
-            if (targetChar.img.style.border !== "5px solid gold") {
-                targetChar.img.style.border = "none";
+    if (entity.target && !entity.target.container.style.display === 'none') {
+        const targetChar = entity.target;
+        if (targetChar.img.style.border !== "5px solid gold") {
+            if (entity.baseDMG > 0) {
+                targetChar.img.style.border = "4px solid red";
+            } else {
+                targetChar.img.style.border = "4px solid green";
             }
-            clearInterval(borderInterval);
-        }, 500);
+            let borderInterval = setInterval(() => {
+                if (targetChar.img.style.border !== "5px solid gold") {
+                    targetChar.img.style.border = "none";
+                }
+                clearInterval(borderInterval);
+            }, 500);
+        }
     }
 }
 

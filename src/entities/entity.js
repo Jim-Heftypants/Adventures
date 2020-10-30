@@ -449,7 +449,7 @@ class Entity { // this. is selectedChar
 
     autoAttack(targetChar) {
         // console.log('auto attack target: ', targetChar);
-        if (this.allied) { this.target = targetChar; } // can refactor out targets
+        if (this.allied) { this.target = targetChar; }
         if (this.withinAttackRange(targetChar)) {
             if (this.pos[0] < targetChar.pos[0]) {
                 this.img.style.transform = "scaleX(1)";
@@ -502,7 +502,6 @@ export default Entity;
 
 
 function colorFade(element, time, start, end) {
-    element.style.width = '100%';
     element.style.border = 'none';
     element.style.backgroundColor = 'rgb(' + start.toString() + ')';
     let currentColor = start.slice();
@@ -519,7 +518,6 @@ function colorFade(element, time, start, end) {
         timeCount++;
         if (timeCount >= (time * 5)) {
             element.style.backgroundColor = 'rgb(' + end.toString() + ')';
-            element.style.width = '95%';
             element.style.border = '5px solid gold';
             // console.log('color fade complete');
             clearInterval(interval);

@@ -7,18 +7,35 @@ p, h1 {
     margin-block-start:0; margin-block-end:0; margin-inline-start:0; margin-inline-end:0;
 }
 
+body {
+    overflow: scroll; /* Hide scrollbars */
+    margin: 0;
+    margin-bottom: 15px;
+    background: white;
+}
+::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent; /* make scrollbar transparent */
+}
+
 #full-container {
+    height: 100vh;
+    width: 100vw;
     display: flex;
-    border: 5px solid black;
+    flex-direction: column;
+    /* border: 5px solid black; */
+    padding-bottom: 0;
+    margin-bottom: 20px;
 }
 
 #game-container {
-    position: relative;
-    margin: auto;
-    height: 900px;
-    width: 90%;
+    /* position: relative; */
+    height: 100%;
+    width: 100%;
     background-color: lawngreen;
-    border-left: 2px solid black;
+    /* border-left: 2px solid black; */
+    z-index: 4;
 }
 
 .entity-container {
@@ -33,6 +50,15 @@ p, h1 {
     background-color: grey;
     border: 5px solid green;
     margin: auto;
+}
+
+.exp-words {
+    margin-left: 20px;
+    position: absolute;
+    text-align: center;
+    font-size: 25px;
+    color: red;
+    z-index: 50;
 }
 
 .hp-percentage-left {
@@ -64,6 +90,7 @@ p, h1 {
     text-align: center;
     color: blueviolet;
     font-size: 70px;
+    font-size: 5vw;
 }
 
 #level-name-display {
@@ -73,8 +100,8 @@ p, h1 {
 }
 
 #game-over-display, #game-won-display {
+    font-size: 6vw;
     color: red;
-    font-size: 80px;
     margin-top: 15%;
     z-index: 6;
 }
@@ -82,8 +109,8 @@ p, h1 {
 .links {
     font-size: 30px;
     position: relative;
-    top: 5px;
     margin-left: 30%;
+    padding: 0;
 }
 
 .h-button {
@@ -95,7 +122,7 @@ p, h1 {
     width: 550px;
     padding: 15px;
     margin-top: 1.5%;
-    z-index: 2;
+    z-index: 5;
     color: rgb(22, 141, 195);
     background-color: rgb(143, 75, 143);
     border: 6px solid steelblue;
@@ -141,31 +168,43 @@ p, h1 {
   transform: rotate(-45deg);
 }
 
+#level-button-container-header {
+    background-color: skyblue;
+    color: red;
+    font-size: 80px;
+    font-size: 5vw;
+    text-align: center;
+}
+
 #level-button-container {
     display: flex;
     flex-wrap: wrap;
 }
 
 .level-button {
+    position: relative;
+    left: 3%;
     margin-top: 2%;
-    margin-left: 3%;
-    margin-right: 3%;
+    margin-left: 2%;
+    margin-right: 2%;
+    /* margin: auto; */
     border: 5px solid blue;
     background-color: white;
     cursor: default;
-    width: 270px;
+    width: 19%;
     height: 270px;
     opacity: 60%;
     font-size: 70px;
+    font-size: 4.5vw;
     color: purple;
     word-wrap: break-word;
 }
 
 #background-image {
     position: absolute;
-    height: 900px;
+    height: 100%;
     width: 100%;
-    z-index: 1;
+    z-index: 5;
 }
 
 #tutorial-message {
@@ -175,7 +214,7 @@ p, h1 {
     text-align: center;
     font-size: 40px;
     color: red;
-    z-index: 2;
+    z-index: 5;
     cursor: default;
 }
 
@@ -193,6 +232,7 @@ p, h1 {
     position: relative;
     text-align: center;
     font-size: 60px;
+    font-size: 4vw;
     background-color: blueviolet;
     color: black;
     cursor: pointer;
@@ -200,7 +240,7 @@ p, h1 {
 
 #test, #return-button {
     position: absolute;
-    z-index: 3;
+    z-index: 5;
 }
 
 #return-button {
@@ -227,7 +267,7 @@ p, h1 {
 
 #game-tag-container {
     width: 100%;
-    z-index: 2;
+    z-index: 5;
 }
 
 #game-tag {
@@ -242,7 +282,7 @@ p, h1 {
     border: 5px solid red;
     background-color: steelblue;
     position: relative;
-    z-index: 2;
+    z-index: 5;
 }
 
 #full-keybind-container{
@@ -297,40 +337,57 @@ p, h1 {
 }
 
 #all-characters-ability-container {
-    height: 900px;
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    width: 10%;
+    height: 0%;
     background-color: darkgreen;
-    border-right: 2px solid black;
+    border-top: 2px solid black;
+    z-index: 6;
+}
+
+.ability-full-container {
+    display: flex;
+    height: 90%;
+    width: 90%;
+    margin: auto;
+}
+
+.ability-container {
+    width: 80%;
+    height: 100%;
+    margin: auto;
+    display: flex;
 }
 
 .a1-ability-boxes, .a2-ability-boxes, .a3-ability-boxes, .a4-ability-boxes {
-    /* height: 150px; */
-    margin: auto;
-    width: 90%;
+    display: flex;
     color: red;
+    height: 100%;
     font-size: 30px;
     font-size: 2.25vw;
     text-align: center;
-    margin-bottom: 10px;
 }
 
 .a1-inner-ability-divs, .a2-inner-ability-divs, .a3-inner-ability-divs, .a4-inner-ability-divs {
-    width: 95%;
-    height: 120px;
+    height: 95%;
+    width: 20%;
     background-color: rgb(0,0,255);
     border: 5px solid gold;
 }
 
-.a1-ability-labels {
-    margin: 0;
+.a1-ability-labels, .a2-ability-labels, .a3-ability-labels, .a4-ability-labels {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 1%;
 }
 
 .class-names {
+    height: 100%;
+    width: 20%;
     text-align: center;
     color: red;
     font-size: 2.5vw;
+    margin-top: 2%;
 }
 
 .level-up {
@@ -458,11 +515,11 @@ p, h1 {
 }
 
 #title-screen-chars {
-    margin-top: 60px;
+    margin-top: 30px;
     position: relative;
     display: flex;
     align-content: space-between;
-    z-index: 2;
+    z-index: 5;
 }
 
 .title-screen-char {

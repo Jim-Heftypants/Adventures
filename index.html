@@ -16,95 +16,9 @@
         gtag('config', 'G-CTVBMXZ5YV');
     </script>
 </head>
-<body>
+<body class="body">
     <script src="./dist/main.js"></script>
     <div id='full-container'>
-        <div id='all-characters-ability-container'>
-            <div id='a1-ability-full-container' style="display: none;">
-                <h1 id='a1-class-name' class="class-names"></h1>
-                <div id='a1-ability-container'>
-                    <div id='a1-ability-1-box' class="a1-ability-boxes">
-                        <p id='a1-ability-1-label' class='a1-ability-labels'>1</p>
-                        <div id='a1-inner-ability-1' class="a1-inner-ability-divs"></div>
-                    </div>
-                    <div id='a1-ability-2-box' class="a1-ability-boxes">
-                        <p id='a1-ability-2-label' class='a1-ability-labels'>2</p>
-                        <div id='a1-inner-ability-2' class="a1-inner-ability-divs"></div>
-                    </div>
-                    <div id='a1-ability-3-box' class="a1-ability-boxes">
-                        <p id='a1-ability-3-label' class='a1-ability-labels'>3</p>
-                        <div id='a1-inner-ability-3' class="a1-inner-ability-divs"></div>
-                    </div>
-                    <div id='a1-ability-4-box' class="a1-ability-boxes">
-                        <p id='a1-ability-4-label' class='a1-ability-labels'>4</p>
-                        <div id='a1-inner-ability-4' class="a1-inner-ability-divs"></div>
-                    </div>
-                </div>
-            </div>
-            <div id='a2-ability-full-container' style="display: none;">
-                <h1 id='a2-class-name' class="class-names"></h1>
-                <div id='a2-ability-container'>
-                    <div id='a2-ability-1-box' class="a2-ability-boxes">
-                        <p id='a2-ability-1-label' class='a2-ability-labels'>1</p>
-                        <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
-                    </div>
-                    <div id='a2-ability-2-box' class="a2-ability-boxes">
-                        <p id='a2-ability-2-label' class='a2-ability-labels'>2</p>
-                        <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
-                    </div>
-                    <div id='a2-ability-3-box' class="a2-ability-boxes">
-                        <p id='a2-ability-3-label' class='a2-ability-labels'>3</p>
-                        <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
-                    </div>
-                    <div id='a2-ability-4-box' class="a2-ability-boxes">
-                        <p id='a2-ability-4-label' class='a2-ability-labels'>4</p>
-                        <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
-                    </div>
-                </div>
-            </div>
-            <div id='a3-ability-full-container' style="display: none;">
-                <h1 id='a3-class-name' class="class-names"></h1>
-                <div id='a3-ability-container'>
-                    <div id='a3-ability-1-box' class="a3-ability-boxes">
-                        <p id='a3-ability-1-label' class='a3-ability-labels'>1</p>
-                        <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
-                    </div>
-                    <div id='a3-ability-2-box' class="a3-ability-boxes">
-                        <p id='a3-ability-2-label' class='a3-ability-labels'>2</p>
-                        <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
-                    </div>
-                    <div id='a3-ability-3-box' class="a3-ability-boxes">
-                        <p id='a3-ability-3-label' class='a3-ability-labels'>3</p>
-                        <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
-                    </div>
-                    <div id='a3-ability-4-box' class="a3-ability-boxes">
-                        <p id='a3-ability-4-label' class='a3-ability-labels'>4</p>
-                        <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
-                    </div>
-                </div>
-            </div>
-            <div id='a4-ability-full-container' style="display: none;">
-                <h1 id='a4-class-name' class="class-names"></h1>
-                <div id='a4-ability-container'>
-                    <div id='a4-ability-1-box' class="a4-ability-boxes">
-                        <p id='a4-ability-1-label' class='a4-ability-labels'>1</p>
-                        <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
-                    </div>
-                    <div id='a4-ability-2-box' class="a4-ability-boxes">
-                        <p id='a4-ability-2-label' class='a4-ability-labels'>2</p>
-                        <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
-                    </div>
-                    <div id='a4-ability-3-box' class="a4-ability-boxes">
-                        <p id='a4-ability-3-label' class='a4-ability-labels'>3</p>
-                        <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
-                    </div>
-                    <div id='a4-ability-4-box' class="a4-ability-boxes">
-                        <p id='a4-ability-4-label' class='a4-ability-labels'>4</p>
-                        <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div id='game-container'>
 
             <img id='background-image' src='./assets/images/Backgrounds/title-screen-background.jpg' alt='background-image'/>
@@ -168,6 +82,9 @@
                 <p id='begin-level-button' style="display: none;">Start Level</p>
             </div>
 
+            <div id='level-button-container-header' class="level-button-container-header" style="display: none;">
+                Select Tutorial Level
+            </div>
             <div id='level-button-container' class="level-button-container" style="display: none;">
                 <button id='level-1-button' class="level-button">Warrior</button>
                 <button id='level-2-button' class="level-button">Cleric</button>
@@ -308,6 +225,7 @@
                 <div id='a1-hp-bar' class="hp-bar-container">
                     <div id='a1-hp-left' class="hp-percentage-left"></div>
                     <div id='a1-hp-right' class="hp-percentage-right"></div>
+                    <div id='a1-exp-words' class="exp-words"></div>
                 </div>
                 <img src="" alt="something went wrong" class="a1-image-display" />
                 <p id='a1-hotkey-display' class='hotkey-character-display'>1</p>
@@ -317,6 +235,7 @@
                 <div id='a2-hp-bar' class="hp-bar-container">
                     <div id='a2-hp-left' class="hp-percentage-left"></div>
                     <div id='a2-hp-right' class="hp-percentage-right"></div>
+                    <div id='a2-exp-words' class="exp-words"></div>
                 </div>
                 <img src="" alt="something went wrong" class="a2-image-display" />
                 <p id='a2-hotkey-display' class='hotkey-character-display'>2</p>
@@ -326,6 +245,7 @@
                 <div id='a3-hp-bar' class="hp-bar-container">
                     <div id='a3-hp-left' class="hp-percentage-left"></div>
                     <div id='a3-hp-right' class="hp-percentage-right"></div>
+                    <div id='a3-exp-words' class="exp-words"></div>
                 </div>
                 <img src="" alt="something went wrong" class="a3-image-display" />
                 <p id='a3-hotkey-display' class='hotkey-character-display'>3</p>
@@ -335,6 +255,7 @@
                 <div id='a4-hp-bar' class="hp-bar-container">
                     <div id='a4-hp-left' class="hp-percentage-left"></div>
                     <div id='a4-hp-right' class="hp-percentage-right"></div>
+                    <div id='a4-exp-words' class="exp-words"></div>
                 </div>
                 <img src="" alt="something went wrong" class="a4-image-display" />
                 <p id='a4-hotkey-display' class='hotkey-character-display'>4</p>
@@ -426,6 +347,84 @@
             <img src="./assets/images/EPaladin/Paladin-attack-2.png" alt="Paladin" class="EPaladin" style="display: none;" />
             <img src="./assets/images/EPaladin/Paladin-attack-3.png" alt="Paladin" class="EPaladin" style="display: none;" />
             
+        </div>
+        <div id='all-characters-ability-container'>
+            <div id='a1-ability-full-container' class="ability-full-container" style="display: none;">
+                <h1 id='a1-class-name' class="class-names"></h1>
+                <div id='a1-ability-container' class="ability-container">
+                    <div id='a1-ability-1-box' class="a1-ability-boxes"><p id='a1-ability-1-label' class='a1-ability-labels'>1</p></div>
+                    <div id='a1-inner-ability-1' class="a1-inner-ability-divs"></div>
+                    <div id='a1-ability-2-box' class="a1-ability-boxes"><p id='a1-ability-2-label' class='a1-ability-labels'>2</p></div>
+                    <div id='a1-inner-ability-2' class="a1-inner-ability-divs"></div>
+                    <div id='a1-ability-3-box' class="a1-ability-boxes"><p id='a1-ability-3-label' class='a1-ability-labels'>3</p></div>
+                    <div id='a1-inner-ability-3' class="a1-inner-ability-divs"></div>
+                    <div id='a1-ability-4-box' class="a1-ability-boxes"><p id='a1-ability-4-label' class='a1-ability-labels'>4</p></div>
+                    <div id='a1-inner-ability-4' class="a1-inner-ability-divs"></div>
+                </div>
+            </div>
+            <div id='a2-ability-full-container' class="ability-full-container" style="display: none;">
+                <h1 id='a2-class-name' class="class-names"></h1>
+                <div id='a2-ability-container' class="ability-container">
+                    <div id='a2-ability-1-box' class="a2-ability-boxes">
+                        <p id='a2-ability-1-label' class='a2-ability-labels'>1</p>
+                    </div>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                    <div id='a2-ability-2-box' class="a2-ability-boxes">
+                        <p id='a2-ability-2-label' class='a2-ability-labels'>2</p>
+                    </div>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                    <div id='a2-ability-3-box' class="a2-ability-boxes">
+                        <p id='a2-ability-3-label' class='a2-ability-labels'>3</p>
+                    </div>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                    <div id='a2-ability-4-box' class="a2-ability-boxes">
+                        <p id='a2-ability-4-label' class='a2-ability-labels'>4</p>
+                    </div>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                </div>
+            </div>
+            <div id='a3-ability-full-container' class="ability-full-container" style="display: none;">
+                <h1 id='a3-class-name' class="class-names"></h1>
+                <div id='a3-ability-container' class="ability-container">
+                    <div id='a3-ability-1-box' class="a3-ability-boxes">
+                        <p id='a3-ability-1-label' class='a3-ability-labels'>1</p>
+                    </div>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                    <div id='a3-ability-2-box' class="a3-ability-boxes">
+                        <p id='a3-ability-2-label' class='a3-ability-labels'>2</p>
+                    </div>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                    <div id='a3-ability-3-box' class="a3-ability-boxes">
+                        <p id='a3-ability-3-label' class='a3-ability-labels'>3</p>
+                    </div>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                    <div id='a3-ability-4-box' class="a3-ability-boxes">
+                        <p id='a3-ability-4-label' class='a3-ability-labels'>4</p>
+                    </div>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                </div>
+            </div>
+            <div id='a4-ability-full-container' class="ability-full-container" style="display: none;">
+                <h1 id='a4-class-name' class="class-names"></h1>
+                <div id='a4-ability-container' class="ability-container">
+                    <div id='a4-ability-1-box' class="a4-ability-boxes">
+                        <p id='a4-ability-1-label' class='a4-ability-labels'>1</p>
+                    </div>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                    <div id='a4-ability-2-box' class="a4-ability-boxes">
+                        <p id='a4-ability-2-label' class='a4-ability-labels'>2</p>
+                    </div>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                    <div id='a4-ability-3-box' class="a4-ability-boxes">
+                        <p id='a4-ability-3-label' class='a4-ability-labels'>3</p>
+                    </div>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                    <div id='a4-ability-4-box' class="a4-ability-boxes">
+                        <p id='a4-ability-4-label' class='a4-ability-labels'>4</p>
+                    </div>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                </div>
+            </div>
         </div>
     </div>
     <a class='links' id='github' rel='hub' target='_blank' href='https://github.com/Jim-Heftypants/Adventures' >Github</a>

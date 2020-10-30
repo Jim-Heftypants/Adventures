@@ -242,6 +242,22 @@ function deSelect() {
     }
 }
 
+function styleAbilityBox(entity) {
+    const aBoxes = document.getElementsByClassName(entity.imgName + '-inner-ability-divs');
+    // const aLabels = document.getElementsByClassName(entity.imgName + '-ability-labels');
+    for (let i = 0; i < aBoxes.length; i++) {
+        aBoxes[i].style.width = aBoxes[i].offsetHeight + 'px';
+    }
+}
+
+function select(entity) {
+    entity.abilityContainer.style.display = '';
+    currentAbilityBoxes = entity.abilityContainer;
+    styleAbilityBox(entity);
+    entity.img.style.border = '5px solid gold';
+    selectedChar = entity;
+}
+
 function beginCurrentLevel() {
     const beginLevelButton = document.getElementById('begin-level-button');
     fadeOut(beginLevelButton);
@@ -255,6 +271,7 @@ function returnToSelectPage() {
     document.getElementById(`level-name-display`).style.display = 'none';
     document.getElementById('begin-level-button').style.display = 'none';
     document.getElementById('level-button-container').style.display = '';
+    document.getElementById('level-button-container-header').style.display = '';
     document.getElementById('close-button').style.display = '';
 }
 
@@ -262,47 +279,24 @@ function selectChar(entity) {
     if (!entity || entity.container.style.display === 'none' || entity.hp < 0) {
         return;
     }
-    if (!selectedChar || selectedChar.hp < 0) {
-        // for (let i = 0; i < entity.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = ''; }
-        entity.abilityContainer.style.display = '';
-        currentAbilityBoxes = entity.abilityContainer;
-        selectedChar = entity;
-        entity.img.style.border = '5px solid gold';
-        // console.log('selected char: ', selectedChar.imgName);
-    } else if (selectedChar.baseDMG < 0) {
-        // for (let i = 0; i < selectedChar.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = 'none'; }
-        if (selectedChar.target === entity && selectedChar.isAttacking) {
-            deSelect();
-            return;
+    if (selectedChar && selectedChar.baseDMG < 0) {
+        if (!selectedChar.target === entity || !selectedChar.isAttacking) {
+            selectedChar.autoAttack(entity);
         }
-        selectedChar.autoAttack(entity);
-        deSelect();
-    } else {
-        selectedChar.abilityContainer.style.display = 'none';
-        selectedChar.img.style.border = 'none';
-        entity.abilityContainer.style.display = '';
-        currentAbilityBoxes = entity.abilityContainer;
-        selectedChar = entity;
-        entity.img.style.border = '5px solid gold';
     }
+    deSelect();
+    select(entity);
 }
 
 function selectEnemy(entity) {
     if (!selectedChar || selectedChar.hp < 0) {
-        selectedChar = null;
+        deSelect();
         return;
     } else if ((selectedChar.target === entity && selectedChar.isAttacking) || (entity.hp && entity.hp < 0)) {
-        deSelect();
         return;
     }
     if (selectedChar.allied && selectedChar.baseDMG > 0) {
-        clearInterval(selectedChar.currentAction);
-        clearInterval(selectedChar.currentAnimation);
         selectedChar.autoAttack(entity);
-        selectedChar.img.style.border = 'none';
-        selectedChar.abilityContainer.style.display = 'none';
-        currentAbilityBoxes = null;
-        selectedChar = null;
     }
 }
 
@@ -345,10 +339,11 @@ function abilityClick(arr) {
 
 function setAbilityBoxes() {
     let abilityBoxes = [];
-    abilityBoxes.push(document.getElementsByClassName('a1-inner-ability-divs'));
-    abilityBoxes.push(document.getElementsByClassName('a2-inner-ability-divs'));
-    abilityBoxes.push(document.getElementsByClassName('a3-inner-ability-divs'));
-    abilityBoxes.push(document.getElementsByClassName('a4-inner-ability-divs'));
+    // let abilityLabels = [];
+    for (let i = 1; i < 5; i++) {
+        abilityBoxes.push(document.getElementsByClassName(`a${i}-inner-ability-divs`));
+        // abilityLabels.push(document.getElementsByClassName(`a${i}-ability-labels`));
+    }
     for (let i = 0; i < abilityBoxes.length; i++) {
         for (let j = 0; j < abilityBoxes[i].length; j++) {
             abilityBoxes[i][j].addEventListener('click', () => abilityClick([i+1, j]));
@@ -410,8 +405,8 @@ function loadLevel(levelNumber) {
     level.action();
     // console.log('level selected: ', levelNumber);
     document.getElementById('return-button').style.display = '';
-    const levelButtonContainer = document.getElementById('level-button-container');
-    levelButtonContainer.style.display = 'none';
+    document.getElementById('level-button-container').style.display = 'none';
+    document.getElementById('level-button-container-header').style.display = 'none';
     const levelNameDisp = document.getElementById(`level-name-display`);
     levelNameDisp.style.opacity = 0;
     levelNameDisp.style.display = '';
@@ -452,11 +447,14 @@ function setInitialTargets(chars, enemies) {
 
 function setAvailableAbilities(char) {
     const abilities = document.getElementsByClassName(char.imgName + '-ability-boxes');
+    const boxes = document.getElementsByClassName(char.imgName + '-inner-ability-divs');
     for (let i = 0; i < abilities.length; i++) {
         if (i < char.abilities.length) {
             abilities[i].style.display = '';
+            boxes[i].style.display = '';
         } else {
             abilities[i].style.display = 'none';
+            boxes[i].style.display = 'none';
         }
     }
 }
@@ -505,55 +503,6 @@ function setRandomSpawn(enemy, checkPositions) {
     enemy.container.style.left = enemy.pos[0] + 'px';
     enemy.container.style.top = enemy.pos[1] + 'px';
 }
-
-// function randomizeEnemySpawnLocation(char) {
-//     const container = document.getElementById('game-container');
-//     const width = Math.floor(container.offsetWidth);
-//     const height = Math.floor(container.offsetHeight);
-//     let p = Math.floor(Math.random() * 1.2 - 0.2); // from -20% to 100%
-//     const side = Math.floor(Math.random() * Math.floor(4));
-//     switch (side) {
-//         case 0:
-//             char.pos[1] = -210; // top
-//             char.pos[0] = Math.floor(p * width);
-//             if (char.range === 'infinite') {
-//                 moveInside(-210, null);
-//             }
-//             break;
-//         case 1:
-//             char.pos[0] = -160; // left
-//             char.pos[1] = Math.floor(p * height);
-//             if (char.range === 'infinite') {
-//                 moveInside(null, -160);
-//             }
-//             break;
-//         case 2:
-//             char.pos[1] = height + 210; // bottom
-//             char.pos[0] = Math.floor(p * width);
-//             if (char.range === 'infinite') {
-//                 moveInside(210, null);
-//             }
-//             break;
-//         case 3:
-//             char.pos[0] = width + 160; // right
-//             char.pos[1] = Math.floor(p * height);
-//             if (char.range === 'infinite') {
-//                 moveInside(null, 160);
-//             }
-//             break;
-//     }
-//     char.container.style.left = char.pos[0] + 'px';
-//     char.container.style.top = char.pos[1] + 'px';
-//     function moveInside(y, x) {
-//         if (x) {
-//             const randomY = Math.floor(Math.floor(Math.random() * 0.7 + 0.1) * height); // 90% cuz height == top
-//             char.move([char.pos[0] - x, randomY], char.target);
-//         } else {
-//             const randomX = Math.floor(Math.floor(Math.random() * 0.7 + 0.1) * width); // 90%
-//             char.move([randomX, char.pos[1] - y], char.target);
-//         }
-//     }
-// }
 
 let boxEntities = [];
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
@@ -727,6 +676,8 @@ function addCharXP() {
     // console.log(c);
     for (let i = 0; i < c.length; i++) {
         c[i].xpObserver.disconnect();
+        const expWords = document.getElementById(c[i].imgName + '-exp-words');
+        expWords.innerHTML = 'Level: ' + c[i].level;
         c[i].hpContainerLeft.style.backgroundColor = 'gold';
         const xpPercent = Math.floor((c[i].xp / c[i].nextLevelXP) * 100);
         c[i].hpContainerLeft.style.width = `${xpPercent}%`;
@@ -755,6 +706,8 @@ function addCharXP() {
             c[i].xp += xpPerInterval;
             if (c[i].xp > c[i].nextLevelXP) {
                 c[i].levelUp();
+                const expWords = document.getElementById(c[i].imgName + '-exp-words');
+                expWords.innerHTML = 'Level: ' + c[i].level;
             }
             const xpPercent = Math.floor((c[i].xp / c[i].nextLevelXP) * 100);
             c[i].hpContainerLeft.style.width = `${xpPercent}%`;
@@ -794,12 +747,18 @@ function fadeOutGame(won) {
 function resetGame(won) {
     livingChars = {};
     livingEnemies = {};
-    const levelButtonContainer = document.getElementById('level-button-container');
-    levelButtonContainer.style.display = '';
+    document.getElementById('level-button-container').style.display = '';
+    document.getElementById('level-button-container-header').style.display = '';
     document.getElementById('close-button').style.display = '';
+    document.getElementById('game-container').style.height = '100%';
+    document.getElementById('background-image').style.height = '100%';
+    document.getElementById('all-characters-ability-container').style.height = '0%';
+    const levelButtons = document.getElementsByClassName('level-button');
+    for (let i = 0; i < levelButtons.length; i++) {
+        levelButtons[i].style.height = levelButtons[i].offsetWidth + 'px';
+    }
     if (won && maxLevelNumber === currentLevelNumber) {
         maxLevelNumber++;
-        const levelButtons = document.getElementsByClassName('level-button');
         if (levelButtons[maxLevelNumber]) {
             levelButtons[maxLevelNumber].style.opacity = 100 + '%';
             levelButtons[maxLevelNumber].style.cursor = 'pointer';
@@ -809,15 +768,19 @@ function resetGame(won) {
     const levEnems = levels[currentLevelNumber].enemyList;
     for (let i = 0; i < levChars.length; i++) {
         levChars[i].hp = levChars[i].baseHP; levChars[i].dmg = levChars[i].baseDMG; levChars[i].defense = levChars[i].baseDefense;
+        levChars[i].ms = levChars[i].baseMS; levChars[i].stunned = false; levChars[i].rooted = false;
         levChars[i].pos[0] = levChars[i].basePos[0]; levChars[i].pos[1] = levChars[i].basePos[1];
         levChars[i].container.style.top = levChars[i].pos[1] + 'px';
         levChars[i].container.style.left = levChars[i].pos[0] + 'px';
         levChars[i].hpContainerLeft.style.backgroundColor = 'blue';
+        const expWords = document.getElementById(levChars[i].imgName + '-exp-words');
+        expWords.innerHTML = '';
         levChars[i].img.style.border = 'none';
         levChars[i].setHpBars();
     }
     for (let i = 0; i < levEnems.length; i++) {
         levEnems[i].hp = levEnems[i].baseHP; levEnems[i].dmg = levEnems[i].baseDMG; levEnems[i].defense = levEnems[i].baseDefense;
+        levEnems[i].ms = levEnems[i].baseMS; levEnems[i].stunned = false; levEnems[i].rooted = false;
         levEnems[i].pos[0] = levEnems[i].basePos[0]; levEnems[i].pos[1] = levEnems[i].basePos[1];
         levEnems[i].container.style.top = levEnems[i].pos[1] + 'px';
         levEnems[i].container.style.left = levEnems[i].pos[0] + 'px';

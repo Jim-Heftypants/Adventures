@@ -136,7 +136,9 @@ var powerSwing = function powerSwing(entity) {
   }
 
   setTimeout(function () {
-    entity.target.stunned = false;
+    if (entity.target) {
+      entity.target.stunned = false;
+    }
   }, 2000);
   return 10;
 };
@@ -154,6 +156,11 @@ var poisonDagger = function poisonDagger(entity) {
   entity.target.ms -= Math.floor(entity.target.baseMS / 2);
 
   var _int = setInterval(function () {
+    if (!entity.target || entity.target.container.style.display === 'none') {
+      clearInterval(_int);
+      return;
+    }
+
     timer++;
     entity.target.hp -= Math.floor(Math.ceil(entity.dmg * 1.5) / 6);
     entity.target.setHpBars();
@@ -182,7 +189,7 @@ var meteor = function meteor(entity) {
     return false;
   }
 
-  var fireblastDiv = document.getElementById('fireblast-div');
+  var fireblastDiv = document.getElementById('firebomb-div');
   spellTrack(fireblastDiv, entity, entity.target, function (entity, img) {
     // console.log('entity: ', entity, " img: ", img);
     img.style.display = 'none';
@@ -192,22 +199,24 @@ var meteor = function meteor(entity) {
 };
 
 function setBorder(entity) {
-  var targetChar = entity.target;
+  if (entity.target && !entity.target.container.style.display === 'none') {
+    var targetChar = entity.target;
 
-  if (targetChar.img.style.border !== "5px solid gold") {
-    if (entity.baseDMG > 0) {
-      targetChar.img.style.border = "4px solid red";
-    } else {
-      targetChar.img.style.border = "4px solid green";
-    }
-
-    var borderInterval = setInterval(function () {
-      if (targetChar.img.style.border !== "5px solid gold") {
-        targetChar.img.style.border = "none";
+    if (targetChar.img.style.border !== "5px solid gold") {
+      if (entity.baseDMG > 0) {
+        targetChar.img.style.border = "4px solid red";
+      } else {
+        targetChar.img.style.border = "4px solid green";
       }
 
-      clearInterval(borderInterval);
-    }, 500);
+      var borderInterval = setInterval(function () {
+        if (targetChar.img.style.border !== "5px solid gold") {
+          targetChar.img.style.border = "none";
+        }
+
+        clearInterval(borderInterval);
+      }, 500);
+    }
   }
 }
 
@@ -1150,8 +1159,7 @@ var Entity = /*#__PURE__*/function () {
       // console.log('auto attack target: ', targetChar);
       if (this.allied) {
         this.target = targetChar;
-      } // can refactor out targets
-
+      }
 
       if (this.withinAttackRange(targetChar)) {
         if (this.pos[0] < targetChar.pos[0]) {
@@ -1214,7 +1222,6 @@ var Entity = /*#__PURE__*/function () {
 /* harmony default export */ __webpack_exports__["default"] = (Entity);
 
 function colorFade(element, time, start, end) {
-  element.style.width = '100%';
   element.style.border = 'none';
   element.style.backgroundColor = 'rgb(' + start.toString() + ')';
   var currentColor = start.slice();
@@ -1232,7 +1239,6 @@ function colorFade(element, time, start, end) {
 
     if (timeCount >= time * 5) {
       element.style.backgroundColor = 'rgb(' + end.toString() + ')';
-      element.style.width = '95%';
       element.style.border = '5px solid gold'; // console.log('color fade complete');
 
       clearInterval(interval);
@@ -1332,6 +1338,8 @@ function slowFade(element) {
 
 
 window.addEventListener('load', function () {
+  // document.getElementById('full-container').style.height = document.getElementById('body').offsetHeight + 'px';
+  // document.getElementById('body').style.height = document.getElementById('full-container').offsetHeight + 'px';
   // const abilityBoxes = document.getElementsByClassName('inner-ability-div');
   // console.log(document.getElementById('a1-hp-left'));
   var gameTag = document.getElementById('game-tag');
@@ -1345,10 +1353,12 @@ window.addEventListener('load', function () {
 
   var keybindContainer = document.getElementById('full-keybind-container');
   var levelButtonContainer = document.getElementById('level-button-container');
+  var levelButtonHeader = document.getElementById("level-button-container-header");
   var statsContainer = document.getElementById('heroes-stats-full-container');
   var levelButtons = document.getElementsByClassName('level-button');
   var backgroundImage = document.getElementById('background-image');
   var titleBackground = document.getElementById('title');
+  var gameContainer = document.getElementById('game-container');
   var keybindInputs = document.getElementsByClassName('keybind-input');
 
   var _loop = function _loop(i) {
@@ -1385,6 +1395,7 @@ window.addEventListener('load', function () {
       } // controlsButton.style.display = '';
 
 
+      levelButtonHeader.style.display = 'none';
       levelButtonContainer.style.display = 'none';
       keybindContainer.style.display = 'none';
       statsContainer.style.display = 'none';
@@ -1403,6 +1414,9 @@ window.addEventListener('load', function () {
 
         charsDisp.style.display = 'none';
         backgroundImage.style.display = 'none';
+        gameContainer.style.height = '88%';
+        document.getElementById('background-image').style.height = '88%';
+        document.getElementById('all-characters-ability-container').style.height = '12%';
         Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i2);
       });
     };
@@ -1428,6 +1442,11 @@ window.addEventListener('load', function () {
     hButtons[0].addEventListener('click', function () {
       hButtonPartialAction();
       levelButtonContainer.style.display = '';
+      levelButtonHeader.style.display = '';
+
+      for (var _i4 = 0; _i4 < levelButtons.length; _i4++) {
+        levelButtons[_i4].style.height = levelButtons[_i4].offsetWidth + 'px';
+      }
     });
     hButtons[1].addEventListener('click', function () {
       hButtonPartialAction();
@@ -1608,7 +1627,7 @@ var actionEight = function actionEight() {
   applyMod(enemiesArr[7][3], 70, false);
 };
 
-var levelOne = new Level('One', enemiesArr[0], 20, "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character is de-selected.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0]]);
+var levelOne = new Level('One', enemiesArr[0], 20, "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character will keep doing it until given a new action.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0]]);
 var levelTwo = new Level('Two', enemiesArr[1], 80, "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1]]);
 var levelThree = new Level('Three', enemiesArr[2], 120, "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2]]);
 var levelFour = new Level('Four', enemiesArr[3], 240, "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", firstFourActions, _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"]);
@@ -1932,6 +1951,22 @@ function deSelect() {
   }
 }
 
+function styleAbilityBox(entity) {
+  var aBoxes = document.getElementsByClassName(entity.imgName + '-inner-ability-divs'); // const aLabels = document.getElementsByClassName(entity.imgName + '-ability-labels');
+
+  for (var i = 0; i < aBoxes.length; i++) {
+    aBoxes[i].style.width = aBoxes[i].offsetHeight + 'px';
+  }
+}
+
+function select(entity) {
+  entity.abilityContainer.style.display = '';
+  currentAbilityBoxes = entity.abilityContainer;
+  styleAbilityBox(entity);
+  entity.img.style.border = '5px solid gold';
+  selectedChar = entity;
+}
+
 function beginCurrentLevel() {
   var beginLevelButton = document.getElementById('begin-level-button');
   Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(beginLevelButton);
@@ -1945,6 +1980,7 @@ function returnToSelectPage() {
   document.getElementById("level-name-display").style.display = 'none';
   document.getElementById('begin-level-button').style.display = 'none';
   document.getElementById('level-button-container').style.display = '';
+  document.getElementById('level-button-container-header').style.display = '';
   document.getElementById('close-button').style.display = '';
 }
 
@@ -1953,48 +1989,26 @@ function selectChar(entity) {
     return;
   }
 
-  if (!selectedChar || selectedChar.hp < 0) {
-    // for (let i = 0; i < entity.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = ''; }
-    entity.abilityContainer.style.display = '';
-    currentAbilityBoxes = entity.abilityContainer;
-    selectedChar = entity;
-    entity.img.style.border = '5px solid gold'; // console.log('selected char: ', selectedChar.imgName);
-  } else if (selectedChar.baseDMG < 0) {
-    // for (let i = 0; i < selectedChar.abilityBoxes; i++) { entity.abilityBoxes[i].style.display = 'none'; }
-    if (selectedChar.target === entity && selectedChar.isAttacking) {
-      deSelect();
-      return;
+  if (selectedChar && selectedChar.baseDMG < 0) {
+    if (!selectedChar.target === entity || !selectedChar.isAttacking) {
+      selectedChar.autoAttack(entity);
     }
-
-    selectedChar.autoAttack(entity);
-    deSelect();
-  } else {
-    selectedChar.abilityContainer.style.display = 'none';
-    selectedChar.img.style.border = 'none';
-    entity.abilityContainer.style.display = '';
-    currentAbilityBoxes = entity.abilityContainer;
-    selectedChar = entity;
-    entity.img.style.border = '5px solid gold';
   }
+
+  deSelect();
+  select(entity);
 }
 
 function selectEnemy(entity) {
   if (!selectedChar || selectedChar.hp < 0) {
-    selectedChar = null;
+    deSelect();
     return;
   } else if (selectedChar.target === entity && selectedChar.isAttacking || entity.hp && entity.hp < 0) {
-    deSelect();
     return;
   }
 
   if (selectedChar.allied && selectedChar.baseDMG > 0) {
-    clearInterval(selectedChar.currentAction);
-    clearInterval(selectedChar.currentAnimation);
     selectedChar.autoAttack(entity);
-    selectedChar.img.style.border = 'none';
-    selectedChar.abilityContainer.style.display = 'none';
-    currentAbilityBoxes = null;
-    selectedChar = null;
   }
 }
 
@@ -2036,26 +2050,26 @@ function abilityClick(arr) {
 }
 
 function setAbilityBoxes() {
-  var abilityBoxes = [];
-  abilityBoxes.push(document.getElementsByClassName('a1-inner-ability-divs'));
-  abilityBoxes.push(document.getElementsByClassName('a2-inner-ability-divs'));
-  abilityBoxes.push(document.getElementsByClassName('a3-inner-ability-divs'));
-  abilityBoxes.push(document.getElementsByClassName('a4-inner-ability-divs'));
+  var abilityBoxes = []; // let abilityLabels = [];
 
-  var _loop2 = function _loop2(i) {
+  for (var i = 1; i < 5; i++) {
+    abilityBoxes.push(document.getElementsByClassName("a".concat(i, "-inner-ability-divs"))); // abilityLabels.push(document.getElementsByClassName(`a${i}-ability-labels`));
+  }
+
+  var _loop2 = function _loop2(_i4) {
     var _loop3 = function _loop3(j) {
-      abilityBoxes[i][j].addEventListener('click', function () {
-        return abilityClick([i + 1, j]);
+      abilityBoxes[_i4][j].addEventListener('click', function () {
+        return abilityClick([_i4 + 1, j]);
       });
     };
 
-    for (var j = 0; j < abilityBoxes[i].length; j++) {
+    for (var j = 0; j < abilityBoxes[_i4].length; j++) {
       _loop3(j);
     }
   };
 
-  for (var i = 0; i < abilityBoxes.length; i++) {
-    _loop2(i);
+  for (var _i4 = 0; _i4 < abilityBoxes.length; _i4++) {
+    _loop2(_i4);
   }
 }
 
@@ -2113,8 +2127,8 @@ function loadLevel(levelNumber) {
   level.action(); // console.log('level selected: ', levelNumber);
 
   document.getElementById('return-button').style.display = '';
-  var levelButtonContainer = document.getElementById('level-button-container');
-  levelButtonContainer.style.display = 'none';
+  document.getElementById('level-button-container').style.display = 'none';
+  document.getElementById('level-button-container-header').style.display = 'none';
   var levelNameDisp = document.getElementById("level-name-display");
   levelNameDisp.style.opacity = 0;
   levelNameDisp.style.display = '';
@@ -2163,12 +2177,15 @@ function setInitialTargets(chars, enemies) {
 
 function setAvailableAbilities(_char4) {
   var abilities = document.getElementsByClassName(_char4.imgName + '-ability-boxes');
+  var boxes = document.getElementsByClassName(_char4.imgName + '-inner-ability-divs');
 
   for (var i = 0; i < abilities.length; i++) {
     if (i < _char4.abilities.length) {
       abilities[i].style.display = '';
+      boxes[i].style.display = '';
     } else {
       abilities[i].style.display = 'none';
+      boxes[i].style.display = 'none';
     }
   }
 }
@@ -2220,55 +2237,7 @@ function setRandomSpawn(enemy, checkPositions) {
   enemy.pos[1] = position[1];
   enemy.container.style.left = enemy.pos[0] + 'px';
   enemy.container.style.top = enemy.pos[1] + 'px';
-} // function randomizeEnemySpawnLocation(char) {
-//     const container = document.getElementById('game-container');
-//     const width = Math.floor(container.offsetWidth);
-//     const height = Math.floor(container.offsetHeight);
-//     let p = Math.floor(Math.random() * 1.2 - 0.2); // from -20% to 100%
-//     const side = Math.floor(Math.random() * Math.floor(4));
-//     switch (side) {
-//         case 0:
-//             char.pos[1] = -210; // top
-//             char.pos[0] = Math.floor(p * width);
-//             if (char.range === 'infinite') {
-//                 moveInside(-210, null);
-//             }
-//             break;
-//         case 1:
-//             char.pos[0] = -160; // left
-//             char.pos[1] = Math.floor(p * height);
-//             if (char.range === 'infinite') {
-//                 moveInside(null, -160);
-//             }
-//             break;
-//         case 2:
-//             char.pos[1] = height + 210; // bottom
-//             char.pos[0] = Math.floor(p * width);
-//             if (char.range === 'infinite') {
-//                 moveInside(210, null);
-//             }
-//             break;
-//         case 3:
-//             char.pos[0] = width + 160; // right
-//             char.pos[1] = Math.floor(p * height);
-//             if (char.range === 'infinite') {
-//                 moveInside(null, 160);
-//             }
-//             break;
-//     }
-//     char.container.style.left = char.pos[0] + 'px';
-//     char.container.style.top = char.pos[1] + 'px';
-//     function moveInside(y, x) {
-//         if (x) {
-//             const randomY = Math.floor(Math.floor(Math.random() * 0.7 + 0.1) * height); // 90% cuz height == top
-//             char.move([char.pos[0] - x, randomY], char.target);
-//         } else {
-//             const randomX = Math.floor(Math.floor(Math.random() * 0.7 + 0.1) * width); // 90%
-//             char.move([randomX, char.pos[1] - y], char.target);
-//         }
-//     }
-// }
-
+}
 
 var boxEntities = [];
 
@@ -2338,43 +2307,43 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     observerObserve(charactersArr[i]);
   }
 
-  var _loop4 = function _loop4(_i4) {
-    if (!enemiesArr[_i4].observer) {
-      addEntityEvents(enemiesArr[_i4], enemiesArr, charactersArr);
+  var _loop4 = function _loop4(_i5) {
+    if (!enemiesArr[_i5].observer) {
+      addEntityEvents(enemiesArr[_i5], enemiesArr, charactersArr);
     }
 
-    livingEnemies[enemiesArr[_i4].imgName] = enemiesArr[_i4];
-    enemiesArr[_i4].container.style.top = enemiesArr[_i4].pos[1] + 'px';
-    enemiesArr[_i4].container.style.left = enemiesArr[_i4].pos[0] + 'px';
-    enemiesArr[_i4].container.style.opacity = 0;
-    enemiesArr[_i4].container.style.display = '';
-    var hpBar = document.getElementById("".concat(enemiesArr[_i4].imgName, "-hp-bar"));
+    livingEnemies[enemiesArr[_i5].imgName] = enemiesArr[_i5];
+    enemiesArr[_i5].container.style.top = enemiesArr[_i5].pos[1] + 'px';
+    enemiesArr[_i5].container.style.left = enemiesArr[_i5].pos[0] + 'px';
+    enemiesArr[_i5].container.style.opacity = 0;
+    enemiesArr[_i5].container.style.display = '';
+    var hpBar = document.getElementById("".concat(enemiesArr[_i5].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
-    var hotkeyInput = document.getElementById("e".concat(_i4 + 1, "-keybind"));
-    enemiesArr[_i4].hotkeyDisplay.innerHTML = hotkeyInput.value;
-    hotkeys[hotkeyInput.value] = enemiesArr[_i4];
+    var hotkeyInput = document.getElementById("e".concat(_i5 + 1, "-keybind"));
+    enemiesArr[_i5].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = enemiesArr[_i5];
 
-    enemiesArr[_i4].container.addEventListener('click', enemyClickEvents);
+    enemiesArr[_i5].container.addEventListener('click', enemyClickEvents);
 
-    enemiesArr[_i4].img.src = enemiesArr[_i4].baseImg.src;
+    enemiesArr[_i5].img.src = enemiesArr[_i5].baseImg.src;
 
-    if (enemiesArr[_i4].pos === null) {
-      setRandomSpawn(enemiesArr[_i4], boxEntities.slice());
+    if (enemiesArr[_i5].pos === null) {
+      setRandomSpawn(enemiesArr[_i5], boxEntities.slice());
     }
 
-    boxEntities.push(enemiesArr[_i4]);
+    boxEntities.push(enemiesArr[_i5]);
 
     var action = function action() {
-      return enemiesArr[_i4].autoAttack(enemiesArr[_i4].target);
+      return enemiesArr[_i5].autoAttack(enemiesArr[_i5].target);
     };
 
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i4].container, action); // begin attacking target
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i5].container, action); // begin attacking target
 
-    observerObserve(enemiesArr[_i4]);
+    observerObserve(enemiesArr[_i5]);
   };
 
-  for (var _i4 = 0; _i4 < enemiesArr.length; _i4++) {
-    _loop4(_i4);
+  for (var _i5 = 0; _i5 < enemiesArr.length; _i5++) {
+    _loop4(_i5);
   } // console.log("hotkeys: ", hotkeys);
 
 }
@@ -2410,44 +2379,44 @@ function endGame(charsList, enemyList) {
   var allCharsList = levels[currentLevelNumber].characterList;
   var allEnemyList = levels[currentLevelNumber].enemyList;
 
-  for (var _i5 = 0; _i5 < allCharsList.length; _i5++) {
-    allCharsList[_i5].observer.disconnect();
+  for (var _i6 = 0; _i6 < allCharsList.length; _i6++) {
+    allCharsList[_i6].observer.disconnect();
 
-    if (allCharsList[_i5].currentAction) {
-      clearInterval(allCharsList[_i5].currentAction);
+    if (allCharsList[_i6].currentAction) {
+      clearInterval(allCharsList[_i6].currentAction);
     }
 
-    if (allCharsList[_i5].currentAnimation) {
-      clearInterval(allCharsList[_i5].currentAnimation);
+    if (allCharsList[_i6].currentAnimation) {
+      clearInterval(allCharsList[_i6].currentAnimation);
     }
 
-    allCharsList[_i5].isAttacking = false;
-    allCharsList[_i5].isMoving = false;
-    allCharsList[_i5].target = null;
+    allCharsList[_i6].isAttacking = false;
+    allCharsList[_i6].isMoving = false;
+    allCharsList[_i6].target = null;
 
-    allCharsList[_i5].container.removeEventListener('click', allyClickEvents);
+    allCharsList[_i6].container.removeEventListener('click', allyClickEvents);
 
-    allCharsList[_i5].img.src = allCharsList[_i5].baseImg.src;
+    allCharsList[_i6].img.src = allCharsList[_i6].baseImg.src;
   }
 
-  for (var _i6 = 0; _i6 < allEnemyList.length; _i6++) {
-    allEnemyList[_i6].observer.disconnect();
+  for (var _i7 = 0; _i7 < allEnemyList.length; _i7++) {
+    allEnemyList[_i7].observer.disconnect();
 
-    if (allEnemyList[_i6].currentAction) {
-      clearInterval(allEnemyList[_i6].currentAction);
+    if (allEnemyList[_i7].currentAction) {
+      clearInterval(allEnemyList[_i7].currentAction);
     }
 
-    if (allEnemyList[_i6].currentAnimation) {
-      clearInterval(allEnemyList[_i6].currentAnimation);
+    if (allEnemyList[_i7].currentAnimation) {
+      clearInterval(allEnemyList[_i7].currentAnimation);
     }
 
-    allEnemyList[_i6].isAttacking = false;
-    allEnemyList[_i6].isMoving = false;
-    allEnemyList[_i6].target = null;
+    allEnemyList[_i7].isAttacking = false;
+    allEnemyList[_i7].isMoving = false;
+    allEnemyList[_i7].target = null;
 
-    allEnemyList[_i6].container.removeEventListener('click', enemyClickEvents);
+    allEnemyList[_i7].container.removeEventListener('click', enemyClickEvents);
 
-    allEnemyList[_i6].img.src = allEnemyList[_i6].baseImg.src;
+    allEnemyList[_i7].img.src = allEnemyList[_i7].baseImg.src;
   }
 
   if (charsList.length > 0) {
@@ -2456,8 +2425,8 @@ function endGame(charsList, enemyList) {
     var backgroundImg = document.getElementById('background-image');
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
 
-    for (var _i7 = 0; _i7 < enemyList.length; _i7++) {
-      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i7].container);
+    for (var _i8 = 0; _i8 < enemyList.length; _i8++) {
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i8].container);
     }
 
     fadeOutGame(false);
@@ -2497,6 +2466,8 @@ function addCharXP() {
 
   for (var i = 0; i < c.length; i++) {
     c[i].xpObserver.disconnect();
+    var expWords = document.getElementById(c[i].imgName + '-exp-words');
+    expWords.innerHTML = 'Level: ' + c[i].level;
     c[i].hpContainerLeft.style.backgroundColor = 'gold';
     var xpPercent = Math.floor(c[i].xp / c[i].nextLevelXP * 100);
     c[i].hpContainerLeft.style.width = "".concat(xpPercent, "%");
@@ -2515,28 +2486,32 @@ function addCharXP() {
     if (timeCount === 60) {
       clearInterval(xpInterval);
 
-      for (var _i8 = 0; _i8 < c.length; _i8++) {
-        c[_i8].xp = Math.ceil(c[_i8].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+      for (var _i9 = 0; _i9 < c.length; _i9++) {
+        c[_i9].xp = Math.ceil(c[_i9].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
 
-        c[_i8].container.style.border = 'none';
-        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i8].container);
+        c[_i9].container.style.border = 'none';
+        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i9].container);
       }
 
       var backgroundImg = document.getElementById('background-image');
       Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
     }
 
-    for (var _i9 = 0; _i9 < c.length; _i9++) {
-      c[_i9].xp += xpPerInterval;
+    for (var _i10 = 0; _i10 < c.length; _i10++) {
+      c[_i10].xp += xpPerInterval;
 
-      if (c[_i9].xp > c[_i9].nextLevelXP) {
-        c[_i9].levelUp();
+      if (c[_i10].xp > c[_i10].nextLevelXP) {
+        c[_i10].levelUp();
+
+        var _expWords = document.getElementById(c[_i10].imgName + '-exp-words');
+
+        _expWords.innerHTML = 'Level: ' + c[_i10].level;
       }
 
-      var _xpPercent = Math.floor(c[_i9].xp / c[_i9].nextLevelXP * 100);
+      var _xpPercent = Math.floor(c[_i10].xp / c[_i10].nextLevelXP * 100);
 
-      c[_i9].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
-      c[_i9].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
+      c[_i10].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
+      c[_i10].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
     }
 
     timeCount++;
@@ -2587,13 +2562,20 @@ function fadeOutGame(won) {
 function resetGame(won) {
   livingChars = {};
   livingEnemies = {};
-  var levelButtonContainer = document.getElementById('level-button-container');
-  levelButtonContainer.style.display = '';
+  document.getElementById('level-button-container').style.display = '';
+  document.getElementById('level-button-container-header').style.display = '';
   document.getElementById('close-button').style.display = '';
+  document.getElementById('game-container').style.height = '100%';
+  document.getElementById('background-image').style.height = '100%';
+  document.getElementById('all-characters-ability-container').style.height = '0%';
+  var levelButtons = document.getElementsByClassName('level-button');
+
+  for (var i = 0; i < levelButtons.length; i++) {
+    levelButtons[i].style.height = levelButtons[i].offsetWidth + 'px';
+  }
 
   if (won && maxLevelNumber === currentLevelNumber) {
     maxLevelNumber++;
-    var levelButtons = document.getElementsByClassName('level-button');
 
     if (levelButtons[maxLevelNumber]) {
       levelButtons[maxLevelNumber].style.opacity = 100 + '%';
@@ -2604,30 +2586,39 @@ function resetGame(won) {
   var levChars = levels[currentLevelNumber].characterList;
   var levEnems = levels[currentLevelNumber].enemyList;
 
-  for (var i = 0; i < levChars.length; i++) {
-    levChars[i].hp = levChars[i].baseHP;
-    levChars[i].dmg = levChars[i].baseDMG;
-    levChars[i].defense = levChars[i].baseDefense;
-    levChars[i].pos[0] = levChars[i].basePos[0];
-    levChars[i].pos[1] = levChars[i].basePos[1];
-    levChars[i].container.style.top = levChars[i].pos[1] + 'px';
-    levChars[i].container.style.left = levChars[i].pos[0] + 'px';
-    levChars[i].hpContainerLeft.style.backgroundColor = 'blue';
-    levChars[i].img.style.border = 'none';
-    levChars[i].setHpBars();
+  for (var _i11 = 0; _i11 < levChars.length; _i11++) {
+    levChars[_i11].hp = levChars[_i11].baseHP;
+    levChars[_i11].dmg = levChars[_i11].baseDMG;
+    levChars[_i11].defense = levChars[_i11].baseDefense;
+    levChars[_i11].ms = levChars[_i11].baseMS;
+    levChars[_i11].stunned = false;
+    levChars[_i11].rooted = false;
+    levChars[_i11].pos[0] = levChars[_i11].basePos[0];
+    levChars[_i11].pos[1] = levChars[_i11].basePos[1];
+    levChars[_i11].container.style.top = levChars[_i11].pos[1] + 'px';
+    levChars[_i11].container.style.left = levChars[_i11].pos[0] + 'px';
+    levChars[_i11].hpContainerLeft.style.backgroundColor = 'blue';
+    var expWords = document.getElementById(levChars[_i11].imgName + '-exp-words');
+    expWords.innerHTML = '';
+    levChars[_i11].img.style.border = 'none';
+
+    levChars[_i11].setHpBars();
   }
 
-  for (var _i10 = 0; _i10 < levEnems.length; _i10++) {
-    levEnems[_i10].hp = levEnems[_i10].baseHP;
-    levEnems[_i10].dmg = levEnems[_i10].baseDMG;
-    levEnems[_i10].defense = levEnems[_i10].baseDefense;
-    levEnems[_i10].pos[0] = levEnems[_i10].basePos[0];
-    levEnems[_i10].pos[1] = levEnems[_i10].basePos[1];
-    levEnems[_i10].container.style.top = levEnems[_i10].pos[1] + 'px';
-    levEnems[_i10].container.style.left = levEnems[_i10].pos[0] + 'px';
-    levEnems[_i10].img.style.border = 'none';
+  for (var _i12 = 0; _i12 < levEnems.length; _i12++) {
+    levEnems[_i12].hp = levEnems[_i12].baseHP;
+    levEnems[_i12].dmg = levEnems[_i12].baseDMG;
+    levEnems[_i12].defense = levEnems[_i12].baseDefense;
+    levEnems[_i12].ms = levEnems[_i12].baseMS;
+    levEnems[_i12].stunned = false;
+    levEnems[_i12].rooted = false;
+    levEnems[_i12].pos[0] = levEnems[_i12].basePos[0];
+    levEnems[_i12].pos[1] = levEnems[_i12].basePos[1];
+    levEnems[_i12].container.style.top = levEnems[_i12].pos[1] + 'px';
+    levEnems[_i12].container.style.left = levEnems[_i12].pos[0] + 'px';
+    levEnems[_i12].img.style.border = 'none';
 
-    levEnems[_i10].setHpBars();
+    levEnems[_i12].setHpBars();
   }
 }
 
