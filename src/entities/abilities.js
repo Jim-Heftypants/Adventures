@@ -1,3 +1,5 @@
+//                              Cleric Abilities
+
 const groupHeal = (entity) => {
     for (let i = 0; i < entity.allies.length; i++) {
         if (entity.allies[i].hp > 0) {
@@ -11,13 +13,16 @@ const groupHeal = (entity) => {
     return 10;
 }
 
+const protection = (entity) => {
+    if (!checkAbilityPossible(entity, 1)) { return false; }
+    entity.target.tempHP -= entity.dmg;
+    entity.target.armor += entity.dmg;
+
+}
+
+
 const powerSwing = (entity) => {
-    if (!entity.target || !entity.withinAttackRange(entity.target) || entity.target.hp < 0) {
-        entity.abilityShouldCast[0] = true;
-        // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
-        document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
-        return false;
-    }
+    if (!checkAbilityPossible(entity, 0)) { return false; }
     entity.target.hp -= Math.ceil(entity.dmg * 1.5);
     // knockbackTarget(entity, 80);
     entity.target.setHpBars();
@@ -33,12 +38,7 @@ const powerSwing = (entity) => {
 }
 
 const poisonDagger = (entity) => {
-    if (!entity.target || !entity.withinAttackRange(entity.target) || entity.target.hp < 0) {
-        entity.abilityShouldCast[0] = true;
-        // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
-        document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
-        return false;
-    }
+    if (!checkAbilityPossible(entity, 0)) { return false; }
     let timer = 0;
     entity.target.slowed = 50;
     entity.target.ms -= Math.floor(entity.target.baseMS / 2);
@@ -65,12 +65,7 @@ const poisonDagger = (entity) => {
 }
 
 const meteor = (entity) => {
-    if (!entity.target || entity.target.hp < 0) {
-        entity.abilityShouldCast[0] = true;
-        // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
-        document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
-        return false;
-    }
+    if (!checkAbilityPossible(entity, 0)) {return false;}
     const fireblastDiv = document.getElementById('firebomb-div');
     spellTrack(fireblastDiv, entity, entity.target, (entity, img) => {
         // console.log('entity: ', entity, " img: ", img);
@@ -105,9 +100,16 @@ const wizardAbilities = [meteor];
 const rogueAbilities = [poisonDagger];
 export const allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
 
+function checkAbilityPossible(entity, abNum) {
+    if (entity.target && entity.withinAttackRange(entity.target) && entity.target.hp > 0) {
+        return true;
+    }
+    entity.abilityShouldCast[abNum] = true;
+    document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[abNum].style.backgroundColor = 'lawngreen';
+    return false;
+}
 
 const lightningAutoAttack = (entity) => {
-    // const effectDiv = document.getElementById(entity.imgName + '-extra-effect');
     let pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
     if (entity.img.style.transform === "scaleX(-1)") {
         pos[0] -= 60

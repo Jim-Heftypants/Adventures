@@ -578,7 +578,7 @@ body {
     position: absolute;
     height: 200px;
     width: 150px;
-    opacity: 30%;
+    opacity: 50%;
     background-color: mediumaquamarine;
     z-index: 20;
     pointer-events: none;

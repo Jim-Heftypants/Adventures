@@ -6,6 +6,7 @@ class Entity { // this. is selectedChar
         this.trueBaseHp = baseHP;
         this.baseHP = baseHP;
         this.hp = this.baseHP;
+        this.tempHP = 0;
         this.baseMS = ms; // speed / time
         this.ms = this.baseMS;
         this.allied = allied; // true === player character
@@ -159,14 +160,14 @@ class Entity { // this. is selectedChar
         this.movingOutTheWay = true;
         this.clearIntervals();
         this.isMoving = true;
-        endPos[0] = Math.floor(endPos[0] - (this.img.width * (3/2)));
-        endPos[1] = Math.floor(endPos[1] - (this.img.height * (3/4)));
+        endPos[0] = Math.floor(endPos[0] - (this.container.offsetWidth * (1/2)));
+        endPos[1] = Math.floor(endPos[1] - (this.container.offsetHeight * (1/2)));
         let pos = this.pos;
         let posChange = this.vectorToScalar(endPos);
         // console.log("pos change on move", posChange);
         const bigDiv = document.getElementById('game-container');
-        const difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
-        const checker = difference + Math.floor(bigDiv.offsetWidth);
+        const width = bigDiv.offsetWidth;
+        const height = bigDiv.offsetHeight;
         if (pos[0] - endPos[0] < 0) {
             this.img.style.transform = "scaleX(1)";
         } else {
@@ -191,10 +192,10 @@ class Entity { // this. is selectedChar
                 } else { // need to add something for if (attackOnFinish) then update move destination to be the target's new position (with the modifiers)
                 // begin some kind of animation
                     pos[0] += posChange[0]; pos[1] += posChange[1];
-                    if (pos[0] + Math.floor((3 * self.img.width) / 2) + 50 > checker) { pos[0] = checker - (Math.floor((3 * self.img.width) / 2) + 50);}
-                    if (pos[0] < 15) {pos[0] = 15;}
-                    if (pos[1] + Math.floor(self.img.height) > 850) { pos[1] = 850 - Math.floor(self.img.height);}
-                    if (pos[1] < 15) {pos[1] = 15;}
+                    if (pos[0] + Math.floor(self.container.offsetWidth) + 10 > width) { pos[0] = width - Math.floor(self.container.offsetWidth) - 10;}
+                    if (pos[0] < 10) {pos[0] = 10;}
+                    if (pos[1] + Math.floor(self.container.offsetHeight) + 10 > height) { pos[1] = height - Math.floor(self.container.offsetHeight) - 10;}
+                    if (pos[1] < 10) {pos[1] = 10;}
                     // console.log('posChange: ', posChange);
                     // console.log('pos: ', pos);
     
@@ -319,21 +320,30 @@ class Entity { // this. is selectedChar
     }
 
     setOverlay(targetChar) {
-        this.attackOverlay[0].style.top = (targetChar.pos[1] + 40) + 'px';
-        this.attackOverlay[0].style.left = targetChar.pos[0] + 'px';
-        this.attackOverlay[0].style.width = targetChar.img.width + 'px';
-        this.attackOverlay[0].style.height = targetChar.img.height + 'px';
-        this.attackOverlay[0].style.display = '';
-        const selectedChar = this;
+        // create div for overlay
+        let attackOverlay = document.createElement("div");
+        attackOverlay.classList.add(targetChar.imgName.substr(0, 1) + "-heal-overlay");
+        document.getElementById("game-container").appendChild(attackOverlay);
+        attackOverlay.style.top = (targetChar.pos[1] + 40) + 'px';
+        attackOverlay.style.left = targetChar.pos[0] + 'px';
+        attackOverlay.style.width = targetChar.img.width + 'px';
+        attackOverlay.style.height = targetChar.img.height + 'px';
+        attackOverlay.style.display = '';
         const clearTime = Math.floor(this.as / 2);
+        // 50%op => 0%op over clearTime / 20
+        const iterations = clearTime / 20;
+        let opacity = 50;
+        const opSubtraction = opacity / iterations;
         let timeCheck = 0;
         let stackInterval = setInterval(() => {
-            selectedChar.attackOverlay[0].style.top = targetChar.pos[1] + 40 + 'px';
-            selectedChar.attackOverlay[0].style.left = targetChar.pos[0] + 'px';
+            attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
+            attackOverlay.style.left = targetChar.pos[0] + 'px';
+            opacity -= opSubtraction;
+            attackOverlay.style.opacity = opacity + '%';
             timeCheck += 20;
             if (timeCheck >= clearTime || targetChar.img.style.display === 'none') {
                 clearInterval(stackInterval);
-                selectedChar.attackOverlay[0].style.display = 'none';
+                attackOverlay.remove();
             }
         }, 20);
     }
@@ -406,7 +416,6 @@ class Entity { // this. is selectedChar
             if (this.target.hp > this.target.baseHP) { this.target.hp = this.target.baseHP; }
             if (!this.target.allied && this.allied && this.target.baseDMG > 0 && this.defense > this.target.target.defense) {
                 this.target.target = this;
-                this.target.clearIntervals();
                 this.target.autoAttack(this);
             }
             this.target.setHpBars();
@@ -433,15 +442,18 @@ class Entity { // this. is selectedChar
             }
             if (this.range !== 'infinite' && this.charactersStacked()) {
                 this.movingOutTheWay = true;
-                const addition = Math.floor(this.img.width / 2);
+                const widthAddition = Math.floor(this.container.offsetWidth / 2);
+                const eWidthAddition = Math.floor(this.target.container.offsetWidth);
+                // const heightAddition = Math.floor(this.container.offsetHeight / 2);
+                const eHeightAddition = Math.floor(this.target.container.offsetHeight / 2);
                 if (this.img.style.transform === "scaleX(-1)") {
                     // move to left side of target
-                    this.img.style.transform = "scaleX(1)";// - (addition / 4)
-                    this.move([this.target.pos[0] + addition, this.target.pos[1] + Math.floor(this.target.img.height * 3 / 4)], this.target)
+                    this.img.style.transform = "scaleX(1)";
+                    this.move([this.target.pos[0] - widthAddition, this.target.pos[1] + eHeightAddition], this.target)
                 } else {
                     // move to right side of target;
                     this.img.style.transform = "scaleX(-1)";
-                    this.move([this.target.pos[0] + (5 * addition), this.target.pos[1] + Math.floor(this.target.img.height * 3 / 4)], this.target)
+                    this.move([this.target.pos[0] + (widthAddition + eWidthAddition), this.target.pos[1] + eHeightAddition], this.target)
                 }
             }
         }

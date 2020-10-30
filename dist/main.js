@@ -97,6 +97,7 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "allAbilities", function() { return allAbilities; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "specialAttackEffects", function() { return specialAttackEffects; });
+//                              Cleric Abilities
 var groupHeal = function groupHeal(entity) {
   for (var i = 0; i < entity.allies.length; i++) {
     if (entity.allies[i].hp > 0) {
@@ -115,11 +116,17 @@ var groupHeal = function groupHeal(entity) {
   return 10;
 };
 
-var powerSwing = function powerSwing(entity) {
-  if (!entity.target || !entity.withinAttackRange(entity.target) || entity.target.hp < 0) {
-    entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
+var protection = function protection(entity) {
+  if (!checkAbilityPossible(entity, 1)) {
+    return false;
+  }
 
-    document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
+  entity.target.tempHP -= entity.dmg;
+  entity.target.armor += entity.dmg;
+};
+
+var powerSwing = function powerSwing(entity) {
+  if (!checkAbilityPossible(entity, 0)) {
     return false;
   }
 
@@ -144,10 +151,7 @@ var powerSwing = function powerSwing(entity) {
 };
 
 var poisonDagger = function poisonDagger(entity) {
-  if (!entity.target || !entity.withinAttackRange(entity.target) || entity.target.hp < 0) {
-    entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
-
-    document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
+  if (!checkAbilityPossible(entity, 0)) {
     return false;
   }
 
@@ -182,10 +186,7 @@ var poisonDagger = function poisonDagger(entity) {
 };
 
 var meteor = function meteor(entity) {
-  if (!entity.target || entity.target.hp < 0) {
-    entity.abilityShouldCast[0] = true; // document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.border = '5px solid black';
-
-    document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[0].style.backgroundColor = 'lawngreen';
+  if (!checkAbilityPossible(entity, 0)) {
     return false;
   }
 
@@ -226,8 +227,17 @@ var wizardAbilities = [meteor];
 var rogueAbilities = [poisonDagger];
 var allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
 
+function checkAbilityPossible(entity, abNum) {
+  if (entity.target && entity.withinAttackRange(entity.target) && entity.target.hp > 0) {
+    return true;
+  }
+
+  entity.abilityShouldCast[abNum] = true;
+  document.getElementsByClassName(entity.imgName + '-inner-ability-divs')[abNum].style.backgroundColor = 'lawngreen';
+  return false;
+}
+
 var lightningAutoAttack = function lightningAutoAttack(entity) {
-  // const effectDiv = document.getElementById(entity.imgName + '-extra-effect');
   var pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
 
   if (entity.img.style.transform === "scaleX(-1)") {
@@ -584,6 +594,7 @@ var Entity = /*#__PURE__*/function () {
     this.trueBaseHp = baseHP;
     this.baseHP = baseHP;
     this.hp = this.baseHP;
+    this.tempHP = 0;
     this.baseMS = ms; // speed / time
 
     this.ms = this.baseMS;
@@ -762,14 +773,14 @@ var Entity = /*#__PURE__*/function () {
       this.movingOutTheWay = true;
       this.clearIntervals();
       this.isMoving = true;
-      endPos[0] = Math.floor(endPos[0] - this.img.width * (3 / 2));
-      endPos[1] = Math.floor(endPos[1] - this.img.height * (3 / 4));
+      endPos[0] = Math.floor(endPos[0] - this.container.offsetWidth * (1 / 2));
+      endPos[1] = Math.floor(endPos[1] - this.container.offsetHeight * (1 / 2));
       var pos = this.pos;
       var posChange = this.vectorToScalar(endPos); // console.log("pos change on move", posChange);
 
       var bigDiv = document.getElementById('game-container');
-      var difference = Math.floor((window.innerWidth - bigDiv.offsetWidth) / 2);
-      var checker = difference + Math.floor(bigDiv.offsetWidth);
+      var width = bigDiv.offsetWidth;
+      var height = bigDiv.offsetHeight;
 
       if (pos[0] - endPos[0] < 0) {
         this.img.style.transform = "scaleX(1)";
@@ -804,20 +815,20 @@ var Entity = /*#__PURE__*/function () {
             pos[0] += posChange[0];
             pos[1] += posChange[1];
 
-            if (pos[0] + Math.floor(3 * self.img.width / 2) + 50 > checker) {
-              pos[0] = checker - (Math.floor(3 * self.img.width / 2) + 50);
+            if (pos[0] + Math.floor(self.container.offsetWidth) + 10 > width) {
+              pos[0] = width - Math.floor(self.container.offsetWidth) - 10;
             }
 
-            if (pos[0] < 15) {
-              pos[0] = 15;
+            if (pos[0] < 10) {
+              pos[0] = 10;
             }
 
-            if (pos[1] + Math.floor(self.img.height) > 850) {
-              pos[1] = 850 - Math.floor(self.img.height);
+            if (pos[1] + Math.floor(self.container.offsetHeight) + 10 > height) {
+              pos[1] = height - Math.floor(self.container.offsetHeight) - 10;
             }
 
-            if (pos[1] < 15) {
-              pos[1] = 15;
+            if (pos[1] < 10) {
+              pos[1] = 10;
             } // console.log('posChange: ', posChange);
             // console.log('pos: ', pos);
 
@@ -995,22 +1006,31 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "setOverlay",
     value: function setOverlay(targetChar) {
-      this.attackOverlay[0].style.top = targetChar.pos[1] + 40 + 'px';
-      this.attackOverlay[0].style.left = targetChar.pos[0] + 'px';
-      this.attackOverlay[0].style.width = targetChar.img.width + 'px';
-      this.attackOverlay[0].style.height = targetChar.img.height + 'px';
-      this.attackOverlay[0].style.display = '';
-      var selectedChar = this;
-      var clearTime = Math.floor(this.as / 2);
+      // create div for overlay
+      var attackOverlay = document.createElement("div");
+      attackOverlay.classList.add(targetChar.imgName.substr(0, 1) + "-heal-overlay");
+      document.getElementById("game-container").appendChild(attackOverlay);
+      attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
+      attackOverlay.style.left = targetChar.pos[0] + 'px';
+      attackOverlay.style.width = targetChar.img.width + 'px';
+      attackOverlay.style.height = targetChar.img.height + 'px';
+      attackOverlay.style.display = '';
+      var clearTime = Math.floor(this.as / 2); // 50%op => 0%op over clearTime / 20
+
+      var iterations = clearTime / 20;
+      var opacity = 50;
+      var opSubtraction = opacity / iterations;
       var timeCheck = 0;
       var stackInterval = setInterval(function () {
-        selectedChar.attackOverlay[0].style.top = targetChar.pos[1] + 40 + 'px';
-        selectedChar.attackOverlay[0].style.left = targetChar.pos[0] + 'px';
+        attackOverlay.style.top = targetChar.pos[1] + 40 + 'px';
+        attackOverlay.style.left = targetChar.pos[0] + 'px';
+        opacity -= opSubtraction;
+        attackOverlay.style.opacity = opacity + '%';
         timeCheck += 20;
 
         if (timeCheck >= clearTime || targetChar.img.style.display === 'none') {
           clearInterval(stackInterval);
-          selectedChar.attackOverlay[0].style.display = 'none';
+          attackOverlay.remove();
         }
       }, 20);
     }
@@ -1106,7 +1126,6 @@ var Entity = /*#__PURE__*/function () {
 
         if (!this.target.allied && this.allied && this.target.baseDMG > 0 && this.defense > this.target.target.defense) {
           this.target.target = this;
-          this.target.clearIntervals();
           this.target.autoAttack(this);
         }
 
@@ -1138,17 +1157,19 @@ var Entity = /*#__PURE__*/function () {
 
         if (this.range !== 'infinite' && this.charactersStacked()) {
           this.movingOutTheWay = true;
-          var addition = Math.floor(this.img.width / 2);
+          var widthAddition = Math.floor(this.container.offsetWidth / 2);
+          var eWidthAddition = Math.floor(this.target.container.offsetWidth); // const heightAddition = Math.floor(this.container.offsetHeight / 2);
+
+          var eHeightAddition = Math.floor(this.target.container.offsetHeight / 2);
 
           if (this.img.style.transform === "scaleX(-1)") {
             // move to left side of target
-            this.img.style.transform = "scaleX(1)"; // - (addition / 4)
-
-            this.move([this.target.pos[0] + addition, this.target.pos[1] + Math.floor(this.target.img.height * 3 / 4)], this.target);
+            this.img.style.transform = "scaleX(1)";
+            this.move([this.target.pos[0] - widthAddition, this.target.pos[1] + eHeightAddition], this.target);
           } else {
             // move to right side of target;
             this.img.style.transform = "scaleX(-1)";
-            this.move([this.target.pos[0] + 5 * addition, this.target.pos[1] + Math.floor(this.target.img.height * 3 / 4)], this.target);
+            this.move([this.target.pos[0] + (widthAddition + eWidthAddition), this.target.pos[1] + eHeightAddition], this.target);
           }
         }
       }
@@ -1414,8 +1435,8 @@ window.addEventListener('load', function () {
 
         charsDisp.style.display = 'none';
         backgroundImage.style.display = 'none';
-        gameContainer.style.height = '88%';
         document.getElementById('background-image').style.height = '88%';
+        gameContainer.style.height = '88%';
         document.getElementById('all-characters-ability-container').style.height = '12%';
         Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i2);
       });
@@ -1990,9 +2011,13 @@ function selectChar(entity) {
   }
 
   if (selectedChar && selectedChar.baseDMG < 0) {
-    if (!selectedChar.target === entity || !selectedChar.isAttacking) {
-      selectedChar.autoAttack(entity);
-    }
+    if (!selectedChar.target || selectedChar.target.klass !== entity.klass || !selectedChar.isAttacking) {
+      selectedChar.autoAttack(entity); // console.log('heal target switched');
+    } // console.log('no change. Target: ', selectedChar.target, ' entity: ', entity);
+
+
+    deSelect();
+    return;
   }
 
   deSelect();
@@ -2118,6 +2143,9 @@ function loadLevel(levelNumber) {
   }
 
   if (levelNumber > maxLevelNumber) {
+    document.getElementById('game-container').style.height = '100%';
+    document.getElementById('background-image').style.height = '100%';
+    document.getElementById('all-characters-ability-container').style.height = '0%';
     return;
   }
 
@@ -2457,7 +2485,7 @@ function endMoveChars(charsList) {
 
   for (var i = 0; i < charsList.length; i++) {
     xpObserverObserve(charsList[i]);
-    charsList[i].move([i * 160 + (i + 1) * basePos[0] + basePos[2], basePos[1]], false, true);
+    charsList[i].move([i * 160 + (i + 1) * basePos[0], basePos[1]], false, true); // removed + basePos[2] from x side
   }
 }
 

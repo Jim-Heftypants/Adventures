@@ -280,9 +280,13 @@ function selectChar(entity) {
         return;
     }
     if (selectedChar && selectedChar.baseDMG < 0) {
-        if (!selectedChar.target === entity || !selectedChar.isAttacking) {
+        if (!selectedChar.target || selectedChar.target.klass !== entity.klass || !selectedChar.isAttacking) {
             selectedChar.autoAttack(entity);
+            // console.log('heal target switched');
         }
+        // console.log('no change. Target: ', selectedChar.target, ' entity: ', entity);
+        deSelect();
+        return;
     }
     deSelect();
     select(entity);
@@ -397,6 +401,9 @@ function loadLevel(levelNumber) {
         initializeGameOpening();
     }
     if (levelNumber > maxLevelNumber) {
+        document.getElementById('game-container').style.height = '100%';
+        document.getElementById('background-image').style.height = '100%';
+        document.getElementById('all-characters-ability-container').style.height = '0%';
         return;
     }
     const level = levels[levelNumber];
@@ -667,7 +674,7 @@ function endMoveChars(charsList) {
     const basePos = modEndPos(); // make into % values
     for (let i = 0; i < charsList.length; i++) {
         xpObserverObserve(charsList[i]);
-        charsList[i].move([(i*160) + ((i+1)*basePos[0]) + basePos[2], basePos[1]], false, true);
+        charsList[i].move([(i*160) + ((i+1)*basePos[0]), basePos[1]], false, true); // removed + basePos[2] from x side
     }
 }
 
