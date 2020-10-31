@@ -109,110 +109,206 @@ var groupHeal = function groupHeal(entity) {
 
       entity.setOverlay(entity.allies[i]);
       entity.allies[i].setHpBars();
-      setBorder(entity);
+      setBorder(entity.allies[i]);
     }
   }
 
-  return 10;
+  return 16;
 };
 
-var protection = function protection(entity) {
-  if (!checkAbilityPossible(entity, 1)) {
+var protection = function protection(entity, target) {
+  if (!checkAbilityPossible(entity, 1, target)) {
     return false;
   }
 
-  entity.target.tempHP -= entity.dmg;
-  entity.target.armor += entity.dmg;
-};
+  target.tempHP -= entity.dmg;
+  target.armor -= entity.dmg;
+  target.setHpBars();
+  var overlay = document.createElement("div");
+  overlay.classList.add("oval-shape");
+  document.getElementById("game-container").appendChild(overlay);
+  overlay.style.backgroundColor = 'blue';
+  overlay.style.top = target.pos[1] + 40 + 'px';
+  overlay.style.left = target.pos[0] + 'px';
+  overlay.style.width = target.img.width + 'px';
+  overlay.style.height = target.img.height + 'px';
+  setTimeout(function () {
+    target.armor += entity.dmg;
+    overlay.remove();
+  }, 8000);
+  var timeCount = 0;
+  var timer = setInterval(function () {
+    timeCount += 20;
+    overlay.style.top = target.pos[1] + 40 + 'px';
+    overlay.style.left = target.pos[0] + 'px';
 
-var powerSwing = function powerSwing(entity) {
-  if (!checkAbilityPossible(entity, 0)) {
+    if (timeCount >= 8000) {
+      clearInterval(timer);
+    }
+  }, 20);
+  return 20;
+}; //                              Warrior Abilities
+
+
+var powerSwing = function powerSwing(entity, target) {
+  if (!checkAbilityPossible(entity, 0, target)) {
     return false;
   }
 
-  entity.target.hp -= Math.ceil(entity.dmg * 1.5); // knockbackTarget(entity, 80);
+  target.hp -= Math.ceil(entity.dmg * 1.5); // knockbackTarget(entity, 80);
 
-  entity.target.setHpBars();
-  entity.target.stunned = true;
-  entity.target.img.src = entity.target.baseImg.src;
-  entity.target.imgCycle = 0;
-  setBorder(entity);
+  target.setHpBars();
+  target.stunned = true;
+  target.img.src = target.baseImg.src;
+  target.imgCycle = 0;
+  setBorder(target);
 
-  if (entity.target.hp <= 0) {
-    entity.killEntitiy(entity.target);
+  if (target.hp <= 0) {
+    entity.killEntitiy(target);
   }
 
   setTimeout(function () {
-    if (entity.target) {
-      entity.target.stunned = false;
-    }
+    target.stunned = false;
   }, 2000);
-  return 10;
+  return 12;
 };
 
-var poisonDagger = function poisonDagger(entity) {
-  if (!checkAbilityPossible(entity, 0)) {
+var charge = function charge(entity, target) {
+  if (!checkAbilityPossible(entity, 1, target, true)) {
+    return false;
+  }
+
+  entity.lockedIntoAbility = true;
+  entity.ms += 15;
+  entity.trackTarget(target, true);
+
+  if (target.baseDMG > 0) {
+    target.target = entity;
+    target.autoAttack(entity);
+  }
+
+  var inter = setInterval(function () {
+    if (!entity.lockedIntoAbility) {
+      entity.ms -= 15;
+      clearInterval(inter);
+    }
+  }, 40);
+  return 10;
+}; //                              Rogue Abilities
+
+
+var poisonDagger = function poisonDagger(entity, target) {
+  if (!checkAbilityPossible(entity, 0, target)) {
     return false;
   }
 
   var timer = 0;
-  entity.target.slowed = 50;
-  entity.target.ms -= Math.floor(entity.target.baseMS / 2);
+  target.slowed = 50;
+  target.ms -= Math.floor(target.baseMS / 2);
 
   var _int = setInterval(function () {
-    if (!entity.target || entity.target.container.style.display === 'none') {
+    if (!target || target.container.style.display === 'none') {
       clearInterval(_int);
       return;
     }
 
     timer++;
-    entity.target.hp -= Math.floor(Math.ceil(entity.dmg * 1.5) / 6);
-    entity.target.setHpBars();
-    setBorder(entity);
+    target.hp -= Math.floor(Math.ceil(entity.dmg * 3) / 6);
+    target.setHpBars();
+    setBorder(target);
 
-    if (entity.target.hp <= 0) {
-      entity.killEntitiy(entity.target);
+    if (target.hp <= 0) {
+      entity.killEntitiy(target);
       clearInterval(_int);
     }
 
     if (timer > 5) {
       clearInterval(_int);
-      entity.target.slowed = false;
-      entity.target.ms += Math.floor(entity.target.baseMS / 2);
+      target.slowed = false;
+      target.ms += Math.floor(target.baseMS / 2);
     }
   }, 500);
 
   return 10;
 };
 
-var meteor = function meteor(entity) {
-  if (!checkAbilityPossible(entity, 0)) {
+var backstab = function backstab(entity, target) {
+  if (!checkAbilityPossible(entity, 1, target)) {
+    return false;
+  }
+
+  if (entity.img.style.transform === target.img.style.transform) {
+    target.hp -= Math.ceil(entity.dmg * 2);
+  } else {
+    target.hp -= Math.ceil(entity.dmg * 5);
+  }
+
+  target.setHpBars();
+  setBorder(target);
+
+  if (target.hp <= 0) {
+    entity.killEntitiy(target);
+  }
+
+  return 15;
+}; //                              Wizard Abilities
+
+
+var meteor = function meteor(entity, target) {
+  if (!checkAbilityPossible(entity, 0, target)) {
     return false;
   }
 
   var fireblastDiv = document.getElementById('firebomb-div');
-  spellTrack(fireblastDiv, entity, entity.target, function (entity, img) {
+  fireblastDiv.style.opacity = '70%';
+  spellTrack(fireblastDiv, entity, target, function (entity, img) {
     // console.log('entity: ', entity, " img: ", img);
     img.style.display = 'none';
-    causeAoEEffect(entity, 300, 300);
+    causeAoEEffect(entity, 400, 400, target);
   });
-  return 10;
+  return 14;
 };
 
-function setBorder(entity) {
-  if (entity.target && !entity.target.container.style.display === 'none') {
-    var targetChar = entity.target;
+var freeze = function freeze(entity, target) {
+  var _loop = function _loop(i) {
+    if (entity.enemies[i].container.style.display !== 'none' && entity.enemies[i].hp > 0) {
+      entity.enemies[i].rooted = true;
+      entity.enemies[i].ms -= Math.floor(entity.enemies[i].baseMS / 2);
+      var ice = document.createElement("div");
+      ice.classList.add("under-foot");
+      document.getElementById("game-container").appendChild(ice);
+      ice.style.top = entity.enemies[i].pos[1] + entity.enemies[i].container.offsetHeight + 'px';
+      ice.style.left = entity.enemies[i].pos[0] + 'px';
+      ice.style.width = entity.enemies[i].img.width + 'px';
+      setTimeout(function () {
+        entity.enemies[i].rooted = false;
+        ice.remove();
+      }, 2000);
+      setTimeout(function () {
+        entity.enemies[i].ms += Math.floor(entity.enemies[i].baseMS / 2);
+      }, 6000);
+    }
+  };
 
-    if (targetChar.img.style.border !== "5px solid gold") {
+  for (var i = 0; i < entity.enemies.length; i++) {
+    _loop(i);
+  }
+
+  return 25;
+};
+
+function setBorder(target) {
+  if (target && !target.container.style.display === 'none') {
+    if (target.img.style.border !== "5px solid gold") {
       if (entity.baseDMG > 0) {
-        targetChar.img.style.border = "4px solid red";
+        target.img.style.border = "4px solid red";
       } else {
-        targetChar.img.style.border = "4px solid green";
+        target.img.style.border = "4px solid green";
       }
 
       var borderInterval = setInterval(function () {
-        if (targetChar.img.style.border !== "5px solid gold") {
-          targetChar.img.style.border = "none";
+        if (target.img.style.border !== "5px solid gold") {
+          target.img.style.border = "none";
         }
 
         clearInterval(borderInterval);
@@ -221,14 +317,16 @@ function setBorder(entity) {
   }
 }
 
-var warriorAbilities = [powerSwing];
-var clericAbilities = [groupHeal];
-var wizardAbilities = [meteor];
-var rogueAbilities = [poisonDagger];
+var warriorAbilities = [powerSwing, charge];
+var clericAbilities = [groupHeal, protection];
+var wizardAbilities = [meteor, freeze];
+var rogueAbilities = [poisonDagger, backstab];
 var allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
 
-function checkAbilityPossible(entity, abNum) {
-  if (entity.target && entity.withinAttackRange(entity.target) && entity.target.hp > 0) {
+function checkAbilityPossible(entity, abNum, target) {
+  var infiniteRange = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+  if (target && (infiniteRange || entity.withinAttackRange(target)) && target.hp > 0) {
     return true;
   }
 
@@ -237,14 +335,14 @@ function checkAbilityPossible(entity, abNum) {
   return false;
 }
 
-var lightningAutoAttack = function lightningAutoAttack(entity) {
+var lightningAutoAttack = function lightningAutoAttack(entity, target) {
   var pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
 
   if (entity.img.style.transform === "scaleX(-1)") {
     pos[0] -= 60;
   }
 
-  var div = drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width / 2, entity.target.pos[1] + entity.target.img.height / 2);
+  var div = drawLine(pos[0], pos[1], target.pos[0] + target.img.width / 2, target.pos[1] + target.img.height / 2);
   var maxTime = Math.floor(entity.as / 8);
   setTimeout(function () {
     div.remove();
@@ -253,29 +351,29 @@ var lightningAutoAttack = function lightningAutoAttack(entity) {
 
 var specialAttackEffects = [lightningAutoAttack];
 
-function knockbackTarget(entity, distance) {
-  var dX = entity.target.pos[0] - entity.pos[0];
-  var dY = entity.target.pos[1] - entity.pos[1];
+function knockbackTarget(entity, distance, target) {
+  var dX = target.pos[0] - entity.pos[0];
+  var dY = target.pos[1] - entity.pos[1];
   var hypotenuse = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
   var xRatio = dX / hypotenuse;
   var yRatio = dY / hypotenuse;
   var xRight = distance * xRatio;
   var yDown = distance * yRatio;
-  entity.target.pos[0] += Math.floor(xRight);
-  entity.target.pos[1] += Math.floor(yDown);
-  entity.target.container.style.left = entity.target.pos[0] + 'px';
-  entity.target.container.style.top = entity.target.pos[1] + 'px';
+  target.pos[0] += Math.floor(xRight);
+  target.pos[1] += Math.floor(yDown);
+  target.container.style.left = target.pos[0] + 'px';
+  target.container.style.top = target.pos[1] + 'px';
 }
 
-function causeAoEEffect(entity, width, height) {
-  var targetCenter = [entity.target.pos[0] + Math.floor(entity.target.img.width / 2), entity.target.pos[1] + Math.floor(entity.target.img.height / 2)];
+function causeAoEEffect(entity, width, height, target) {
+  var targetCenter = [target.pos[0] + Math.floor(target.container.offsetWidth / 2), target.pos[1] + Math.floor(target.container.offsetHeight / 2)];
   var topLeft1 = [targetCenter[0] - Math.floor(width / 2), targetCenter[1] - Math.floor(height / 2)];
   var div = document.createElement("div");
-  var leftSetback = (width - entity.target.container.offsetWidth) / 2;
-  var topSetback = (height - entity.target.container.offsetHeight) / 2;
+  var leftSetback = (width - target.container.offsetWidth) / 2;
+  var topSetback = (height - target.container.offsetHeight) / 2;
   div.style.position = "absolute";
-  div.style.left = entity.target.pos[0] - leftSetback + 'px';
-  div.style.top = entity.target.pos[1] - topSetback + 'px';
+  div.style.left = target.pos[0] - leftSetback + 'px';
+  div.style.top = target.pos[1] - topSetback + 'px';
   div.style.width = width + "px";
   div.style.height = height + "px";
   div.style.background = "red";
@@ -288,6 +386,7 @@ function causeAoEEffect(entity, width, height) {
   for (var i = 0; i < entity.enemies.length; i++) {
     if (entity.enemies[i].container.style.display !== 'none') {
       if (imagesTouching(topLeft1, [width, height], entity.enemies[i].pos, [entity.enemies[i].img.width, entity.enemies[i].img.height])) {
+        // console.log('entity hit by fireball: ', entity.enemies[i].klass);
         entity.enemies[i].hp -= Math.ceil(entity.dmg * 1.5);
         entity.enemies[i].setHpBars();
         setBorder(entity.enemies[i]);
@@ -431,10 +530,10 @@ var warriorAbilities = charAbilities[0];
 var clericAbilities = charAbilities[1];
 var wizardAbilities = charAbilities[2];
 var rogueAbilities = charAbilities[3];
-var waAbNames = ['Concussive Blow'];
-var cAbNames = ['Prayer of Healing'];
-var wiAbNames = ['Fire Bomb'];
-var rAbNames = ['Poison Shiv'];
+var waAbNames = ['Concussive Blow', 'Charge'];
+var cAbNames = ['Prayer of Healing', "Protection"];
+var wiAbNames = ['Fire Bomb', 'Freeze'];
+var rAbNames = ['Poison Shiv', 'Backstab'];
 var specialAttackEffects = abilityList[1];
 var wizardAttackEffect = specialAttackEffects[0];
 /*
@@ -652,6 +751,7 @@ var Entity = /*#__PURE__*/function () {
     this.slowed = false;
     this.rooted = false;
     this.feared = false;
+    this.lockedIntoAbility = false;
     this.target;
     this.allies;
     this.enemies;
@@ -706,28 +806,28 @@ var Entity = /*#__PURE__*/function () {
       this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
 
       switch (this.level) {
-        case 5:
+        case 4:
           if (this.allAbilities[0]) {
             this.abilities.push(this.allAbilities[0]);
           }
 
           break;
 
-        case 10:
+        case 8:
           if (this.allAbilities[1]) {
             this.abilities.push(this.allAbilities[1]);
           }
 
           break;
 
-        case 15:
+        case 12:
           if (this.allAbilities[2]) {
             this.abilities.push(this.allAbilities[2]);
           }
 
           break;
 
-        case 20:
+        case 16:
           if (this.allAbilities[3]) {
             this.abilities.push(this.allAbilities[3]);
           }
@@ -770,6 +870,7 @@ var Entity = /*#__PURE__*/function () {
 
       var attackOnFinish = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var addXPBar = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var lockedIn = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
       this.movingOutTheWay = true;
       this.clearIntervals();
       this.isMoving = true;
@@ -793,10 +894,11 @@ var Entity = /*#__PURE__*/function () {
       }, 20);
 
       function frame(self) {
-        if (!self.stunned && !self.rooted) {
+        if (!(self.lockedIntoAbility || self.stunned || self.rooted) || lockedIn) {
           if (posChange[2] === 0) {
             // close animation
             self.clearIntervals();
+            self.lockedIntoAbility = false;
             self.movingOutTheWay = false;
             pos[0] = Math.floor(pos[0]);
             pos[1] = Math.floor(pos[1]);
@@ -863,6 +965,7 @@ var Entity = /*#__PURE__*/function () {
     key: "killEntitiy",
     value: function killEntitiy(entity) {
       // console.log(entity.klass, "killed");
+      self.lockedIntoAbility = false;
       entity.clearIntervals();
 
       if (entity.abilityContainer) {
@@ -937,9 +1040,10 @@ var Entity = /*#__PURE__*/function () {
     }
   }, {
     key: "trackTarget",
-    value: function trackTarget() {
+    value: function trackTarget(target) {
       var _this3 = this;
 
+      var lockedIn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       // hot code
       this.clearIntervals();
       this.isMoving = true;
@@ -951,8 +1055,8 @@ var Entity = /*#__PURE__*/function () {
       }, 20);
 
       function move(self) {
-        if (!self.stunned && !self.rooted) {
-          if (self.target.container.style.display === 'none') {
+        if (!(self.lockedIntoAbility || self.stunned || self.rooted) || lockedIn) {
+          if (target.container.style.display === 'none') {
             self.clearIntervals();
 
             if (!self.allied) {
@@ -962,18 +1066,19 @@ var Entity = /*#__PURE__*/function () {
             return;
           }
 
-          if (self.withinAttackRange(self.target)) {
+          if (self.withinAttackRange(target)) {
             clearInterval(self.currentAction);
-            self.autoAttack(self.target); // console.log('auto attack called from track');
+            self.lockedIntoAbility = false;
+            self.autoAttack(target); // console.log('auto attack called from track');
           } else {
             var pos = self.pos;
-            var movePos = self.target.pos.slice();
+            var movePos = target.pos.slice();
 
             if (pos[0] - movePos[0] < 0) {
-              movePos[0] -= self.target.img.width;
+              movePos[0] -= target.img.width;
               self.img.style.transform = "scaleX(1)";
             } else {
-              movePos[0] += self.target.img.width;
+              movePos[0] += target.img.width;
               self.img.style.transform = "scaleX(-1)";
             }
 
@@ -1014,7 +1119,6 @@ var Entity = /*#__PURE__*/function () {
       attackOverlay.style.left = targetChar.pos[0] + 'px';
       attackOverlay.style.width = targetChar.img.width + 'px';
       attackOverlay.style.height = targetChar.img.height + 'px';
-      attackOverlay.style.display = '';
       var clearTime = Math.floor(this.as / 2); // 50%op => 0%op over clearTime / 20
 
       var iterations = clearTime / 20;
@@ -1039,6 +1143,7 @@ var Entity = /*#__PURE__*/function () {
     value: function beginAttack() {
       var _this4 = this;
 
+      var lockedIn = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       // make some kind of animation start
       this.clearIntervals();
       this.isAttacking = true;
@@ -1054,14 +1159,17 @@ var Entity = /*#__PURE__*/function () {
       }
 
       this.currentAnimation = setInterval(function () {
-        return _this4.animateAttack(_this4);
+        return _this4.animateAttack(lockedIn);
       }, Math.floor(this.as / 4));
     }
   }, {
     key: "animateAttack",
     value: function animateAttack() {
-      if (!this.stunned && this.attackImages) {
+      var lockedIn = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      if (!(this.lockedIntoAbility || this.stunned) || lockedIn) {
         if (!this.target || this.target.hp <= 0) {
+          self.lockedIntoAbility = false;
           this.clearIntervals();
 
           if (!this.allied) {
@@ -1082,7 +1190,7 @@ var Entity = /*#__PURE__*/function () {
 
         if (this.imgCycle === 3) {
           if (this.extraAttackAnimation) {
-            this.extraAttackAnimation(this);
+            this.extraAttackAnimation(this, this.target);
           }
 
           this.attack();
@@ -1098,7 +1206,7 @@ var Entity = /*#__PURE__*/function () {
       var _this5 = this;
 
       if (!this.withinAttackRange(this.target)) {
-        this.trackTarget();
+        this.trackTarget(this.target);
         return;
       } else {
         if (this.dmg > 0) {
@@ -1178,9 +1286,7 @@ var Entity = /*#__PURE__*/function () {
     key: "autoAttack",
     value: function autoAttack(targetChar) {
       // console.log('auto attack target: ', targetChar);
-      if (this.allied) {
-        this.target = targetChar;
-      }
+      this.target = targetChar;
 
       if (this.withinAttackRange(targetChar)) {
         if (this.pos[0] < targetChar.pos[0]) {
@@ -1191,7 +1297,7 @@ var Entity = /*#__PURE__*/function () {
 
         this.beginAttack();
       } else {
-        this.trackTarget();
+        this.trackTarget(this.target);
       }
     }
   }, {
@@ -1217,7 +1323,7 @@ var Entity = /*#__PURE__*/function () {
       this.abilityAvailable[n] = false;
       var ab = this.abilities[n]; // console.log('ability: ', ab);
 
-      var cdTime = ab(this);
+      var cdTime = ab(this, this.target);
 
       if (cdTime === false) {
         // console.log('no target for ability');
@@ -2034,6 +2140,14 @@ function selectEnemy(entity) {
 
   if (selectedChar.allied && selectedChar.baseDMG > 0) {
     selectedChar.autoAttack(entity);
+
+    for (var i = 0; i < selectedChar.abilities.length; i++) {
+      if (selectedChar.abilityShouldCast[i]) {
+        selectedChar.abilityShouldCast[i] = false;
+        selectedChar.useAbility(i);
+        console.log('ability used on click event');
+      }
+    }
   }
 }
 
@@ -2062,6 +2176,8 @@ function keydownEvent(e) {
   } else if ((entity === 0 || entity) && selectedChar) {
     selectedChar.useAbility(entity);
   } else {// console.log('invalid key press of: ', e.key);
+    // console.log('value is: ', entity);
+    // console.log(hotkeys);
   }
 }
 
@@ -2289,89 +2405,93 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   backgroundImg.style.display = '';
   Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(backgroundImg);
 
-  for (var i = 0; i < charactersArr.length; i++) {
-    if (!charactersArr[i].observer) {
-      addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
+  for (var i = 0; i < 4; i++) {
+    var abilityHotkey = document.getElementById("ab".concat(i + 1, "-keybind"));
+    hotkeys[abilityHotkey.value] = i;
+  }
+
+  for (var _i5 = 0; _i5 < charactersArr.length; _i5++) {
+    if (!charactersArr[_i5].observer) {
+      addEntityEvents(charactersArr[_i5], charactersArr, enemiesArr);
     }
 
-    livingChars[charactersArr[i].imgName] = charactersArr[i];
-    charactersArr[i].container.style.top = charactersArr[i].pos[1] + 'px';
-    charactersArr[i].container.style.left = charactersArr[i].pos[0] + 'px';
-    charactersArr[i].container.style.opacity = 0;
-    charactersArr[i].container.style.display = '';
-    boxEntities.push(charactersArr[i]);
-    var hpBar = document.getElementById("".concat(charactersArr[i].imgName, "-hp-bar"));
+    livingChars[charactersArr[_i5].imgName] = charactersArr[_i5];
+    charactersArr[_i5].container.style.top = charactersArr[_i5].pos[1] + 'px';
+    charactersArr[_i5].container.style.left = charactersArr[_i5].pos[0] + 'px';
+    charactersArr[_i5].container.style.opacity = 0;
+    charactersArr[_i5].container.style.display = '';
+    boxEntities.push(charactersArr[_i5]);
+    var hpBar = document.getElementById("".concat(charactersArr[_i5].imgName, "-hp-bar"));
     hpBar.style.display = "flex"; // charactersArr[i].hotkeyDisplay.innerHTML = charactersArr[i].hotkey;
     // hotkeys[charactersArr[i].hotkey] = charactersArr[i];
 
-    var hotkeyInput = document.getElementById("a".concat(i + 1, "-keybind"));
-    charactersArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
-    hotkeys[hotkeyInput.value] = charactersArr[i];
-    var abilityHotkey = document.getElementById("ab".concat(i + 1, "-keybind"));
-    hotkeys[abilityHotkey.value] = i;
-    var abilityClassName = document.getElementById("a".concat(i + 1, "-class-name"));
-    abilityClassName.innerHTML = charactersArr[i].klass;
-    var abilityNames = document.getElementsByClassName("a".concat(i + 1, "-ability-labels"));
-    setAvailableAbilities(charactersArr[i]);
+    var hotkeyInput = document.getElementById("a".concat(_i5 + 1, "-keybind"));
+    charactersArr[_i5].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = charactersArr[_i5];
+    var abilityClassName = document.getElementById("a".concat(_i5 + 1, "-class-name"));
+    abilityClassName.innerHTML = charactersArr[_i5].klass;
+    var abilityNames = document.getElementsByClassName("a".concat(_i5 + 1, "-ability-labels"));
+    setAvailableAbilities(charactersArr[_i5]);
 
     for (var j = 0; j < abilityNames.length; j++) {
-      if (charactersArr[i].abilityNames[j]) {
-        abilityNames[j].innerHTML = charactersArr[i].abilityNames[j];
+      if (charactersArr[_i5].abilityNames[j]) {
+        abilityNames[j].innerHTML = charactersArr[_i5].abilityNames[j];
       } else {
         abilityNames[j].innerHTML = 'No Ability';
       }
     } // const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
 
 
-    charactersArr[i].container.addEventListener('click', allyClickEvents);
-    charactersArr[i].img.src = charactersArr[i].baseImg.src;
+    charactersArr[_i5].container.addEventListener('click', allyClickEvents);
 
-    if (charactersArr[i].pos === null) {
-      setRandomSpawn(charactersArr[i], boxEntities.slice());
+    charactersArr[_i5].img.src = charactersArr[_i5].baseImg.src;
+
+    if (charactersArr[_i5].pos === null) {
+      setRandomSpawn(charactersArr[_i5], boxEntities.slice());
     }
 
-    boxEntities.push(charactersArr[i]);
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[i].container);
-    observerObserve(charactersArr[i]);
+    boxEntities.push(charactersArr[_i5]);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[_i5].container);
+    observerObserve(charactersArr[_i5]);
   }
 
-  var _loop4 = function _loop4(_i5) {
-    if (!enemiesArr[_i5].observer) {
-      addEntityEvents(enemiesArr[_i5], enemiesArr, charactersArr);
+  var _loop4 = function _loop4(_i6) {
+    if (!enemiesArr[_i6].observer) {
+      addEntityEvents(enemiesArr[_i6], enemiesArr, charactersArr);
     }
 
-    livingEnemies[enemiesArr[_i5].imgName] = enemiesArr[_i5];
-    enemiesArr[_i5].container.style.top = enemiesArr[_i5].pos[1] + 'px';
-    enemiesArr[_i5].container.style.left = enemiesArr[_i5].pos[0] + 'px';
-    enemiesArr[_i5].container.style.opacity = 0;
-    enemiesArr[_i5].container.style.display = '';
-    var hpBar = document.getElementById("".concat(enemiesArr[_i5].imgName, "-hp-bar"));
+    livingEnemies[enemiesArr[_i6].imgName] = enemiesArr[_i6];
+    enemiesArr[_i6].container.style.top = enemiesArr[_i6].pos[1] + 'px';
+    enemiesArr[_i6].container.style.left = enemiesArr[_i6].pos[0] + 'px';
+    enemiesArr[_i6].container.style.opacity = 0;
+    enemiesArr[_i6].container.style.display = '';
+    var hpBar = document.getElementById("".concat(enemiesArr[_i6].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
-    var hotkeyInput = document.getElementById("e".concat(_i5 + 1, "-keybind"));
-    enemiesArr[_i5].hotkeyDisplay.innerHTML = hotkeyInput.value;
-    hotkeys[hotkeyInput.value] = enemiesArr[_i5];
+    var hotkeyInput = document.getElementById("e".concat(_i6 + 1, "-keybind"));
+    enemiesArr[_i6].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = enemiesArr[_i6];
 
-    enemiesArr[_i5].container.addEventListener('click', enemyClickEvents);
+    enemiesArr[_i6].container.addEventListener('click', enemyClickEvents);
 
-    enemiesArr[_i5].img.src = enemiesArr[_i5].baseImg.src;
+    enemiesArr[_i6].img.src = enemiesArr[_i6].baseImg.src;
 
-    if (enemiesArr[_i5].pos === null) {
-      setRandomSpawn(enemiesArr[_i5], boxEntities.slice());
+    if (enemiesArr[_i6].pos === null) {
+      setRandomSpawn(enemiesArr[_i6], boxEntities.slice());
     }
 
-    boxEntities.push(enemiesArr[_i5]);
+    boxEntities.push(enemiesArr[_i6]);
 
     var action = function action() {
-      return enemiesArr[_i5].autoAttack(enemiesArr[_i5].target);
+      return enemiesArr[_i6].autoAttack(enemiesArr[_i6].target);
     };
 
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i5].container, action); // begin attacking target
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i6].container, action); // begin attacking target
 
-    observerObserve(enemiesArr[_i5]);
+    observerObserve(enemiesArr[_i6]);
   };
 
-  for (var _i5 = 0; _i5 < enemiesArr.length; _i5++) {
-    _loop4(_i5);
+  for (var _i6 = 0; _i6 < enemiesArr.length; _i6++) {
+    _loop4(_i6);
   } // console.log("hotkeys: ", hotkeys);
 
 }
@@ -2407,44 +2527,44 @@ function endGame(charsList, enemyList) {
   var allCharsList = levels[currentLevelNumber].characterList;
   var allEnemyList = levels[currentLevelNumber].enemyList;
 
-  for (var _i6 = 0; _i6 < allCharsList.length; _i6++) {
-    allCharsList[_i6].observer.disconnect();
+  for (var _i7 = 0; _i7 < allCharsList.length; _i7++) {
+    allCharsList[_i7].observer.disconnect();
 
-    if (allCharsList[_i6].currentAction) {
-      clearInterval(allCharsList[_i6].currentAction);
+    if (allCharsList[_i7].currentAction) {
+      clearInterval(allCharsList[_i7].currentAction);
     }
 
-    if (allCharsList[_i6].currentAnimation) {
-      clearInterval(allCharsList[_i6].currentAnimation);
+    if (allCharsList[_i7].currentAnimation) {
+      clearInterval(allCharsList[_i7].currentAnimation);
     }
 
-    allCharsList[_i6].isAttacking = false;
-    allCharsList[_i6].isMoving = false;
-    allCharsList[_i6].target = null;
+    allCharsList[_i7].isAttacking = false;
+    allCharsList[_i7].isMoving = false;
+    allCharsList[_i7].target = null;
 
-    allCharsList[_i6].container.removeEventListener('click', allyClickEvents);
+    allCharsList[_i7].container.removeEventListener('click', allyClickEvents);
 
-    allCharsList[_i6].img.src = allCharsList[_i6].baseImg.src;
+    allCharsList[_i7].img.src = allCharsList[_i7].baseImg.src;
   }
 
-  for (var _i7 = 0; _i7 < allEnemyList.length; _i7++) {
-    allEnemyList[_i7].observer.disconnect();
+  for (var _i8 = 0; _i8 < allEnemyList.length; _i8++) {
+    allEnemyList[_i8].observer.disconnect();
 
-    if (allEnemyList[_i7].currentAction) {
-      clearInterval(allEnemyList[_i7].currentAction);
+    if (allEnemyList[_i8].currentAction) {
+      clearInterval(allEnemyList[_i8].currentAction);
     }
 
-    if (allEnemyList[_i7].currentAnimation) {
-      clearInterval(allEnemyList[_i7].currentAnimation);
+    if (allEnemyList[_i8].currentAnimation) {
+      clearInterval(allEnemyList[_i8].currentAnimation);
     }
 
-    allEnemyList[_i7].isAttacking = false;
-    allEnemyList[_i7].isMoving = false;
-    allEnemyList[_i7].target = null;
+    allEnemyList[_i8].isAttacking = false;
+    allEnemyList[_i8].isMoving = false;
+    allEnemyList[_i8].target = null;
 
-    allEnemyList[_i7].container.removeEventListener('click', enemyClickEvents);
+    allEnemyList[_i8].container.removeEventListener('click', enemyClickEvents);
 
-    allEnemyList[_i7].img.src = allEnemyList[_i7].baseImg.src;
+    allEnemyList[_i8].img.src = allEnemyList[_i8].baseImg.src;
   }
 
   if (charsList.length > 0) {
@@ -2453,8 +2573,8 @@ function endGame(charsList, enemyList) {
     var backgroundImg = document.getElementById('background-image');
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
 
-    for (var _i8 = 0; _i8 < enemyList.length; _i8++) {
-      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i8].container);
+    for (var _i9 = 0; _i9 < enemyList.length; _i9++) {
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i9].container);
     }
 
     fadeOutGame(false);
@@ -2514,32 +2634,32 @@ function addCharXP() {
     if (timeCount === 60) {
       clearInterval(xpInterval);
 
-      for (var _i9 = 0; _i9 < c.length; _i9++) {
-        c[_i9].xp = Math.ceil(c[_i9].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+      for (var _i10 = 0; _i10 < c.length; _i10++) {
+        c[_i10].xp = Math.ceil(c[_i10].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
 
-        c[_i9].container.style.border = 'none';
-        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i9].container);
+        c[_i10].container.style.border = 'none';
+        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i10].container);
       }
 
       var backgroundImg = document.getElementById('background-image');
       Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
     }
 
-    for (var _i10 = 0; _i10 < c.length; _i10++) {
-      c[_i10].xp += xpPerInterval;
+    for (var _i11 = 0; _i11 < c.length; _i11++) {
+      c[_i11].xp += xpPerInterval;
 
-      if (c[_i10].xp > c[_i10].nextLevelXP) {
-        c[_i10].levelUp();
+      if (c[_i11].xp > c[_i11].nextLevelXP) {
+        c[_i11].levelUp();
 
-        var _expWords = document.getElementById(c[_i10].imgName + '-exp-words');
+        var _expWords = document.getElementById(c[_i11].imgName + '-exp-words');
 
-        _expWords.innerHTML = 'Level: ' + c[_i10].level;
+        _expWords.innerHTML = 'Level: ' + c[_i11].level;
       }
 
-      var _xpPercent = Math.floor(c[_i10].xp / c[_i10].nextLevelXP * 100);
+      var _xpPercent = Math.floor(c[_i11].xp / c[_i11].nextLevelXP * 100);
 
-      c[_i10].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
-      c[_i10].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
+      c[_i11].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
+      c[_i11].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
     }
 
     timeCount++;
@@ -2614,39 +2734,39 @@ function resetGame(won) {
   var levChars = levels[currentLevelNumber].characterList;
   var levEnems = levels[currentLevelNumber].enemyList;
 
-  for (var _i11 = 0; _i11 < levChars.length; _i11++) {
-    levChars[_i11].hp = levChars[_i11].baseHP;
-    levChars[_i11].dmg = levChars[_i11].baseDMG;
-    levChars[_i11].defense = levChars[_i11].baseDefense;
-    levChars[_i11].ms = levChars[_i11].baseMS;
-    levChars[_i11].stunned = false;
-    levChars[_i11].rooted = false;
-    levChars[_i11].pos[0] = levChars[_i11].basePos[0];
-    levChars[_i11].pos[1] = levChars[_i11].basePos[1];
-    levChars[_i11].container.style.top = levChars[_i11].pos[1] + 'px';
-    levChars[_i11].container.style.left = levChars[_i11].pos[0] + 'px';
-    levChars[_i11].hpContainerLeft.style.backgroundColor = 'blue';
-    var expWords = document.getElementById(levChars[_i11].imgName + '-exp-words');
+  for (var _i12 = 0; _i12 < levChars.length; _i12++) {
+    levChars[_i12].hp = levChars[_i12].baseHP;
+    levChars[_i12].dmg = levChars[_i12].baseDMG;
+    levChars[_i12].defense = levChars[_i12].baseDefense;
+    levChars[_i12].ms = levChars[_i12].baseMS;
+    levChars[_i12].stunned = false;
+    levChars[_i12].rooted = false;
+    levChars[_i12].pos[0] = levChars[_i12].basePos[0];
+    levChars[_i12].pos[1] = levChars[_i12].basePos[1];
+    levChars[_i12].container.style.top = levChars[_i12].pos[1] + 'px';
+    levChars[_i12].container.style.left = levChars[_i12].pos[0] + 'px';
+    levChars[_i12].hpContainerLeft.style.backgroundColor = 'blue';
+    var expWords = document.getElementById(levChars[_i12].imgName + '-exp-words');
     expWords.innerHTML = '';
-    levChars[_i11].img.style.border = 'none';
+    levChars[_i12].img.style.border = 'none';
 
-    levChars[_i11].setHpBars();
+    levChars[_i12].setHpBars();
   }
 
-  for (var _i12 = 0; _i12 < levEnems.length; _i12++) {
-    levEnems[_i12].hp = levEnems[_i12].baseHP;
-    levEnems[_i12].dmg = levEnems[_i12].baseDMG;
-    levEnems[_i12].defense = levEnems[_i12].baseDefense;
-    levEnems[_i12].ms = levEnems[_i12].baseMS;
-    levEnems[_i12].stunned = false;
-    levEnems[_i12].rooted = false;
-    levEnems[_i12].pos[0] = levEnems[_i12].basePos[0];
-    levEnems[_i12].pos[1] = levEnems[_i12].basePos[1];
-    levEnems[_i12].container.style.top = levEnems[_i12].pos[1] + 'px';
-    levEnems[_i12].container.style.left = levEnems[_i12].pos[0] + 'px';
-    levEnems[_i12].img.style.border = 'none';
+  for (var _i13 = 0; _i13 < levEnems.length; _i13++) {
+    levEnems[_i13].hp = levEnems[_i13].baseHP;
+    levEnems[_i13].dmg = levEnems[_i13].baseDMG;
+    levEnems[_i13].defense = levEnems[_i13].baseDefense;
+    levEnems[_i13].ms = levEnems[_i13].baseMS;
+    levEnems[_i13].stunned = false;
+    levEnems[_i13].rooted = false;
+    levEnems[_i13].pos[0] = levEnems[_i13].basePos[0];
+    levEnems[_i13].pos[1] = levEnems[_i13].basePos[1];
+    levEnems[_i13].container.style.top = levEnems[_i13].pos[1] + 'px';
+    levEnems[_i13].container.style.left = levEnems[_i13].pos[0] + 'px';
+    levEnems[_i13].img.style.border = 'none';
 
-    levEnems[_i12].setHpBars();
+    levEnems[_i13].setHpBars();
   }
 }
 

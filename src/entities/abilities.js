@@ -7,86 +7,173 @@ const groupHeal = (entity) => {
             if (entity.allies[i].hp > 100) { entity.allies[i].hp = 100; }
             entity.setOverlay(entity.allies[i]);
             entity.allies[i].setHpBars();
-            setBorder(entity);
+            setBorder(entity.allies[i]);
         }
     }
-    return 10;
+    return 16;
 }
 
-const protection = (entity) => {
-    if (!checkAbilityPossible(entity, 1)) { return false; }
-    entity.target.tempHP -= entity.dmg;
-    entity.target.armor += entity.dmg;
-
+const protection = (entity, target) => {
+    if (!checkAbilityPossible(entity, 1, target)) { return false; }
+    target.tempHP -= entity.dmg;
+    target.armor -= entity.dmg;
+    target.setHpBars();
+    let overlay = document.createElement("div");
+    overlay.classList.add("oval-shape");
+    document.getElementById("game-container").appendChild(overlay);
+    overlay.style.backgroundColor = 'blue';
+    overlay.style.top = (target.pos[1] + 40) + 'px';
+    overlay.style.left = target.pos[0] + 'px';
+    overlay.style.width = target.img.width + 'px';
+    overlay.style.height = target.img.height + 'px';
+    setTimeout(() => {
+        target.armor += entity.dmg;
+        overlay.remove();
+    }, 8000);
+    let timeCount = 0;
+    let timer = setInterval(() => {
+        timeCount += 20;
+        overlay.style.top = (target.pos[1] + 40) + 'px';
+        overlay.style.left = target.pos[0] + 'px';
+        if (timeCount >= 8000) {
+            clearInterval(timer);
+        }
+    }, 20)
+    return 20;
 }
 
+//                              Warrior Abilities
 
-const powerSwing = (entity) => {
-    if (!checkAbilityPossible(entity, 0)) { return false; }
-    entity.target.hp -= Math.ceil(entity.dmg * 1.5);
+const powerSwing = (entity, target) => {
+    if (!checkAbilityPossible(entity, 0, target)) { return false; }
+    target.hp -= Math.ceil(entity.dmg * 1.5);
     // knockbackTarget(entity, 80);
-    entity.target.setHpBars();
-    entity.target.stunned = true;
-    entity.target.img.src = entity.target.baseImg.src;
-    entity.target.imgCycle = 0;
-    setBorder(entity);
-    if (entity.target.hp <= 0) {
-        entity.killEntitiy(entity.target);
+    target.setHpBars();
+    target.stunned = true;
+    target.img.src = target.baseImg.src;
+    target.imgCycle = 0;
+    setBorder(target);
+    if (target.hp <= 0) {
+        entity.killEntitiy(target);
     }
-    setTimeout(() => {if (entity.target) { entity.target.stunned = false;}}, 2000);
+    setTimeout(() => {
+        target.stunned = false;
+    }, 2000);
+    return 12;
+}
+
+const charge = (entity, target) => {
+    if (!checkAbilityPossible(entity, 1, target, true)) { return false; }
+    entity.lockedIntoAbility = true;
+    entity.ms += 15;
+    entity.trackTarget(target, true);
+    if (target.baseDMG > 0) {
+        target.target = entity;
+        target.autoAttack(entity);
+    }
+    let inter = setInterval(() => {
+        if (!entity.lockedIntoAbility) {
+            entity.ms -= 15;
+            clearInterval(inter);
+        }
+    }, 40)
     return 10;
 }
 
-const poisonDagger = (entity) => {
-    if (!checkAbilityPossible(entity, 0)) { return false; }
+//                              Rogue Abilities
+
+const poisonDagger = (entity, target) => {
+    if (!checkAbilityPossible(entity, 0, target)) { return false; }
     let timer = 0;
-    entity.target.slowed = 50;
-    entity.target.ms -= Math.floor(entity.target.baseMS / 2);
+    target.slowed = 50;
+    target.ms -= Math.floor(target.baseMS / 2);
     let int = setInterval(() => {
-        if (!entity.target || entity.target.container.style.display === 'none') {
+        if (!target || target.container.style.display === 'none') {
             clearInterval(int);
             return;
         }
         timer++;
-        entity.target.hp -= Math.floor(Math.ceil(entity.dmg * 1.5) / 6);
-        entity.target.setHpBars();
-        setBorder(entity);
-        if (entity.target.hp <= 0) {
-            entity.killEntitiy(entity.target);
+        target.hp -= Math.floor(Math.ceil(entity.dmg * 3) / 6);
+        target.setHpBars();
+        setBorder(target);
+        if (target.hp <= 0) {
+            entity.killEntitiy(target);
             clearInterval(int)
         }
         if (timer > 5) {
             clearInterval(int);
-            entity.target.slowed = false;
-            entity.target.ms += Math.floor(entity.target.baseMS / 2);
+            target.slowed = false;
+            target.ms += Math.floor(target.baseMS / 2);
         }
     }, 500)
     return 10;
 }
 
-const meteor = (entity) => {
-    if (!checkAbilityPossible(entity, 0)) {return false;}
-    const fireblastDiv = document.getElementById('firebomb-div');
-    spellTrack(fireblastDiv, entity, entity.target, (entity, img) => {
-        // console.log('entity: ', entity, " img: ", img);
-        img.style.display = 'none';
-        causeAoEEffect(entity, 300, 300);
-    });
-    return 10;
+const backstab = (entity, target) => {
+    if (!checkAbilityPossible(entity, 1, target)) { return false; }
+    if (entity.img.style.transform === target.img.style.transform) {
+        target.hp -= Math.ceil(entity.dmg * 2);
+    } else {
+        target.hp -= Math.ceil(entity.dmg * 5);
+    }
+    target.setHpBars();
+    setBorder(target);
+    if (target.hp <= 0) {
+        entity.killEntitiy(target);
+    }
+    return 15;
 }
 
-function setBorder(entity) {
-    if (entity.target && !entity.target.container.style.display === 'none') {
-        const targetChar = entity.target;
-        if (targetChar.img.style.border !== "5px solid gold") {
+//                              Wizard Abilities
+
+const meteor = (entity, target) => {
+    if (!checkAbilityPossible(entity, 0, target)) {return false;}
+    const fireblastDiv = document.getElementById('firebomb-div');
+    fireblastDiv.style.opacity = '70%';
+    spellTrack(fireblastDiv, entity, target, (entity, img) => {
+        // console.log('entity: ', entity, " img: ", img);
+        img.style.display = 'none';
+        causeAoEEffect(entity, 400, 400, target);
+    });
+    return 14;
+}
+
+const freeze = (entity, target) => {
+    for (let i = 0; i < entity.enemies.length; i++) {
+        if (entity.enemies[i].container.style.display !== 'none' && entity.enemies[i].hp > 0) {
+            entity.enemies[i].rooted = true;
+            entity.enemies[i].ms -= Math.floor(entity.enemies[i].baseMS / 2);
+            const ice = document.createElement("div");
+            ice.classList.add("under-foot");
+            document.getElementById("game-container").appendChild(ice);
+            ice.style.top = (entity.enemies[i].pos[1] + entity.enemies[i].container.offsetHeight) + 'px';
+            ice.style.left = entity.enemies[i].pos[0] + 'px';
+            ice.style.width = entity.enemies[i].img.width + 'px';
+            setTimeout(() => {
+                entity.enemies[i].rooted = false;
+                ice.remove()
+            }, 2000)
+            setTimeout(() => {
+                entity.enemies[i].ms += Math.floor(entity.enemies[i].baseMS / 2);
+            }, 6000)
+        }
+    }
+    return 25;
+}
+
+
+
+function setBorder(target) {
+    if (target && !target.container.style.display === 'none') {
+        if (target.img.style.border !== "5px solid gold") {
             if (entity.baseDMG > 0) {
-                targetChar.img.style.border = "4px solid red";
+                target.img.style.border = "4px solid red";
             } else {
-                targetChar.img.style.border = "4px solid green";
+                target.img.style.border = "4px solid green";
             }
             let borderInterval = setInterval(() => {
-                if (targetChar.img.style.border !== "5px solid gold") {
-                    targetChar.img.style.border = "none";
+                if (target.img.style.border !== "5px solid gold") {
+                    target.img.style.border = "none";
                 }
                 clearInterval(borderInterval);
             }, 500);
@@ -94,14 +181,14 @@ function setBorder(entity) {
     }
 }
 
-const warriorAbilities = [powerSwing];
-const clericAbilities = [groupHeal];
-const wizardAbilities = [meteor];
-const rogueAbilities = [poisonDagger];
+const warriorAbilities = [powerSwing, charge];
+const clericAbilities = [groupHeal, protection];
+const wizardAbilities = [meteor, freeze];
+const rogueAbilities = [poisonDagger, backstab];
 export const allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
 
-function checkAbilityPossible(entity, abNum) {
-    if (entity.target && entity.withinAttackRange(entity.target) && entity.target.hp > 0) {
+function checkAbilityPossible(entity, abNum, target, infiniteRange=false) {
+    if (target && (infiniteRange || entity.withinAttackRange(target)) && target.hp > 0) {
         return true;
     }
     entity.abilityShouldCast[abNum] = true;
@@ -109,42 +196,42 @@ function checkAbilityPossible(entity, abNum) {
     return false;
 }
 
-const lightningAutoAttack = (entity) => {
+const lightningAutoAttack = (entity, target) => {
     let pos = [entity.pos[0] + 30 + entity.img.width / 2, entity.pos[1] + 38];
     if (entity.img.style.transform === "scaleX(-1)") {
         pos[0] -= 60
     }
-    const div = drawLine(pos[0], pos[1], entity.target.pos[0] + entity.target.img.width/2, entity.target.pos[1] + entity.target.img.height/2);
+    const div = drawLine(pos[0], pos[1], target.pos[0] + target.img.width/2, target.pos[1] + target.img.height/2);
     const maxTime = Math.floor(entity.as / 8);
     setTimeout(() => { div.remove(); }, maxTime);
 }
 
 export const specialAttackEffects = [lightningAutoAttack];
 
-function knockbackTarget(entity, distance) {
-    const dX = entity.target.pos[0] - entity.pos[0];
-    const dY = entity.target.pos[1] - entity.pos[1];
+function knockbackTarget(entity, distance, target) {
+    const dX = target.pos[0] - entity.pos[0];
+    const dY = target.pos[1] - entity.pos[1];
     const hypotenuse = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
     const xRatio = dX / hypotenuse;
     const yRatio = dY / hypotenuse;
     const xRight = distance * xRatio;
     const yDown = distance * yRatio;
-    entity.target.pos[0] += Math.floor(xRight);
-    entity.target.pos[1] += Math.floor(yDown);
-    entity.target.container.style.left = entity.target.pos[0] + 'px';
-    entity.target.container.style.top = entity.target.pos[1] + 'px';
+    target.pos[0] += Math.floor(xRight);
+    target.pos[1] += Math.floor(yDown);
+    target.container.style.left = target.pos[0] + 'px';
+    target.container.style.top = target.pos[1] + 'px';
 }
 
-function causeAoEEffect(entity, width, height) {
-    const targetCenter = [entity.target.pos[0] + Math.floor(entity.target.img.width / 2),
-        entity.target.pos[1] + Math.floor(entity.target.img.height/2)];
+function causeAoEEffect(entity, width, height, target) {
+    const targetCenter = [target.pos[0] + Math.floor(target.container.offsetWidth / 2),
+        target.pos[1] + Math.floor(target.container.offsetHeight/2)];
     const topLeft1 = [targetCenter[0] - Math.floor(width / 2), targetCenter[1] - Math.floor(height / 2)];
     const div = document.createElement("div");
-    const leftSetback = (width - entity.target.container.offsetWidth) / 2;
-    const topSetback = (height - entity.target.container.offsetHeight) / 2;
+    const leftSetback = (width - target.container.offsetWidth) / 2;
+    const topSetback = (height - target.container.offsetHeight) / 2;
     div.style.position = "absolute";
-    div.style.left = entity.target.pos[0] - leftSetback + 'px';
-    div.style.top = entity.target.pos[1] - topSetback + 'px';
+    div.style.left = target.pos[0] - leftSetback + 'px';
+    div.style.top = target.pos[1] - topSetback + 'px';
     div.style.width = width + "px";
     div.style.height = height + "px";
     div.style.background = "red";
@@ -156,6 +243,7 @@ function causeAoEEffect(entity, width, height) {
     for (let i = 0; i < entity.enemies.length; i++) {
         if (entity.enemies[i].container.style.display !== 'none') {
             if (imagesTouching(topLeft1, [width, height], entity.enemies[i].pos, [entity.enemies[i].img.width, entity.enemies[i].img.height])) {
+                // console.log('entity hit by fireball: ', entity.enemies[i].klass);
                 entity.enemies[i].hp -= Math.ceil(entity.dmg * 1.5);
                 entity.enemies[i].setHpBars();
                 setBorder(entity.enemies[i]);

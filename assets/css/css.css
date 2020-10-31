@@ -568,6 +568,7 @@ body {
 
 .ability-description:first-child {
     margin-top: 5%;
+    margin-bottom: 2%;
 }
 .ability-description:last-child {
     margin-bottom: auto;
@@ -591,4 +592,23 @@ body {
 .extra-attack-effect {
     z-index: 20;
     pointer-events: none;
+}
+
+.oval-shape {
+    position: absolute;
+    width: 150px;
+    height: 200px;
+    opacity: 40%;
+    -moz-border-radius: 50px / 100px;
+    -webkit-border-radius: 50px / 100px;
+    border-radius: 50px / 100px;
+    z-index: 52;
+}
+
+.under-foot {
+    position: absolute;
+    background-color: lightblue;
+    width: 150px;
+    height: 25px;
+    z-index: 52;
 }

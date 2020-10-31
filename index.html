@@ -108,6 +108,17 @@
                     Deals Ability damage equal to your Power x 1.5
                 </p>
             </div>
+            <div id='Warrior-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Charge
+                </h1>
+                <p class="ability-description">
+                    Dash at your Target and force them to Target you
+                </p>
+                <p class="ability-description">
+                    
+                </p>
+            </div>
             <div id='Cleric-ability-1-description-div' class="ability-description-div" style="display: none;">
                 <h1 class="ability-description-title">
                     Prayer of Healing
@@ -119,15 +130,37 @@
                     Heals equal to your Power x 2.0
                 </p>
             </div>
+            <div id='Cleric-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Protection
+                </h1>
+                <p class="ability-description">
+                    Bless your Target, warding them against incoming damage
+                </p>
+                <p class="ability-description">
+                    Grants a Shield and Armor equal to your Power
+                </p>
+            </div>
             <div id='Wizard-ability-1-description-div' class="ability-description-div" style="display: none;">
                 <h1 class="ability-description-title">
                     Fire Bomb
                 </h1>
                 <p class="ability-description">
-                    Conjure a powerful orb of fire and launch it at your Target
+                    Conjure a powerful orb of fire and launch it at your Target which explodes damaing all enemies in the area
                 </p>
                 <p class="ability-description">
                     Deals Ability damage equal to your Power x 1.5
+                </p>
+            </div>
+            <div id='Wizard-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Freeze
+                </h1>
+                <p class="ability-description">
+                    Launch blasts of frost at all Enemies, binding their feet
+                </p>
+                <p class="ability-description">
+                    Root all Enemies for 2 seconds then Slow them for 4 seconds
                 </p>
             </div>
             <div id='Rogue-ability-1-description-div' class="ability-description-div" style="display: none;">
@@ -138,7 +171,18 @@
                     Stab your Target with a poisoned dagger inflicting damage over time and Slowing them by 50%
                 </p>
                 <p class="ability-description">
-                    Deals Ability damage equal to your Power x 1.75 over 3 seconds
+                    Deals Ability damage equal to your Power x 3.0 over 3 seconds
+                </p>
+            </div>
+            <div id='Rogue-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Backstab
+                </h1>
+                <p class="ability-description">
+                    Attempt to gouge your Target's back, dealing increased damage if used behind them
+                </p>
+                <p class="ability-description">
+                    Deals Ability damage equal to your Power x 2.0 or Power x 6.0
                 </p>
             </div>
             <div id='heroes-stats-full-container' style="display: none;">
@@ -207,13 +251,9 @@
             <p id='a3-level-up' class="level-up" style="display: none;">Level Up!</p>
             <p id='a4-level-up' class="level-up" style="display: none;">Level Up!</p>
 
-            <!-- effect overlays -->
             <div id='firebomb-div' class="projectile" style="display: none;">
                 <!-- <img src='' alt='fireblast' id='fireblast-img'> -->
             </div>
-            <div id='a2-effect-overlay' class="a-heal-overlay" style="display: none;"></div>
-            <div id='e2-effect-overlay' class="e-heal-overlay" style="display: none;"></div>
-
             <div id='title-screen-chars' style="display: none;">
                 <img src="./assets/images/Rogue/Rogue.png" id='rogue-base-img' class="title-screen-char" />
                 <img src="./assets/images/Wizard/Wizard.png" id='wizard-base-img' class="title-screen-char" />
@@ -365,63 +405,39 @@
             <div id='a2-ability-full-container' class="ability-full-container" style="display: none;">
                 <h1 id='a2-class-name' class="class-names"></h1>
                 <div id='a2-ability-container' class="ability-container">
-                    <div id='a2-ability-1-box' class="a2-ability-boxes">
-                        <p id='a2-ability-1-label' class='a2-ability-labels'>1</p>
-                    </div>
+                    <div id='a2-ability-1-box' class="a2-ability-boxes"><p id='a2-ability-1-label' class='a2-ability-labels'>1</p></div>
                     <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
-                    <div id='a2-ability-2-box' class="a2-ability-boxes">
-                        <p id='a2-ability-2-label' class='a2-ability-labels'>2</p>
-                    </div>
+                    <div id='a2-ability-2-box' class="a2-ability-boxes"><p id='a2-ability-2-label' class='a2-ability-labels'>2</p></div>
                     <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
-                    <div id='a2-ability-3-box' class="a2-ability-boxes">
-                        <p id='a2-ability-3-label' class='a2-ability-labels'>3</p>
-                    </div>
+                    <div id='a2-ability-3-box' class="a2-ability-boxes"><p id='a2-ability-3-label' class='a2-ability-labels'>3</p></div>
                     <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
-                    <div id='a2-ability-4-box' class="a2-ability-boxes">
-                        <p id='a2-ability-4-label' class='a2-ability-labels'>4</p>
-                    </div>
+                    <div id='a2-ability-4-box' class="a2-ability-boxes"><p id='a2-ability-4-label' class='a2-ability-labels'>4</p></div>
                     <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
                 </div>
             </div>
             <div id='a3-ability-full-container' class="ability-full-container" style="display: none;">
                 <h1 id='a3-class-name' class="class-names"></h1>
                 <div id='a3-ability-container' class="ability-container">
-                    <div id='a3-ability-1-box' class="a3-ability-boxes">
-                        <p id='a3-ability-1-label' class='a3-ability-labels'>1</p>
-                    </div>
+                    <div id='a3-ability-1-box' class="a3-ability-boxes"><p id='a3-ability-1-label' class='a3-ability-labels'>1</p></div>
                     <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
-                    <div id='a3-ability-2-box' class="a3-ability-boxes">
-                        <p id='a3-ability-2-label' class='a3-ability-labels'>2</p>
-                    </div>
+                    <div id='a3-ability-2-box' class="a3-ability-boxes"><p id='a3-ability-2-label' class='a3-ability-labels'>2</p></div>
                     <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
-                    <div id='a3-ability-3-box' class="a3-ability-boxes">
-                        <p id='a3-ability-3-label' class='a3-ability-labels'>3</p>
-                    </div>
+                    <div id='a3-ability-3-box' class="a3-ability-boxes"><p id='a3-ability-3-label' class='a3-ability-labels'>3</p></div>
                     <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
-                    <div id='a3-ability-4-box' class="a3-ability-boxes">
-                        <p id='a3-ability-4-label' class='a3-ability-labels'>4</p>
-                    </div>
+                    <div id='a3-ability-4-box' class="a3-ability-boxes"><p id='a3-ability-4-label' class='a3-ability-labels'>4</p></div>
                     <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
                 </div>
             </div>
             <div id='a4-ability-full-container' class="ability-full-container" style="display: none;">
                 <h1 id='a4-class-name' class="class-names"></h1>
                 <div id='a4-ability-container' class="ability-container">
-                    <div id='a4-ability-1-box' class="a4-ability-boxes">
-                        <p id='a4-ability-1-label' class='a4-ability-labels'>1</p>
-                    </div>
+                    <div id='a4-ability-1-box' class="a4-ability-boxes"><p id='a4-ability-1-label' class='a4-ability-labels'>1</p></div>
                     <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
-                    <div id='a4-ability-2-box' class="a4-ability-boxes">
-                        <p id='a4-ability-2-label' class='a4-ability-labels'>2</p>
-                    </div>
+                    <div id='a4-ability-2-box' class="a4-ability-boxes"><p id='a4-ability-2-label' class='a4-ability-labels'>2</p></div>
                     <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
-                    <div id='a4-ability-3-box' class="a4-ability-boxes">
-                        <p id='a4-ability-3-label' class='a4-ability-labels'>3</p>
-                    </div>
+                    <div id='a4-ability-3-box' class="a4-ability-boxes"><p id='a4-ability-3-label' class='a4-ability-labels'>3</p></div>
                     <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
-                    <div id='a4-ability-4-box' class="a4-ability-boxes">
-                        <p id='a4-ability-4-label' class='a4-ability-labels'>4</p>
-                    </div>
+                    <div id='a4-ability-4-box' class="a4-ability-boxes"><p id='a4-ability-4-label' class='a4-ability-labels'>4</p></div>
                     <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
                 </div>
             </div>

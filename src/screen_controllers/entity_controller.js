@@ -301,6 +301,13 @@ function selectEnemy(entity) {
     }
     if (selectedChar.allied && selectedChar.baseDMG > 0) {
         selectedChar.autoAttack(entity);
+        for (let i = 0; i < selectedChar.abilities.length; i++) {
+            if (selectedChar.abilityShouldCast[i]) {
+                selectedChar.abilityShouldCast[i] = false;
+                selectedChar.useAbility(i);
+                console.log('ability used on click event');
+            }
+        }
     }
 }
 
@@ -329,6 +336,8 @@ function keydownEvent (e) {
         selectedChar.useAbility(entity);
     } else {
         // console.log('invalid key press of: ', e.key);
+        // console.log('value is: ', entity);
+        // console.log(hotkeys);
     }
 }
 
@@ -529,6 +538,10 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     backgroundImg.style.opacity = 0;
     backgroundImg.style.display = '';
     fadeIn(backgroundImg);
+    for (let i = 0; i < 4; i++) {
+        const abilityHotkey = document.getElementById(`ab${i + 1}-keybind`);
+        hotkeys[abilityHotkey.value] = i;
+    }
     for (let i = 0; i < charactersArr.length; i++) {
         if (!charactersArr[i].observer) {
             addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
@@ -546,8 +559,6 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
         const hotkeyInput = document.getElementById(`a${i+1}-keybind`);
         charactersArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
         hotkeys[hotkeyInput.value] = charactersArr[i];
-        const abilityHotkey = document.getElementById(`ab${i+1}-keybind`);
-        hotkeys[abilityHotkey.value] = i;
         const abilityClassName = document.getElementById(`a${i+1}-class-name`);
         abilityClassName.innerHTML = charactersArr[i].klass;
         const abilityNames = document.getElementsByClassName(`a${i+1}-ability-labels`);

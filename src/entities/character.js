@@ -11,10 +11,10 @@ const clericAbilities = charAbilities[1];
 const wizardAbilities = charAbilities[2];
 const rogueAbilities = charAbilities[3];
 
-const waAbNames = ['Concussive Blow'];
-const cAbNames = ['Prayer of Healing'];
-const wiAbNames = ['Fire Bomb'];
-const rAbNames = ['Poison Shiv'];
+const waAbNames = ['Concussive Blow', 'Charge'];
+const cAbNames = ['Prayer of Healing', "Protection"];
+const wiAbNames = ['Fire Bomb', 'Freeze'];
+const rAbNames = ['Poison Shiv', 'Backstab'];
 
 const specialAttackEffects = abilityList[1];
 const wizardAttackEffect = specialAttackEffects[0];

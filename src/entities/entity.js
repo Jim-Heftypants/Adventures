@@ -61,6 +61,8 @@ class Entity { // this. is selectedChar
         this.rooted = false;
         this.feared = false;
 
+        this.lockedIntoAbility = false;
+
         this.target;
 
         this.allies;
@@ -112,22 +114,22 @@ class Entity { // this. is selectedChar
         this.baseDMG += Math.ceil(this.trueBaseDMG * 0.1);
         this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
         switch (this.level) {
-            case (5):
+            case (4):
                 if (this.allAbilities[0]) {
                     this.abilities.push(this.allAbilities[0]);
                 }
                 break;
-            case (10):
+            case (8):
                 if (this.allAbilities[1]) {
                     this.abilities.push(this.allAbilities[1]);
                 }
                 break;
-            case (15):
+            case (12):
                 if (this.allAbilities[2]) {
                     this.abilities.push(this.allAbilities[2]);
                 }
                 break;
-            case (20):
+            case (16):
                 if (this.allAbilities[3]) {
                     this.abilities.push(this.allAbilities[3]);
                 }
@@ -156,7 +158,7 @@ class Entity { // this. is selectedChar
         return ([xChange, yChange, numRepeats])
     }
 
-    move(endPos, attackOnFinish = false, addXPBar=false) {
+    move(endPos, attackOnFinish = false, addXPBar=false, lockedIn=false) {
         this.movingOutTheWay = true;
         this.clearIntervals();
         this.isMoving = true;
@@ -175,10 +177,11 @@ class Entity { // this. is selectedChar
         }
         this.currentAction = setInterval(() => frame(this), 20);
         function frame(self) {
-            if (!self.stunned && !self.rooted) {
+            if (!(self.lockedIntoAbility || self.stunned || self.rooted) || lockedIn) {
                 if (posChange[2] === 0) {
                 // close animation
                     self.clearIntervals();
+                    self.lockedIntoAbility = false;
                     self.movingOutTheWay = false;
                     pos[0] = Math.floor(pos[0]); pos[1] = Math.floor(pos[1]);
                     if (attackOnFinish) {
@@ -221,6 +224,7 @@ class Entity { // this. is selectedChar
 
     killEntitiy(entity) {
         // console.log(entity.klass, "killed");
+        self.lockedIntoAbility = false;
         entity.clearIntervals();
         if (entity.abilityContainer) { entity.abilityContainer.style.display = 'none'; }
         entity.hp = -100;
@@ -276,7 +280,7 @@ class Entity { // this. is selectedChar
         return false;
     }
 
-    trackTarget() { // hot code
+    trackTarget(target, lockedIn=false) { // hot code
         this.clearIntervals();
         this.isMoving = true;
         const bigDiv = document.getElementById('game-container');
@@ -284,26 +288,27 @@ class Entity { // this. is selectedChar
         const checker = difference + Math.floor(bigDiv.offsetWidth);
         this.currentAction = setInterval(() => move(this), 20);
         function move(self) {
-            if (!self.stunned && !self.rooted) {
-                if (self.target.container.style.display === 'none') {
+            if (!(self.lockedIntoAbility || self.stunned || self.rooted) || lockedIn) {
+                if (target.container.style.display === 'none') {
                     self.clearIntervals();
                     if (!self.allied) {
                         self.setTargetAndAttack()
                     }
                     return;
                 }
-                if (self.withinAttackRange(self.target)) {
+                if (self.withinAttackRange(target)) {
                     clearInterval(self.currentAction);
-                    self.autoAttack(self.target);
+                    self.lockedIntoAbility = false;
+                    self.autoAttack(target);
                     // console.log('auto attack called from track');
                 } else {
                     const pos = self.pos;
-                    const movePos = self.target.pos.slice();
+                    const movePos = target.pos.slice();
                     if (pos[0] - movePos[0] < 0) {
-                        movePos[0] -= self.target.img.width;
+                        movePos[0] -= target.img.width;
                         self.img.style.transform = "scaleX(1)";
                     } else {
-                        movePos[0] += self.target.img.width;
+                        movePos[0] += target.img.width;
                         self.img.style.transform = "scaleX(-1)";
                     }
                     let posChange = self.vectorToScalar(movePos);
@@ -328,7 +333,6 @@ class Entity { // this. is selectedChar
         attackOverlay.style.left = targetChar.pos[0] + 'px';
         attackOverlay.style.width = targetChar.img.width + 'px';
         attackOverlay.style.height = targetChar.img.height + 'px';
-        attackOverlay.style.display = '';
         const clearTime = Math.floor(this.as / 2);
         // 50%op => 0%op over clearTime / 20
         const iterations = clearTime / 20;
@@ -348,7 +352,7 @@ class Entity { // this. is selectedChar
         }, 20);
     }
 
-    beginAttack() {
+    beginAttack(lockedIn=false) {
         // make some kind of animation start
         this.clearIntervals();
         this.isAttacking = true;
@@ -361,12 +365,13 @@ class Entity { // this. is selectedChar
                 }
             }
         }
-        this.currentAnimation = setInterval(() => this.animateAttack(this), Math.floor(this.as / 4))
+        this.currentAnimation = setInterval(() => this.animateAttack(lockedIn), Math.floor(this.as / 4))
     }
 
-    animateAttack() {
-        if (!this.stunned && this.attackImages) {
+    animateAttack(lockedIn=false) {
+        if (!(this.lockedIntoAbility || this.stunned) || lockedIn) {
             if (!this.target || this.target.hp <= 0) {
+                self.lockedIntoAbility = false;
                 this.clearIntervals();
                 if (!this.allied) {
                     // chose another hero to attack
@@ -383,7 +388,7 @@ class Entity { // this. is selectedChar
             this.imgCycle += 1;
             if (this.imgCycle === 3) {
                 if (this.extraAttackAnimation) {
-                    this.extraAttackAnimation(this);
+                    this.extraAttackAnimation(this, this.target);
                 }
                 this.attack();
             }
@@ -394,7 +399,7 @@ class Entity { // this. is selectedChar
 
     attack() {
         if (!this.withinAttackRange(this.target)) {
-            this.trackTarget();
+            this.trackTarget(this.target);
             return;
         } else {
             if (this.dmg > 0) {
@@ -461,7 +466,7 @@ class Entity { // this. is selectedChar
 
     autoAttack(targetChar) {
         // console.log('auto attack target: ', targetChar);
-        if (this.allied) { this.target = targetChar; }
+        this.target = targetChar;
         if (this.withinAttackRange(targetChar)) {
             if (this.pos[0] < targetChar.pos[0]) {
                 this.img.style.transform = "scaleX(1)";
@@ -470,7 +475,7 @@ class Entity { // this. is selectedChar
             }
             this.beginAttack();
         } else {
-            this.trackTarget();
+            this.trackTarget(this.target);
         }
     }
 
@@ -491,7 +496,7 @@ class Entity { // this. is selectedChar
         this.abilityAvailable[n] = false;
         const ab = this.abilities[n];
         // console.log('ability: ', ab);
-        const cdTime = ab(this);
+        const cdTime = ab(this, this.target);
         if (cdTime === false) {
             // console.log('no target for ability');
             this.abilityAvailable[n] = true;
