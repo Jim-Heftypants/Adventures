@@ -2803,12 +2803,12 @@ function resetGame(won) {
   var levelButtons = document.getElementsByClassName('level-button');
 
   if (won && maxLevelNumber === currentLevelNumber) {
-    maxLevelNumber++;
-
     if (levelButtons[maxLevelNumber]) {
       levelButtons[maxLevelNumber].style.opacity = 100 + '%';
       levelButtons[maxLevelNumber].style.cursor = 'pointer';
     }
+
+    maxLevelNumber++;
   }
 
   var levChars = levels[currentLevelNumber].characterList;

@@ -597,6 +597,8 @@ body {
 
 .ability-description-shader {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: grey;
@@ -606,6 +608,8 @@ body {
 
 .ability-description-div {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     display: flex;

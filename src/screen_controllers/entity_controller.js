@@ -839,11 +839,11 @@ function resetGame(won) {
     document.getElementById('all-characters-ability-container').style.height = '0%';
     const levelButtons = document.getElementsByClassName('level-button');
     if (won && maxLevelNumber === currentLevelNumber) {
-        maxLevelNumber++;
         if (levelButtons[maxLevelNumber]) {
             levelButtons[maxLevelNumber].style.opacity = 100 + '%';
             levelButtons[maxLevelNumber].style.cursor = 'pointer';
         }
+        maxLevelNumber++;
     }
     const levChars = levels[currentLevelNumber].characterList;
     const levEnems = levels[currentLevelNumber].enemyList;
