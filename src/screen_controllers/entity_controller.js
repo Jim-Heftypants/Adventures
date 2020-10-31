@@ -7,7 +7,8 @@ let levelHasEnded = false;
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 0;
 let maxLevelNumber = 0; // change on pushed ver
-let characters = levels[5].characterList;
+const characters = levels[0].characterList;
+let party = levels[5].characterList;
 
 let selectedChar;
 
@@ -33,6 +34,10 @@ window.addEventListener('load', () => {
     const statAbilities1 = document.getElementsByClassName('stat-ability-div-1');
     const statAbilities2 = document.getElementsByClassName('stat-ability-div-2');
     const abDescShader = document.getElementsByClassName('ability-description-shader')[0];
+    const partySelectorButton = document.getElementById('party-button');
+    const partySelectorContainer = document.getElementById('party-selector-container');
+    const partySelectorNames = document.getElementsByClassName('party-selector-name');
+    const characterNameDisplays = document.getElementsByClassName('character-name-dispay');
     abDescShader.addEventListener('click', () => {
         currentShowingAbilityDescription.style.display = 'none';
         currentShowingAbilityDescription = null;
@@ -66,8 +71,8 @@ window.addEventListener('load', () => {
                 statImg.src = char.baseImg.src;
                 nameStat.innerHTML = `Level: ${char.level}`;
                 levelStat.innerHTML = char.klass;
-                hpStat.innerHTML = `Max HP: ${char.baseHP}`;
-                dmgStat.innerHTML = `Damage: ${char.baseDMG}`
+                hpStat.innerHTML = `Health: ${char.baseHP}`;
+                dmgStat.innerHTML = `Power: ${Math.abs(char.baseDMG)}`
                 defenseStat.innerHTML = `Defense: ${char.baseDefense}`;
                 for (let j = 0; j < statAbilities1.length; j++) {
                     if (char.abilities[j]) {
@@ -82,7 +87,67 @@ window.addEventListener('load', () => {
                 }
             }
         }
+        for (let i = 0; i < statSelectorNames.length; i++) {
+            if (party[i]) {
+                statSelectorNames[i].innerHTML = party[i].klass;
+            }
+        }
     })
+    partySelectorButton.addEventListener('click', () => {
+        for (let i = 0; i < characterNameDisplays.length; i++) {
+            if (characters[i]) {
+                characterNameDisplays[i].innerHTML = characters[i].klass;
+                characterNameDisplays[i].style.display = '';
+            } else {
+                characterNameDisplays[i].style.display = 'none';
+            }
+        }
+        for (let i = 0; i < partySelectorNames.length; i++) {
+            if (party[i]) {
+                partySelectorNames[i].innerHTML = party[i].klass;
+            }
+        }
+    })
+    let partyCharSelected = null;
+    let partyCharIdx = null;
+    for (let i = 0; i < characterNameDisplays.length; i++) {
+        characterNameDisplays[i].addEventListener('click', () => {
+            if (!partyCharSelected) {
+                for (let j = 0; j < partySelectorNames.length; j++) {
+                    partySelectorNames[j].style.cursor = 'pointer';
+                    partySelectorNames[j].addEventListener("mouseover", addBlueBorder);
+                    partySelectorNames[j].addEventListener("mouseleave", removeBlueBorder);
+                }
+            } else {
+                characterNameDisplays[partyCharIdx].style.border = '2px solid black';
+            }
+            characterNameDisplays[i].style.border = '5px solid red';
+            partyCharIdx = parseInt(characterNameDisplays[i].id.substr(characterNameDisplays[i].id.length - 1, 1))-1;
+            partyCharSelected = characters[partyCharIdx];
+        })
+    }
+    for (let i = 0; i < partySelectorNames.length; i++) {
+        partySelectorNames[i].addEventListener('click', () => {
+            if (!partyCharSelected) { return; }
+            partySelectorNames[i].style.cursor = 'default';
+            partySelectorNames[i].removeEventListener("mouseover", addBlueBorder);
+            partySelectorNames[i].removeEventListener("mouseleave", removeBlueBorder);
+            partySelectorNames[i].style.border = 'none';
+            for (let j = 0; j < party.length; j++) {
+                if (party[j].klass === partyCharSelected.klass) {
+                    party[j] = party[i];
+                    partySelectorNames[j].innerHTML = party[j].klass;
+                    // console.log(party);
+                }
+            }
+            partySelectorNames[i].innerHTML = partyCharSelected.klass;
+            party[i] = partyCharSelected;
+            characterNameDisplays[partyCharIdx].style.border = '2px solid black';
+            partyCharIdx = null;
+            partyCharSelected = null;
+        })
+    }
+
     let shouldSwap = false;
     let statCharSelected = null;
     function swapStatDisp(e) {
@@ -96,7 +161,7 @@ window.addEventListener('load', () => {
             heroStatsBlocks[j].removeEventListener("mouseleave", removeBlueBorder);
         }
         const charIndex = statCharSelected.id.substr(1, 1);
-        const char = characters[charIndex-1];
+        const char = party[charIndex-1];
         
         statCharSelected.style.border = 'none';
         statCharSelected = null;
@@ -160,11 +225,6 @@ window.addEventListener('load', () => {
     }
     for (let j = 0; j < heroStatsBlocks.length; j++) { heroStatsBlocks[j].addEventListener("click", swapStatDisp); }
     for (let i = 0; i < heroNameplateSelectors.length; i++) { heroNameplateSelectors[i].addEventListener('click', initiateStatSwap); }
-    for (let i = 0; i < statSelectorNames.length; i++) {
-        if (characters[i]) {
-            statSelectorNames[i].innerHTML = characters[i].klass;
-        }
-    }
 })
 
 
@@ -433,8 +493,11 @@ function loadLevel(levelNumber) {
     levelMessage.style.display = '';
     // const secondAction = () => beginLevel(level.characterList, level.enemyList, levelNumber);
     fadeIn(levelNameDisp);
-    const levelNameAction = () => { fadeIn(beginLevel); }
-    const action = () => fadeOut(levelNameDisp, levelNameAction);
+    // const levelNameAction = () => { fadeIn(beginLevel); }
+    const action = () => {
+        fadeOut(levelNameDisp);
+        fadeIn(beginLevel);
+    }
     const beginLevel = document.getElementById('begin-level-button');
     beginLevel.style.opacity = 0;
     beginLevel.style.display = '';
@@ -772,9 +835,6 @@ function resetGame(won) {
     document.getElementById('background-image').style.height = '100%';
     document.getElementById('all-characters-ability-container').style.height = '0%';
     const levelButtons = document.getElementsByClassName('level-button');
-    for (let i = 0; i < levelButtons.length; i++) {
-        levelButtons[i].style.height = levelButtons[i].offsetWidth + 'px';
-    }
     if (won && maxLevelNumber === currentLevelNumber) {
         maxLevelNumber++;
         if (levelButtons[maxLevelNumber]) {

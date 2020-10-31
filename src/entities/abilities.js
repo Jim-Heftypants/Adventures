@@ -185,8 +185,14 @@ const warriorAbilities = [powerSwing, charge];
 const clericAbilities = [groupHeal, protection];
 const wizardAbilities = [meteor, freeze];
 const rogueAbilities = [poisonDagger, backstab];
-export const allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
+const paladinAbilities = [];
+const bardAbilities = [];
+const rangerAbilities = [];
+const warlockAbilities = [];
+export const allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities,
+                                paladinAbilities, bardAbilities, rangerAbilities, warlockAbilities];
 
+                                
 function checkAbilityPossible(entity, abNum, target, infiniteRange=false) {
     if (target && (infiniteRange || entity.withinAttackRange(target)) && target.hp > 0) {
         return true;

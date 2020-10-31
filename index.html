@@ -34,6 +34,7 @@
             <h1 class="h-button" id="start-game-button" style="display: none;">Start Game!</h1>
             <h1 class='h-button' id='keybindings-button' style="display: none;">Keybindings</h1>
             <h1 class="h-button" id='heroes-button' style='display: none;'>Heroes</h1>
+            <h1 class="h-button" id="party-button" style="display: none;">Party</h1>
 
             <div id='full-keybind-container' style="display: none;">
                 <div id='keybindings-rules'>
@@ -94,6 +95,82 @@
                 <button id='level-6-button' class="level-button">Magic</button>
                 <button id='level-7-button' class="level-button">Melee</button>
                 <button id='level-8-button' class="level-button">Doppel-ganger</button>
+            </div>
+
+            <div id='heroes-stats-full-container' style="display: none;">
+                <div id="heroes-stats-ability-container">
+                    <div id='hero-stats-ability-container-1'>
+                        <div id='stat-ability-1-1' class="stat-ability-div-1" style="display: none;"></div>
+                        <div id='stat-ability-1-2' class="stat-ability-div-1" style="display: none;"></div>
+                        <div id='stat-ability-1-3' class="stat-ability-div-1" style="display: none;"></div>
+                        <div id='stat-ability-1-4' class="stat-ability-div-1" style="display: none;"></div>
+                    </div>
+                    <div id='hero-stats-ability-container-2'>
+                        <div id='stat-ability-2-1' class="stat-ability-div-2" style="display: none;"></div>
+                        <div id='stat-ability-2-2' class="stat-ability-div-2" style="display: none;"></div>
+                        <div id='stat-ability-2-3' class="stat-ability-div-2" style="display: none;"></div>
+                        <div id='stat-ability-2-4' class="stat-ability-div-2" style="display: none;"></div>
+                    </div>
+                </div>
+                <div id='heroes-stats-container'>
+                    <div id='hero-stats-1' class="hero-stats">
+                        <div id='stats-img-div-1' class="stats-img-div">
+                            <img src="" alt="No Character Selected" id='stats-img-1' class="stats-img" style="display: none;" />
+                        </div>
+                        <div id='stats-container-1' class="stats-container">
+                            <p id='stats-name-1' class="hero-stat"></p>
+                            <p id='stats-level-1' class="hero-stat"></p>
+                            <p id='stats-hp-1' class="hero-stat"></p>
+                            <p id='stats-dmg-1' class="hero-stat"></p>
+                            <p id='stats-defense-1' class="hero-stat"></p>
+                        </div>
+                    </div>
+                    <div id='hero-stats-2' class="hero-stats">
+                        <div id='stats-img-div-2' class="stats-img-div">
+                            <img src="" alt="No Character Selected" id='stats-img-2' class="stats-img" style="display: none;" />
+                        </div>
+                        <div id='stats-container-2' class="stats-container">
+                            <p id='stats-name-2' class="hero-stat"></p>
+                            <p id='stats-level-2' class="hero-stat"></p>
+                            <p id='stats-hp-2' class="hero-stat"></p>
+                            <p id='stats-dmg-2' class="hero-stat"></p>
+                            <p id='stats-defense-2' class="hero-stat"></p>
+                        </div>
+                    </div>
+                </div>
+                <div id='stats-selectors'>
+                    <div id='a1-stat-selector' class='stat-selector'><p id='stat-selector-name-1' class="stat-selector-name"></p></div>
+                    <div id='a2-stat-selector' class='stat-selector'><p id='stat-selector-name-2' class="stat-selector-name"></p></div>
+                    <div id='a3-stat-selector' class='stat-selector'><p id='stat-selector-name-3' class="stat-selector-name"></p></div>
+                    <div id='a4-stat-selector' class='stat-selector'><p id='stat-selector-name-4' class="stat-selector-name"></p></div>
+                </div>
+            </div>
+
+            <div id="party-selector-container" style="display: none;">
+                <div id='all-characters-display'>
+                    <div id='character-display-1' class="character-name-dispay"></div>
+                    <div id='character-display-2' class="character-name-dispay"></div>
+                    <div id='character-display-3' class="character-name-dispay"></div>
+                    <div id='character-display-4' class="character-name-dispay"></div>
+                    <div id='character-display-5' class="character-name-dispay"></div>
+                    <div id='character-display-6' class="character-name-dispay"></div>
+                    <div id='character-display-7' class="character-name-dispay"></div>
+                    <div id='character-display-8' class="character-name-dispay"></div>
+                </div>
+                <div id='party-display'>
+                    <div id='a1-party-selector' class='party-selector'>
+                        <p id='party-selector-name-1' class="party-selector-name"></p>
+                    </div>
+                    <div id='a2-party-selector' class='party-selector'>
+                        <p id='party-selector-name-2' class="party-selector-name"></p>
+                    </div>
+                    <div id='a3-party-selector' class='party-selector'>
+                        <p id='party-selector-name-3' class="party-selector-name"></p>
+                    </div>
+                    <div id='a4-party-selector' class='party-selector'>
+                        <p id='party-selector-name-4' class="party-selector-name"></p>
+                    </div>
+                </div>
             </div>
 
             <div class="ability-description-shader" style="display: none;"></div>
@@ -185,62 +262,6 @@
                     Deals Ability damage equal to your Power x 2.0 or Power x 6.0
                 </p>
             </div>
-            <div id='heroes-stats-full-container' style="display: none;">
-                <div id="heroes-stats-ability-container">
-                    <div id='hero-stats-ability-container-1'>
-                        <div id='stat-ability-1-1' class="stat-ability-div-1" style="display: none;"></div>
-                        <div id='stat-ability-1-2' class="stat-ability-div-1" style="display: none;"></div>
-                        <div id='stat-ability-1-3' class="stat-ability-div-1" style="display: none;"></div>
-                        <div id='stat-ability-1-4' class="stat-ability-div-1" style="display: none;"></div>
-                    </div>
-                    <div id='hero-stats-ability-container-2'>
-                        <div id='stat-ability-2-1' class="stat-ability-div-2" style="display: none;"></div>
-                        <div id='stat-ability-2-2' class="stat-ability-div-2" style="display: none;"></div>
-                        <div id='stat-ability-2-3' class="stat-ability-div-2" style="display: none;"></div>
-                        <div id='stat-ability-2-4' class="stat-ability-div-2" style="display: none;"></div>
-                    </div>
-                </div>
-                <div id='heroes-stats-container'>
-                    <div id='hero-stats-1' class="hero-stats">
-                        <div id='stats-img-div-1' class="stats-img-div">
-                            <img src="" alt="No Character Selected" id='stats-img-1' class="stats-img" style="display: none;"/>
-                        </div>
-                        <div id='stats-container-1' class="stats-container">
-                            <p id='stats-name-1' class="hero-stat"></p>
-                            <p id='stats-level-1' class="hero-stat"></p>
-                            <p id='stats-hp-1' class="hero-stat"></p>
-                            <p id='stats-dmg-1' class="hero-stat"></p>
-                            <p id='stats-defense-1' class="hero-stat"></p>
-                        </div>
-                    </div>
-                    <div id='hero-stats-2' class="hero-stats">
-                        <div id='stats-img-div-2' class="stats-img-div">
-                            <img src="" alt="No Character Selected" id='stats-img-2' class="stats-img" style="display: none;"/>
-                        </div>
-                        <div id='stats-container-2' class="stats-container">
-                            <p id='stats-name-2' class="hero-stat"></p>
-                            <p id='stats-level-2' class="hero-stat"></p>
-                            <p id='stats-hp-2' class="hero-stat"></p>
-                            <p id='stats-dmg-2' class="hero-stat"></p>
-                            <p id='stats-defense-2' class="hero-stat"></p>
-                        </div>
-                    </div>
-                </div>
-                <div id='stats-selectors'>
-                    <div id='a1-stat-selector' class='stat-selector'>
-                        <p id='stat-selector-name-1' class="stat-selector-name"></p>
-                    </div>
-                    <div id='a2-stat-selector' class='stat-selector'>
-                        <p id='stat-selector-name-2' class="stat-selector-name"></p>
-                    </div>
-                    <div id='a3-stat-selector' class='stat-selector'>
-                        <p id='stat-selector-name-3' class="stat-selector-name"></p>
-                    </div>
-                    <div id='a4-stat-selector' class='stat-selector'>
-                        <p id='stat-selector-name-4' class="stat-selector-name"></p>
-                    </div>
-                </div>
-            </div>
 
             <a href="#" id='close-button' class="close" style="display: none;"></a>
             <a href="#" id="return-button" style="display: none;">Select Screen</a>
@@ -255,10 +276,14 @@
                 <!-- <img src='' alt='fireblast' id='fireblast-img'> -->
             </div>
             <div id='title-screen-chars' style="display: none;">
-                <img src="./assets/images/Rogue/Rogue.png" id='rogue-base-img' class="title-screen-char" />
-                <img src="./assets/images/Wizard/Wizard.png" id='wizard-base-img' class="title-screen-char" />
-                <img src="./assets/images/Cleric/Cleric.png" id='cleric-base-img' class="title-screen-char"  />
-                <img src="./assets/images/Warrior/Warrior.png" id='warrior-base-img' class="title-screen-char" />
+                <div id='title-screen-chars-left' class="title-screen-chars-inner">
+                    <img src="./assets/images/Rogue/Rogue.png" id='rogue-base-img' class="title-screen-char" />
+                    <img src="./assets/images/Wizard/Wizard.png" id='wizard-base-img' class="title-screen-char" />
+                </div>
+                <div id='title-screen-chars-right' class="title-screen-chars-inner">
+                    <img src="./assets/images/Cleric/Cleric.png" id='cleric-base-img' class="title-screen-char"  />
+                    <img src="./assets/images/Warrior/Warrior.png" id='warrior-base-img' class="title-screen-char" />
+                </div>
             </div>
 
             <div id="a1-display" class='entity-container' style="position: absolute;">

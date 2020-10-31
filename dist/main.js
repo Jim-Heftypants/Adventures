@@ -321,7 +321,11 @@ var warriorAbilities = [powerSwing, charge];
 var clericAbilities = [groupHeal, protection];
 var wizardAbilities = [meteor, freeze];
 var rogueAbilities = [poisonDagger, backstab];
-var allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities];
+var paladinAbilities = [];
+var bardAbilities = [];
+var rangerAbilities = [];
+var warlockAbilities = [];
+var allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities, paladinAbilities, bardAbilities, rangerAbilities, warlockAbilities];
 
 function checkAbilityPossible(entity, abNum, target) {
   var infiniteRange = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
@@ -530,10 +534,12 @@ var warriorAbilities = charAbilities[0];
 var clericAbilities = charAbilities[1];
 var wizardAbilities = charAbilities[2];
 var rogueAbilities = charAbilities[3];
+var paladinAbilities = charAbilities[4];
 var waAbNames = ['Concussive Blow', 'Charge'];
 var cAbNames = ['Prayer of Healing', "Protection"];
 var wiAbNames = ['Fire Bomb', 'Freeze'];
 var rAbNames = ['Poison Shiv', 'Backstab'];
+var pAbNames = [];
 var specialAttackEffects = abilityList[1];
 var wizardAttackEffect = specialAttackEffects[0];
 /*
@@ -554,14 +560,15 @@ abNames
 */
 // tank
 
-var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, null, null, warriorAbilities, waAbNames); // heals
+var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, null, null, warriorAbilities, waAbNames);
+var Paladin = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Paladin', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, null, null, paladinAbilities, pAbNames); // heals
 
 var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 12, 2, null, clericAbilities, cAbNames); // rdps
 
 var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 14, null, wizardAttackEffect, wizardAbilities, wiAbNames); // mdps
 
 var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, null, null, rogueAbilities, rAbNames);
-var charactersArr = [Warrior, Cleric, Wizard, Rogue];
+var charactersArr = [Warrior, Cleric, Wizard, Rogue, Paladin];
 /* harmony default export */ __webpack_exports__["default"] = (charactersArr);
 
 /***/ }),
@@ -1459,25 +1466,15 @@ function slowFade(element) {
     element.style.opacity = op / 40;
     op -= 1;
   }, 50);
-} // const handleLoadCharClick = (e) => {
-//     switch 
-// }
-
+}
 
 window.addEventListener('load', function () {
-  // document.getElementById('full-container').style.height = document.getElementById('body').offsetHeight + 'px';
-  // document.getElementById('body').style.height = document.getElementById('full-container').offsetHeight + 'px';
-  // const abilityBoxes = document.getElementsByClassName('inner-ability-div');
-  // console.log(document.getElementById('a1-hp-left'));
   var gameTag = document.getElementById('game-tag');
   gameTag.style.opacity = 0;
   gameTag.style.display = '';
-  var charsDisp = document.getElementById('title-screen-chars'); // const controlsContainer = document.getElementsByClassName('controls-display')[0];
-
+  var charsDisp = document.getElementById('title-screen-chars');
   var closeButton = document.getElementById('close-button');
-  var hButtons = document.getElementsByClassName('h-button'); // const startGameButton = document.getElementById('start-game-button');
-  // const controlsButton = document.getElementById('game-controls-button');
-
+  var hButtons = document.getElementsByClassName('h-button');
   var keybindContainer = document.getElementById('full-keybind-container');
   var levelButtonContainer = document.getElementById('level-button-container');
   var levelButtonHeader = document.getElementById("level-button-container-header");
@@ -1486,6 +1483,7 @@ window.addEventListener('load', function () {
   var backgroundImage = document.getElementById('background-image');
   var titleBackground = document.getElementById('title');
   var gameContainer = document.getElementById('game-container');
+  var partySelectorContainer = document.getElementById('party-selector-container');
   var keybindInputs = document.getElementsByClassName('keybind-input');
 
   var _loop = function _loop(i) {
@@ -1527,6 +1525,7 @@ window.addEventListener('load', function () {
       keybindContainer.style.display = 'none';
       statsContainer.style.display = 'none';
       closeButton.style.display = 'none';
+      partySelectorContainer.style.display = 'none';
       charsDisp.style.display = '';
       backgroundImage.src = titleBackground.src;
       backgroundImage.style.opacity = 100;
@@ -1544,7 +1543,7 @@ window.addEventListener('load', function () {
         document.getElementById('background-image').style.height = '88%';
         gameContainer.style.height = '88%';
         document.getElementById('all-characters-ability-container').style.height = '12%';
-        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i2);
+        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i2 + 1);
       });
     };
 
@@ -1570,10 +1569,6 @@ window.addEventListener('load', function () {
       hButtonPartialAction();
       levelButtonContainer.style.display = '';
       levelButtonHeader.style.display = '';
-
-      for (var _i4 = 0; _i4 < levelButtons.length; _i4++) {
-        levelButtons[_i4].style.height = levelButtons[_i4].offsetWidth + 'px';
-      }
     });
     hButtons[1].addEventListener('click', function () {
       hButtonPartialAction();
@@ -1582,6 +1577,10 @@ window.addEventListener('load', function () {
     hButtons[2].addEventListener('click', function () {
       hButtonPartialAction();
       statsContainer.style.display = '';
+    });
+    hButtons[3].addEventListener('click', function () {
+      hButtonPartialAction();
+      partySelectorContainer.style.display = '';
     });
   }
 
@@ -1594,11 +1593,12 @@ window.addEventListener('load', function () {
 /*!*****************************!*\
   !*** ./src/levels/level.js ***!
   \*****************************/
-/*! exports provided: levelOne, levelTwo, levelThree, levelFour, levelFive, levelSix, levelSeven, levelEight */
+/*! exports provided: levelZero, levelOne, levelTwo, levelThree, levelFour, levelFive, levelSix, levelSeven, levelEight */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "levelZero", function() { return levelZero; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "levelOne", function() { return levelOne; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "levelTwo", function() { return levelTwo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "levelThree", function() { return levelThree; });
@@ -1620,7 +1620,7 @@ var enemiesArr = Object.values(_entities_enemy__WEBPACK_IMPORTED_MODULE_1__);
 var Level = function Level(name, enemyList, xp) {
   var message = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
   var actionChanges = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : function () {};
-  var characterList = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"];
+  var characterList = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"].slice(0, 4);
 
   _classCallCheck(this, Level);
 
@@ -1754,6 +1754,7 @@ var actionEight = function actionEight() {
   applyMod(enemiesArr[7][3], 70, false);
 };
 
+var levelZero = new Level('Zero', [], 0, "", null, _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"]);
 var levelOne = new Level('One', enemiesArr[0], 20, "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character will keep doing it until given a new action.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0]]);
 var levelTwo = new Level('Two', enemiesArr[1], 80, "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1]]);
 var levelThree = new Level('Three', enemiesArr[2], 120, "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2]]);
@@ -1784,7 +1785,8 @@ var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 0;
 var maxLevelNumber = 0; // change on pushed ver
 
-var characters = levels[5].characterList;
+var characters = levels[0].characterList;
+var party = levels[5].characterList;
 var selectedChar;
 var countToReach = 0;
 var moveFinishCount = 0;
@@ -1804,6 +1806,10 @@ window.addEventListener('load', function () {
   var statAbilities1 = document.getElementsByClassName('stat-ability-div-1');
   var statAbilities2 = document.getElementsByClassName('stat-ability-div-2');
   var abDescShader = document.getElementsByClassName('ability-description-shader')[0];
+  var partySelectorButton = document.getElementById('party-button');
+  var partySelectorContainer = document.getElementById('party-selector-container');
+  var partySelectorNames = document.getElementsByClassName('party-selector-name');
+  var characterNameDisplays = document.getElementsByClassName('character-name-dispay');
   abDescShader.addEventListener('click', function () {
     currentShowingAbilityDescription.style.display = 'none';
     currentShowingAbilityDescription = null;
@@ -1857,8 +1863,8 @@ window.addEventListener('load', function () {
         statImg.src = _char.baseImg.src;
         nameStat.innerHTML = "Level: ".concat(_char.level);
         levelStat.innerHTML = _char.klass;
-        hpStat.innerHTML = "Max HP: ".concat(_char.baseHP);
-        dmgStat.innerHTML = "Damage: ".concat(_char.baseDMG);
+        hpStat.innerHTML = "Health: ".concat(_char.baseHP);
+        dmgStat.innerHTML = "Power: ".concat(Math.abs(_char.baseDMG));
         defenseStat.innerHTML = "Defense: ".concat(_char.baseDefense);
 
         for (var j = 0; j < statAbilities1.length; j++) {
@@ -1878,7 +1884,89 @@ window.addEventListener('load', function () {
         }
       }
     }
+
+    for (var _i2 = 0; _i2 < statSelectorNames.length; _i2++) {
+      if (party[_i2]) {
+        statSelectorNames[_i2].innerHTML = party[_i2].klass;
+      }
+    }
   });
+  partySelectorButton.addEventListener('click', function () {
+    for (var _i3 = 0; _i3 < characterNameDisplays.length; _i3++) {
+      if (characters[_i3]) {
+        characterNameDisplays[_i3].innerHTML = characters[_i3].klass;
+        characterNameDisplays[_i3].style.display = '';
+      } else {
+        characterNameDisplays[_i3].style.display = 'none';
+      }
+    }
+
+    for (var _i4 = 0; _i4 < partySelectorNames.length; _i4++) {
+      if (party[_i4]) {
+        partySelectorNames[_i4].innerHTML = party[_i4].klass;
+      }
+    }
+  });
+  var partyCharSelected = null;
+  var partyCharIdx = null;
+
+  var _loop2 = function _loop2(_i5) {
+    characterNameDisplays[_i5].addEventListener('click', function () {
+      if (!partyCharSelected) {
+        for (var _j2 = 0; _j2 < partySelectorNames.length; _j2++) {
+          partySelectorNames[_j2].style.cursor = 'pointer';
+
+          partySelectorNames[_j2].addEventListener("mouseover", addBlueBorder);
+
+          partySelectorNames[_j2].addEventListener("mouseleave", removeBlueBorder);
+        }
+      } else {
+        characterNameDisplays[partyCharIdx].style.border = '2px solid black';
+      }
+
+      characterNameDisplays[_i5].style.border = '5px solid red';
+      partyCharIdx = parseInt(characterNameDisplays[_i5].id.substr(characterNameDisplays[_i5].id.length - 1, 1)) - 1;
+      partyCharSelected = characters[partyCharIdx];
+    });
+  };
+
+  for (var _i5 = 0; _i5 < characterNameDisplays.length; _i5++) {
+    _loop2(_i5);
+  }
+
+  var _loop3 = function _loop3(_i6) {
+    partySelectorNames[_i6].addEventListener('click', function () {
+      if (!partyCharSelected) {
+        return;
+      }
+
+      partySelectorNames[_i6].style.cursor = 'default';
+
+      partySelectorNames[_i6].removeEventListener("mouseover", addBlueBorder);
+
+      partySelectorNames[_i6].removeEventListener("mouseleave", removeBlueBorder);
+
+      partySelectorNames[_i6].style.border = 'none';
+
+      for (var _j3 = 0; _j3 < party.length; _j3++) {
+        if (party[_j3].klass === partyCharSelected.klass) {
+          party[_j3] = party[_i6];
+          partySelectorNames[_j3].innerHTML = party[_j3].klass; // console.log(party);
+        }
+      }
+
+      partySelectorNames[_i6].innerHTML = partyCharSelected.klass;
+      party[_i6] = partyCharSelected;
+      characterNameDisplays[partyCharIdx].style.border = '2px solid black';
+      partyCharIdx = null;
+      partyCharSelected = null;
+    });
+  };
+
+  for (var _i6 = 0; _i6 < partySelectorNames.length; _i6++) {
+    _loop3(_i6);
+  }
+
   var shouldSwap = false;
   var statCharSelected = null;
 
@@ -1898,7 +1986,7 @@ window.addEventListener('load', function () {
     }
 
     var charIndex = statCharSelected.id.substr(1, 1);
-    var _char2 = characters[charIndex - 1];
+    var _char2 = party[charIndex - 1];
     statCharSelected.style.border = 'none';
     statCharSelected = null;
 
@@ -1984,14 +2072,8 @@ window.addEventListener('load', function () {
     heroStatsBlocks[j].addEventListener("click", swapStatDisp);
   }
 
-  for (var _i2 = 0; _i2 < heroNameplateSelectors.length; _i2++) {
-    heroNameplateSelectors[_i2].addEventListener('click', initiateStatSwap);
-  }
-
-  for (var _i3 = 0; _i3 < statSelectorNames.length; _i3++) {
-    if (characters[_i3]) {
-      statSelectorNames[_i3].innerHTML = characters[_i3].klass;
-    }
+  for (var _i7 = 0; _i7 < heroNameplateSelectors.length; _i7++) {
+    heroNameplateSelectors[_i7].addEventListener('click', initiateStatSwap);
   }
 });
 
@@ -2197,20 +2279,20 @@ function setAbilityBoxes() {
     abilityBoxes.push(document.getElementsByClassName("a".concat(i, "-inner-ability-divs"))); // abilityLabels.push(document.getElementsByClassName(`a${i}-ability-labels`));
   }
 
-  var _loop2 = function _loop2(_i4) {
-    var _loop3 = function _loop3(j) {
-      abilityBoxes[_i4][j].addEventListener('click', function () {
-        return abilityClick([_i4 + 1, j]);
+  var _loop4 = function _loop4(_i8) {
+    var _loop5 = function _loop5(j) {
+      abilityBoxes[_i8][j].addEventListener('click', function () {
+        return abilityClick([_i8 + 1, j]);
       });
     };
 
-    for (var j = 0; j < abilityBoxes[_i4].length; j++) {
-      _loop3(j);
+    for (var j = 0; j < abilityBoxes[_i8].length; j++) {
+      _loop5(j);
     }
   };
 
-  for (var _i4 = 0; _i4 < abilityBoxes.length; _i4++) {
-    _loop2(_i4);
+  for (var _i8 = 0; _i8 < abilityBoxes.length; _i8++) {
+    _loop4(_i8);
   }
 }
 
@@ -2282,14 +2364,11 @@ function loadLevel(levelNumber) {
   levelMessage.style.opacity = 0;
   levelMessage.style.display = ''; // const secondAction = () => beginLevel(level.characterList, level.enemyList, levelNumber);
 
-  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(levelNameDisp);
-
-  var levelNameAction = function levelNameAction() {
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(beginLevel);
-  };
+  Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(levelNameDisp); // const levelNameAction = () => { fadeIn(beginLevel); }
 
   var action = function action() {
-    return Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(levelNameDisp, levelNameAction);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(levelNameDisp);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(beginLevel);
   };
 
   var beginLevel = document.getElementById('begin-level-button');
@@ -2410,88 +2489,88 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     hotkeys[abilityHotkey.value] = i;
   }
 
-  for (var _i5 = 0; _i5 < charactersArr.length; _i5++) {
-    if (!charactersArr[_i5].observer) {
-      addEntityEvents(charactersArr[_i5], charactersArr, enemiesArr);
+  for (var _i9 = 0; _i9 < charactersArr.length; _i9++) {
+    if (!charactersArr[_i9].observer) {
+      addEntityEvents(charactersArr[_i9], charactersArr, enemiesArr);
     }
 
-    livingChars[charactersArr[_i5].imgName] = charactersArr[_i5];
-    charactersArr[_i5].container.style.top = charactersArr[_i5].pos[1] + 'px';
-    charactersArr[_i5].container.style.left = charactersArr[_i5].pos[0] + 'px';
-    charactersArr[_i5].container.style.opacity = 0;
-    charactersArr[_i5].container.style.display = '';
-    boxEntities.push(charactersArr[_i5]);
-    var hpBar = document.getElementById("".concat(charactersArr[_i5].imgName, "-hp-bar"));
+    livingChars[charactersArr[_i9].imgName] = charactersArr[_i9];
+    charactersArr[_i9].container.style.top = charactersArr[_i9].pos[1] + 'px';
+    charactersArr[_i9].container.style.left = charactersArr[_i9].pos[0] + 'px';
+    charactersArr[_i9].container.style.opacity = 0;
+    charactersArr[_i9].container.style.display = '';
+    boxEntities.push(charactersArr[_i9]);
+    var hpBar = document.getElementById("".concat(charactersArr[_i9].imgName, "-hp-bar"));
     hpBar.style.display = "flex"; // charactersArr[i].hotkeyDisplay.innerHTML = charactersArr[i].hotkey;
     // hotkeys[charactersArr[i].hotkey] = charactersArr[i];
 
-    var hotkeyInput = document.getElementById("a".concat(_i5 + 1, "-keybind"));
-    charactersArr[_i5].hotkeyDisplay.innerHTML = hotkeyInput.value;
-    hotkeys[hotkeyInput.value] = charactersArr[_i5];
-    var abilityClassName = document.getElementById("a".concat(_i5 + 1, "-class-name"));
-    abilityClassName.innerHTML = charactersArr[_i5].klass;
-    var abilityNames = document.getElementsByClassName("a".concat(_i5 + 1, "-ability-labels"));
-    setAvailableAbilities(charactersArr[_i5]);
+    var hotkeyInput = document.getElementById("a".concat(_i9 + 1, "-keybind"));
+    charactersArr[_i9].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = charactersArr[_i9];
+    var abilityClassName = document.getElementById("a".concat(_i9 + 1, "-class-name"));
+    abilityClassName.innerHTML = charactersArr[_i9].klass;
+    var abilityNames = document.getElementsByClassName("a".concat(_i9 + 1, "-ability-labels"));
+    setAvailableAbilities(charactersArr[_i9]);
 
     for (var j = 0; j < abilityNames.length; j++) {
-      if (charactersArr[_i5].abilityNames[j]) {
-        abilityNames[j].innerHTML = charactersArr[_i5].abilityNames[j];
+      if (charactersArr[_i9].abilityNames[j]) {
+        abilityNames[j].innerHTML = charactersArr[_i9].abilityNames[j];
       } else {
         abilityNames[j].innerHTML = 'No Ability';
       }
     } // const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
 
 
-    charactersArr[_i5].container.addEventListener('click', allyClickEvents);
+    charactersArr[_i9].container.addEventListener('click', allyClickEvents);
 
-    charactersArr[_i5].img.src = charactersArr[_i5].baseImg.src;
+    charactersArr[_i9].img.src = charactersArr[_i9].baseImg.src;
 
-    if (charactersArr[_i5].pos === null) {
-      setRandomSpawn(charactersArr[_i5], boxEntities.slice());
+    if (charactersArr[_i9].pos === null) {
+      setRandomSpawn(charactersArr[_i9], boxEntities.slice());
     }
 
-    boxEntities.push(charactersArr[_i5]);
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[_i5].container);
-    observerObserve(charactersArr[_i5]);
+    boxEntities.push(charactersArr[_i9]);
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(charactersArr[_i9].container);
+    observerObserve(charactersArr[_i9]);
   }
 
-  var _loop4 = function _loop4(_i6) {
-    if (!enemiesArr[_i6].observer) {
-      addEntityEvents(enemiesArr[_i6], enemiesArr, charactersArr);
+  var _loop6 = function _loop6(_i10) {
+    if (!enemiesArr[_i10].observer) {
+      addEntityEvents(enemiesArr[_i10], enemiesArr, charactersArr);
     }
 
-    livingEnemies[enemiesArr[_i6].imgName] = enemiesArr[_i6];
-    enemiesArr[_i6].container.style.top = enemiesArr[_i6].pos[1] + 'px';
-    enemiesArr[_i6].container.style.left = enemiesArr[_i6].pos[0] + 'px';
-    enemiesArr[_i6].container.style.opacity = 0;
-    enemiesArr[_i6].container.style.display = '';
-    var hpBar = document.getElementById("".concat(enemiesArr[_i6].imgName, "-hp-bar"));
+    livingEnemies[enemiesArr[_i10].imgName] = enemiesArr[_i10];
+    enemiesArr[_i10].container.style.top = enemiesArr[_i10].pos[1] + 'px';
+    enemiesArr[_i10].container.style.left = enemiesArr[_i10].pos[0] + 'px';
+    enemiesArr[_i10].container.style.opacity = 0;
+    enemiesArr[_i10].container.style.display = '';
+    var hpBar = document.getElementById("".concat(enemiesArr[_i10].imgName, "-hp-bar"));
     hpBar.style.display = "flex";
-    var hotkeyInput = document.getElementById("e".concat(_i6 + 1, "-keybind"));
-    enemiesArr[_i6].hotkeyDisplay.innerHTML = hotkeyInput.value;
-    hotkeys[hotkeyInput.value] = enemiesArr[_i6];
+    var hotkeyInput = document.getElementById("e".concat(_i10 + 1, "-keybind"));
+    enemiesArr[_i10].hotkeyDisplay.innerHTML = hotkeyInput.value;
+    hotkeys[hotkeyInput.value] = enemiesArr[_i10];
 
-    enemiesArr[_i6].container.addEventListener('click', enemyClickEvents);
+    enemiesArr[_i10].container.addEventListener('click', enemyClickEvents);
 
-    enemiesArr[_i6].img.src = enemiesArr[_i6].baseImg.src;
+    enemiesArr[_i10].img.src = enemiesArr[_i10].baseImg.src;
 
-    if (enemiesArr[_i6].pos === null) {
-      setRandomSpawn(enemiesArr[_i6], boxEntities.slice());
+    if (enemiesArr[_i10].pos === null) {
+      setRandomSpawn(enemiesArr[_i10], boxEntities.slice());
     }
 
-    boxEntities.push(enemiesArr[_i6]);
+    boxEntities.push(enemiesArr[_i10]);
 
     var action = function action() {
-      return enemiesArr[_i6].autoAttack(enemiesArr[_i6].target);
+      return enemiesArr[_i10].autoAttack(enemiesArr[_i10].target);
     };
 
-    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i6].container, action); // begin attacking target
+    Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeIn"])(enemiesArr[_i10].container, action); // begin attacking target
 
-    observerObserve(enemiesArr[_i6]);
+    observerObserve(enemiesArr[_i10]);
   };
 
-  for (var _i6 = 0; _i6 < enemiesArr.length; _i6++) {
-    _loop4(_i6);
+  for (var _i10 = 0; _i10 < enemiesArr.length; _i10++) {
+    _loop6(_i10);
   } // console.log("hotkeys: ", hotkeys);
 
 }
@@ -2527,44 +2606,44 @@ function endGame(charsList, enemyList) {
   var allCharsList = levels[currentLevelNumber].characterList;
   var allEnemyList = levels[currentLevelNumber].enemyList;
 
-  for (var _i7 = 0; _i7 < allCharsList.length; _i7++) {
-    allCharsList[_i7].observer.disconnect();
+  for (var _i11 = 0; _i11 < allCharsList.length; _i11++) {
+    allCharsList[_i11].observer.disconnect();
 
-    if (allCharsList[_i7].currentAction) {
-      clearInterval(allCharsList[_i7].currentAction);
+    if (allCharsList[_i11].currentAction) {
+      clearInterval(allCharsList[_i11].currentAction);
     }
 
-    if (allCharsList[_i7].currentAnimation) {
-      clearInterval(allCharsList[_i7].currentAnimation);
+    if (allCharsList[_i11].currentAnimation) {
+      clearInterval(allCharsList[_i11].currentAnimation);
     }
 
-    allCharsList[_i7].isAttacking = false;
-    allCharsList[_i7].isMoving = false;
-    allCharsList[_i7].target = null;
+    allCharsList[_i11].isAttacking = false;
+    allCharsList[_i11].isMoving = false;
+    allCharsList[_i11].target = null;
 
-    allCharsList[_i7].container.removeEventListener('click', allyClickEvents);
+    allCharsList[_i11].container.removeEventListener('click', allyClickEvents);
 
-    allCharsList[_i7].img.src = allCharsList[_i7].baseImg.src;
+    allCharsList[_i11].img.src = allCharsList[_i11].baseImg.src;
   }
 
-  for (var _i8 = 0; _i8 < allEnemyList.length; _i8++) {
-    allEnemyList[_i8].observer.disconnect();
+  for (var _i12 = 0; _i12 < allEnemyList.length; _i12++) {
+    allEnemyList[_i12].observer.disconnect();
 
-    if (allEnemyList[_i8].currentAction) {
-      clearInterval(allEnemyList[_i8].currentAction);
+    if (allEnemyList[_i12].currentAction) {
+      clearInterval(allEnemyList[_i12].currentAction);
     }
 
-    if (allEnemyList[_i8].currentAnimation) {
-      clearInterval(allEnemyList[_i8].currentAnimation);
+    if (allEnemyList[_i12].currentAnimation) {
+      clearInterval(allEnemyList[_i12].currentAnimation);
     }
 
-    allEnemyList[_i8].isAttacking = false;
-    allEnemyList[_i8].isMoving = false;
-    allEnemyList[_i8].target = null;
+    allEnemyList[_i12].isAttacking = false;
+    allEnemyList[_i12].isMoving = false;
+    allEnemyList[_i12].target = null;
 
-    allEnemyList[_i8].container.removeEventListener('click', enemyClickEvents);
+    allEnemyList[_i12].container.removeEventListener('click', enemyClickEvents);
 
-    allEnemyList[_i8].img.src = allEnemyList[_i8].baseImg.src;
+    allEnemyList[_i12].img.src = allEnemyList[_i12].baseImg.src;
   }
 
   if (charsList.length > 0) {
@@ -2573,8 +2652,8 @@ function endGame(charsList, enemyList) {
     var backgroundImg = document.getElementById('background-image');
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
 
-    for (var _i9 = 0; _i9 < enemyList.length; _i9++) {
-      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i9].container);
+    for (var _i13 = 0; _i13 < enemyList.length; _i13++) {
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i13].container);
     }
 
     fadeOutGame(false);
@@ -2634,32 +2713,32 @@ function addCharXP() {
     if (timeCount === 60) {
       clearInterval(xpInterval);
 
-      for (var _i10 = 0; _i10 < c.length; _i10++) {
-        c[_i10].xp = Math.ceil(c[_i10].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+      for (var _i14 = 0; _i14 < c.length; _i14++) {
+        c[_i14].xp = Math.ceil(c[_i14].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
 
-        c[_i10].container.style.border = 'none';
-        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i10].container);
+        c[_i14].container.style.border = 'none';
+        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i14].container);
       }
 
       var backgroundImg = document.getElementById('background-image');
       Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
     }
 
-    for (var _i11 = 0; _i11 < c.length; _i11++) {
-      c[_i11].xp += xpPerInterval;
+    for (var _i15 = 0; _i15 < c.length; _i15++) {
+      c[_i15].xp += xpPerInterval;
 
-      if (c[_i11].xp > c[_i11].nextLevelXP) {
-        c[_i11].levelUp();
+      if (c[_i15].xp > c[_i15].nextLevelXP) {
+        c[_i15].levelUp();
 
-        var _expWords = document.getElementById(c[_i11].imgName + '-exp-words');
+        var _expWords = document.getElementById(c[_i15].imgName + '-exp-words');
 
-        _expWords.innerHTML = 'Level: ' + c[_i11].level;
+        _expWords.innerHTML = 'Level: ' + c[_i15].level;
       }
 
-      var _xpPercent = Math.floor(c[_i11].xp / c[_i11].nextLevelXP * 100);
+      var _xpPercent = Math.floor(c[_i15].xp / c[_i15].nextLevelXP * 100);
 
-      c[_i11].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
-      c[_i11].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
+      c[_i15].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
+      c[_i15].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
     }
 
     timeCount++;
@@ -2718,10 +2797,6 @@ function resetGame(won) {
   document.getElementById('all-characters-ability-container').style.height = '0%';
   var levelButtons = document.getElementsByClassName('level-button');
 
-  for (var i = 0; i < levelButtons.length; i++) {
-    levelButtons[i].style.height = levelButtons[i].offsetWidth + 'px';
-  }
-
   if (won && maxLevelNumber === currentLevelNumber) {
     maxLevelNumber++;
 
@@ -2734,39 +2809,38 @@ function resetGame(won) {
   var levChars = levels[currentLevelNumber].characterList;
   var levEnems = levels[currentLevelNumber].enemyList;
 
-  for (var _i12 = 0; _i12 < levChars.length; _i12++) {
-    levChars[_i12].hp = levChars[_i12].baseHP;
-    levChars[_i12].dmg = levChars[_i12].baseDMG;
-    levChars[_i12].defense = levChars[_i12].baseDefense;
-    levChars[_i12].ms = levChars[_i12].baseMS;
-    levChars[_i12].stunned = false;
-    levChars[_i12].rooted = false;
-    levChars[_i12].pos[0] = levChars[_i12].basePos[0];
-    levChars[_i12].pos[1] = levChars[_i12].basePos[1];
-    levChars[_i12].container.style.top = levChars[_i12].pos[1] + 'px';
-    levChars[_i12].container.style.left = levChars[_i12].pos[0] + 'px';
-    levChars[_i12].hpContainerLeft.style.backgroundColor = 'blue';
-    var expWords = document.getElementById(levChars[_i12].imgName + '-exp-words');
+  for (var i = 0; i < levChars.length; i++) {
+    levChars[i].hp = levChars[i].baseHP;
+    levChars[i].dmg = levChars[i].baseDMG;
+    levChars[i].defense = levChars[i].baseDefense;
+    levChars[i].ms = levChars[i].baseMS;
+    levChars[i].stunned = false;
+    levChars[i].rooted = false;
+    levChars[i].pos[0] = levChars[i].basePos[0];
+    levChars[i].pos[1] = levChars[i].basePos[1];
+    levChars[i].container.style.top = levChars[i].pos[1] + 'px';
+    levChars[i].container.style.left = levChars[i].pos[0] + 'px';
+    levChars[i].hpContainerLeft.style.backgroundColor = 'blue';
+    var expWords = document.getElementById(levChars[i].imgName + '-exp-words');
     expWords.innerHTML = '';
-    levChars[_i12].img.style.border = 'none';
-
-    levChars[_i12].setHpBars();
+    levChars[i].img.style.border = 'none';
+    levChars[i].setHpBars();
   }
 
-  for (var _i13 = 0; _i13 < levEnems.length; _i13++) {
-    levEnems[_i13].hp = levEnems[_i13].baseHP;
-    levEnems[_i13].dmg = levEnems[_i13].baseDMG;
-    levEnems[_i13].defense = levEnems[_i13].baseDefense;
-    levEnems[_i13].ms = levEnems[_i13].baseMS;
-    levEnems[_i13].stunned = false;
-    levEnems[_i13].rooted = false;
-    levEnems[_i13].pos[0] = levEnems[_i13].basePos[0];
-    levEnems[_i13].pos[1] = levEnems[_i13].basePos[1];
-    levEnems[_i13].container.style.top = levEnems[_i13].pos[1] + 'px';
-    levEnems[_i13].container.style.left = levEnems[_i13].pos[0] + 'px';
-    levEnems[_i13].img.style.border = 'none';
+  for (var _i16 = 0; _i16 < levEnems.length; _i16++) {
+    levEnems[_i16].hp = levEnems[_i16].baseHP;
+    levEnems[_i16].dmg = levEnems[_i16].baseDMG;
+    levEnems[_i16].defense = levEnems[_i16].baseDefense;
+    levEnems[_i16].ms = levEnems[_i16].baseMS;
+    levEnems[_i16].stunned = false;
+    levEnems[_i16].rooted = false;
+    levEnems[_i16].pos[0] = levEnems[_i16].basePos[0];
+    levEnems[_i16].pos[1] = levEnems[_i16].basePos[1];
+    levEnems[_i16].container.style.top = levEnems[_i16].pos[1] + 'px';
+    levEnems[_i16].container.style.left = levEnems[_i16].pos[0] + 'px';
+    levEnems[_i16].img.style.border = 'none';
 
-    levEnems[_i13].setHpBars();
+    levEnems[_i16].setHpBars();
   }
 }
 

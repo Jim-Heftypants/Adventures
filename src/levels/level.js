@@ -6,7 +6,7 @@ import * as enemiesObj from '../entities/enemy';
 const enemiesArr = Object.values(enemiesObj);
 
 class Level {
-    constructor(name, enemyList, xp, message="", actionChanges=()=>{}, characterList=charactersArr) {
+    constructor(name, enemyList, xp, message="", actionChanges=()=>{}, characterList=charactersArr.slice(0, 4)) {
         this.name = name;
         this.enemyList = enemyList;
         this.xp = xp;
@@ -135,6 +135,7 @@ const actionEight = () => {
     applyMod(enemiesArr[7][3], 70, false);
 }
 
+export const levelZero = new Level('Zero', [], 0, "", null, charactersArr);
 export const levelOne = new Level('One', enemiesArr[0], 20, 
     "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character will keep doing it until given a new action.",
     firstFourActions, [charactersArr[0]]);

@@ -91,12 +91,11 @@ body {
     color: blueviolet;
     font-size: 70px;
     font-size: 5vw;
+    cursor: default;
 }
 
 #level-name-display {
-    cursor: default;
-    margin-bottom: 0;
-    padding-bottom: 0;
+    margin-top: 2%;
 }
 
 #game-over-display, #game-won-display {
@@ -116,11 +115,12 @@ body {
 .h-button {
     cursor: pointer;
     text-align: center;
-    font-size: 100px;
+    font-size: 7vw;
     position: relative;
     margin: auto;
-    width: 550px;
-    padding: 15px;
+    width: 40vw;
+    /* height: 7.5vw; */
+    padding: 10px;
     margin-top: 1.5%;
     z-index: 5;
     color: rgb(22, 141, 195);
@@ -173,6 +173,8 @@ body {
     color: red;
     font-size: 80px;
     font-size: 5vw;
+    padding-bottom: 0.5vw;
+    padding-top: 0.5vw;
     text-align: center;
 }
 
@@ -191,8 +193,8 @@ body {
     border: 5px solid blue;
     background-color: white;
     cursor: default;
-    width: 19%;
-    height: 270px;
+    width: 19vw;
+    height: 19vw;
     opacity: 60%;
     font-size: 70px;
     font-size: 4.5vw;
@@ -211,8 +213,10 @@ body {
     position: relative;
     margin-left: 10%;
     margin-right: 10%;
+    margin-top: 2%;
     text-align: center;
     font-size: 40px;
+    font-size: 3vw;
     color: red;
     z-index: 5;
     cursor: default;
@@ -425,31 +429,42 @@ body {
 #heroes-stats-container, #heroes-stats-ability-container {
     display: flex;
     align-content: space-between;
-    width: 100%;
-    height: 20%;
+    width: 100vw;
+    height: 9vw;
 }
 
 #heroes-stats-container {
-    height: 45%;
-    margin-bottom: 3%;
+    height: 50vh;
+    width: 100vw;
+    margin-bottom: 3vh;
+    margin-top: 1vh;
+}
+
+#heroes-stats-ability-container {
+    height: 14vh;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
 }
 
 #hero-stats-ability-container-1, #hero-stats-ability-container-2 {
     width: 45%;
     height: 100%;
     display: flex;
-    border: 3px solid black;
+    /* border: 3px solid black; */
     margin-left: auto;
     margin-right: auto;
 }
 
 .stat-ability-div-1, .stat-ability-div-2 {
-    width: 18%;
-    height: 72%;
+    width: 14vh;
+    height: 14vh;
+    /* margin-top: 1vh;
+    margin-bottom: 1vh; */
     border: 5px solid green;
     background-color: blue;
     cursor: pointer;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .hero-stats {
@@ -470,14 +485,15 @@ body {
 }
 
 .stats-img {
-    height: 20vw;
-    width: 15vw;
+    height: 25vw;
+    width: 18.75vw;
 }
 
 .stats-container {
     height: 100%;
     width: 60%;
     font-size: 50px;
+    font-size: 6.25vh;
     color: seagreen;
     text-align: center;
 }
@@ -487,45 +503,96 @@ body {
     margin-bottom: 20px;
 }
 
-#stats-selectors {
-    height: 25%;
-    width: 100%;
-    padding-top: 4%;
-    padding-bottom: 4%;
+#stats-selectors, #party-display {
+    width: 100vw;
+    height: 25vh;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
     display: flex;
     align-content: space-between;
     background-color: hotpink;
+    position: absolute;
+    bottom: 0px;
 }
 
-.stat-selector {
-    width: 20%;
-    height: 100%;
+.stat-selector, .party-selector {
+    width: 20vw;
+    height: 20vh;
     background-color: indigo;
     /* border: 2px solid green; */
     cursor: pointer;
     margin: auto;
     font-size: 70px;
+    font-size: 5vw;
     text-align: center;
     color: magenta;
 }
 
-.stat-selector-name {
+.character-name-dispay {
+    width: 24vw;
+    height: 10vw;
+    margin-left: 0.5vw;
+    margin-right: 0.5vw;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    font-size: 6vw;
+    text-align: center;
+    background-color: lightskyblue;
+    color: green;
+    border: 2px solid black;
+    cursor: pointer;
+}
+
+#party-selector-container {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: lightslategray;
+}
+
+#all-characters-display {
+    display: flex;
+    flex-wrap: wrap;
+    width: 80vw;
+    margin: auto;
+}
+
+.party-selector {
+    cursor: default;
+    /* border: 3px solid indigo; */
+}
+
+.stat-selector-name, .party-selector-name {
     margin-top: 50px;
-    margin-bottom: auto;
 }
 
 #title-screen-chars {
-    margin-top: 30px;
-    position: relative;
+    bottom: 35vh;
+    width: 100vw;
+    position: absolute;
     display: flex;
     align-content: space-between;
     z-index: 5;
+    pointer-events: none;
+}
+
+.title-screen-chars-inner {
+    width: 30vw;
+    display: flex;
+}
+
+#title-screen-chars-left {
+    margin-right: auto;
+}
+#title-screen-chars-right {
+    margin-left: auto;
 }
 
 .title-screen-char {
-    width: 180px;
-    height: 240px;
-    margin: auto;
+    width: 13.125vw;
+    height: 17.5vw;
+    margin-left: 1.1vw;
+    margin-right: 1.1vw;
 }
 
 .ability-description-shader {
@@ -562,14 +629,11 @@ body {
 
 .ability-description {
     font-size: 60px;
+    margin: 1%;
     color: royalblue;
     text-align: center;
 }
 
-.ability-description:first-child {
-    margin-top: 5%;
-    margin-bottom: 2%;
-}
 .ability-description:last-child {
     margin-bottom: auto;
 }
