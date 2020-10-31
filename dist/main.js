@@ -568,7 +568,7 @@ var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infi
 var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 14, null, wizardAttackEffect, wizardAbilities, wiAbNames); // mdps
 
 var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, null, null, rogueAbilities, rAbNames);
-var charactersArr = [Warrior, Cleric, Wizard, Rogue, Paladin];
+var charactersArr = [Warrior, Cleric, Wizard, Rogue];
 /* harmony default export */ __webpack_exports__["default"] = (charactersArr);
 
 /***/ }),
@@ -1620,7 +1620,7 @@ var enemiesArr = Object.values(_entities_enemy__WEBPACK_IMPORTED_MODULE_1__);
 var Level = function Level(name, enemyList, xp) {
   var message = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
   var actionChanges = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : function () {};
-  var characterList = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"].slice(0, 4);
+  var characterList = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
   _classCallCheck(this, Level);
 
@@ -1758,7 +1758,7 @@ var levelZero = new Level('Zero', [], 0, "", null, _entities_character__WEBPACK_
 var levelOne = new Level('One', enemiesArr[0], 20, "Click on the stick figure, the warrior, in black to select it. Then click on the red stick figure enemy to attack it or click anywhere on the map to move there. Once an action is performed, the character will keep doing it until given a new action.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0]]);
 var levelTwo = new Level('Two', enemiesArr[1], 80, "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1]]);
 var levelThree = new Level('Three', enemiesArr[2], 120, "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2]]);
-var levelFour = new Level('Four', enemiesArr[3], 240, "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", firstFourActions, _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"]);
+var levelFour = new Level('Four', enemiesArr[3], 240, "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", firstFourActions, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3]]);
 var levelFive = new Level('Five', enemiesArr[4], 300, "The tutorial levels are over. Time for more of a challenge", actionFive);
 var levelSix = new Level('Six', enemiesArr[5], 375, "Wizards and Clerics", actionSix);
 var levelSeven = new Level('Seven', enemiesArr[6], 450, "All melee", actionSeven);
@@ -1782,11 +1782,11 @@ __webpack_require__.r(__webpack_exports__);
 var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
-var currentLevelNumber = 0;
-var maxLevelNumber = 0; // change on pushed ver
+var currentLevelNumber = 1;
+var maxLevelNumber = 1; // change on pushed ver
 
-var characters = levels[0].characterList;
-var party = levels[5].characterList;
+var characters = levels[0].characterList.slice();
+var party = levels[4].characterList.slice();
 var selectedChar;
 var countToReach = 0;
 var moveFinishCount = 0;
@@ -2348,6 +2348,11 @@ function loadLevel(levelNumber) {
   }
 
   var level = levels[levelNumber];
+
+  if (level.characterList === null) {
+    level.characterList = party;
+  }
+
   levelHasEnded = false;
   currentLevelNumber = levelNumber;
   level.action(); // console.log('level selected: ', levelNumber);

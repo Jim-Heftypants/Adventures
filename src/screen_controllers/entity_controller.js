@@ -5,10 +5,10 @@ let hasBeenLoaded = false;
 let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
-let currentLevelNumber = 0;
-let maxLevelNumber = 0; // change on pushed ver
-const characters = levels[0].characterList;
-let party = levels[5].characterList;
+let currentLevelNumber = 1;
+let maxLevelNumber = 1; // change on pushed ver
+const characters = levels[0].characterList.slice();
+let party = levels[4].characterList.slice();
 
 let selectedChar;
 
@@ -476,6 +476,9 @@ function loadLevel(levelNumber) {
         return;
     }
     const level = levels[levelNumber];
+    if (level.characterList === null) {
+        level.characterList = party;
+    }
     levelHasEnded = false;
     currentLevelNumber = levelNumber;
     level.action();

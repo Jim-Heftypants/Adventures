@@ -6,7 +6,7 @@ import * as enemiesObj from '../entities/enemy';
 const enemiesArr = Object.values(enemiesObj);
 
 class Level {
-    constructor(name, enemyList, xp, message="", actionChanges=()=>{}, characterList=charactersArr.slice(0, 4)) {
+    constructor(name, enemyList, xp, message="", actionChanges=()=>{}, characterList=null) {
         this.name = name;
         this.enemyList = enemyList;
         this.xp = xp;
@@ -147,7 +147,7 @@ export const levelThree = new Level('Three', enemiesArr[2], 120,
     firstFourActions, [charactersArr[0], charactersArr[1], charactersArr[2]]);
 export const levelFour = new Level('Four', enemiesArr[3], 240,
     "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.",
-    firstFourActions, charactersArr);
+    firstFourActions, [charactersArr[0], charactersArr[1], charactersArr[2], charactersArr[3]]);
 export const levelFive = new Level('Five', enemiesArr[4],  300,
     "The tutorial levels are over. Time for more of a challenge",
     actionFive);

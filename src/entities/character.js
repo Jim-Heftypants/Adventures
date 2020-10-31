@@ -51,5 +51,5 @@ const Wizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 20, true, "
 // mdps
 const Rogue = new classCreator("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, null, null, rogueAbilities, rAbNames);
 
-const charactersArr = [Warrior, Cleric, Wizard, Rogue, Paladin];
+const charactersArr = [Warrior, Cleric, Wizard, Rogue];
 export default charactersArr;
