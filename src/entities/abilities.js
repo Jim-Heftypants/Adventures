@@ -76,6 +76,11 @@ const charge = (entity, target) => {
             entity.ms -= 15;
             clearInterval(inter);
         }
+        if (target.container.style.display === 'none' || target.hp < 0) {
+            entity.lockedIntoAbility = false;
+            entity.ms -= 15;
+            clearInterval(inter);
+        }
     }, 40)
     return 10;
 }
@@ -192,7 +197,7 @@ const warlockAbilities = [];
 export const allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities,
                                 paladinAbilities, bardAbilities, rangerAbilities, warlockAbilities];
 
-                                
+
 function checkAbilityPossible(entity, abNum, target, infiniteRange=false) {
     if (target && (infiniteRange || entity.withinAttackRange(target)) && target.hp > 0) {
         return true;

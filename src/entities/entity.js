@@ -1,5 +1,5 @@
 class Entity { // this. is selectedChar
-    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, img="", pos=[0, 0], defense=0,
+    constructor(klass="", range=0, baseHP=0, ms=0, attackSpeed=0, attackDMG, allied, pos=[0, 0], defense=0,
             hasAttackOverlay = null, extraAttackAnimation = null, abilities = [], abilityNames = []) {
         this.klass = klass;
         this.range = range;
@@ -20,9 +20,9 @@ class Entity { // this. is selectedChar
         this.trueBaseDefense = defense;
         this.baseDefense = defense
         this.defense = this.baseDefense;
+        this.level = 1;
         if (this.allied) {
             this.xp = 0;
-            this.level = 1;
             this.nextLevelXP = 100;
         }
 
@@ -37,7 +37,7 @@ class Entity { // this. is selectedChar
         this.hotkeyDisplay;
         this.hotkey;
 
-        this.imgName = img;
+        this.imgName;
         this.img; // base standing image
         this.attackImages; // cycle through array of images
         this.moveImages; // cycle through array of images
@@ -73,67 +73,111 @@ class Entity { // this. is selectedChar
         this.observer;
         this.xpObserver;
         this.observationToken = true;
-
-        window.addEventListener('load', () => {
-            this.addInlineStyle();
-        });
     }
 
     addInlineStyle() {
-        this.img = document.getElementsByClassName(this.imgName + "-image-display")[0];
+        const entityContainer = document.createElement("div");
+        entityContainer.classList.add("entity-container");
+        entityContainer.id = this.imgName + '-display';
+        document.getElementById("game-container").appendChild(entityContainer);
+        const hpBar = document.createElement("div");
+        hpBar.classList.add("hp-bar-container");
+        hpBar.id = this.imgName + '-hp-bar';
+        hpBar.style.display = "flex";
+        entityContainer.appendChild(hpBar);
+        const leftBar = document.createElement("div");
+        leftBar.classList.add("hp-percentage-left");
+        leftBar.id = this.imgName + '-hp-left';
+        hpBar.appendChild(leftBar);
+        const innerLeftBar = document.createElement("div");
+        innerLeftBar.id = this.imgName + '-inner-leftHP-bar';
+        innerLeftBar.style.width = '100%';
+        if (this.allied) { innerLeftBar.style.backgroundColor = 'blue';
+        } else { innerLeftBar.style.backgroundColor = 'red'; }
+        const innerTempBar = document.createElement("div");
+        innerTempBar.id = this.imgName + '-inner-tempHP-bar';
+        innerTempBar.style.backgroundColor = 'gold';
+        innerTempBar.style.width = '0%';
+        leftBar.appendChild(innerLeftBar);
+        leftBar.appendChild(innerTempBar);
+        const rightBar = document.createElement("div");
+        rightBar.classList.add("hp-percentage-right");
+        rightBar.id = this.imgName + '-hp-right';
+        hpBar.appendChild(rightBar);
+        if (this.allied) {
+            const expBar = document.createElement("div");
+            expBar.classList.add("exp-words");
+            expBar.id = this.imgName + '-exp-words';
+            hpBar.appendChild(expBar);
+        }
+        const img = document.createElement("img");
+        img.classList.add('image-display');
+        img.id = this.imgName + '-image-display';
+        entityContainer.appendChild(img);
+        const hotkeyDisplay = document.createElement("p");
+        hotkeyDisplay.classList.add("hotkey-character-display");
+        hotkeyDisplay.id = this.imgName + 'hotkey-display';
+        entityContainer.appendChild(hotkeyDisplay);
+        this.img = img;
         this.baseImg = document.getElementsByClassName(this.klass)[0];
         this.img.src = this.baseImg.src;
         this.attackImages = document.getElementsByClassName(this.klass);
-        this.container = document.getElementById(`${this.imgName}-display`);
+        this.container = entityContainer;
         this.container.style.opacity = 0; // fading in so started at op 0
-        this.container.style.display = 'none';
         this.img.style.display = "";
         this.container.style.left = this.pos[0] + "px";
         this.container.style.top = this.pos[1] + "px";
-        this.hotkeyDisplay = document.getElementById(this.imgName + '-hotkey-display');
+        this.hotkeyDisplay = hotkeyDisplay;
         this.hotkey = document.getElementById(this.imgName + '-keybind').value;
-        this.hpContainerLeft = document.getElementById(this.imgName + '-hp-left');
-        this.hpContainerRight = document.getElementById(this.imgName + '-hp-right');
-        if (this.attackOverlay) {
-            this.attackOverlay = [document.getElementById(this.imgName + '-effect-overlay'), this.attackOverlay];
-        }
+        this.hotkeyDisplay.innerHTML = this.hotkey;
+        this.hpContainerLeft = leftBar;
+        this.hpContainerRight = rightBar;
         if (this.allied) {
             this.abilityContainer = document.getElementById(this.imgName + '-ability-full-container');
         }
     }
 
-    levelUp() {
-        const levelUpDisp = document.getElementById(this.imgName + '-level-up');
-        // console.log('levelUpDisp: ', levelUpDisp);
-        levelUpDisp.style.display = '';
-        fastFadeOut(levelUpDisp);
-        this.xp -= this.nextLevelXP;
-        this.nextLevelXP += (this.nextLevelXP * 0.1);
-        this.level++;
-        this.baseDefense += Math.ceil(this.trueBaseDefense * 0.05);
-        this.baseDMG += Math.ceil(this.trueBaseDMG * 0.1);
-        this.baseHP += Math.ceil(this.trueBaseHp * 0.1);
-        switch (this.level) {
-            case (4):
-                if (this.allAbilities[0]) {
-                    this.abilities.push(this.allAbilities[0]);
-                }
-                break;
-            case (8):
-                if (this.allAbilities[1]) {
-                    this.abilities.push(this.allAbilities[1]);
-                }
-                break;
-            case (12):
-                if (this.allAbilities[2]) {
-                    this.abilities.push(this.allAbilities[2]);
-                }
-                break;
-            case (16):
-                if (this.allAbilities[3]) {
-                    this.abilities.push(this.allAbilities[3]);
-                }
-                break;
+    setLevel(level) {
+        this.level = level;
+        this.baseDefense = Math.floor(this.baseDefense + Math.ceil(this.trueBaseDefense * 0.05) * level);
+        if (this.baseDMG > 0) {
+            this.baseDMG = Math.floor(this.baseDMG + Math.ceil(this.trueBaseDMG * 0.1) * level);
+        } else {
+            this.baseDMG = Math.ceil(this.baseDMG + Math.floor(this.trueBaseDMG * 0.1) * level);
+        }
+        this.baseHP = Math.floor(this.baseHP + Math.ceil(this.trueBaseHp * 0.1) * level);
+        // console.log(this.klass);
+        // console.log(this.baseDMG);
+        // console.log(this.level);
+        if (this.allied) {
+            const levelUpDisp = document.getElementById(this.imgName + '-level-up');
+            // console.log('levelUpDisp: ', levelUpDisp);
+            levelUpDisp.style.display = '';
+            fastFadeOut(levelUpDisp);
+            this.xp -= this.nextLevelXP;
+            this.nextLevelXP += (this.nextLevelXP * 0.1);
+            switch (this.level) {
+                case (4):
+                    if (this.allAbilities[0]) {
+                        this.abilities.push(this.allAbilities[0]);
+                    }
+                    break;
+                case (8):
+                    if (this.allAbilities[1]) {
+                        this.abilities.push(this.allAbilities[1]);
+                    }
+                    break;
+                case (12):
+                    if (this.allAbilities[2]) {
+                        this.abilities.push(this.allAbilities[2]);
+                    }
+                    break;
+                case (16):
+                    if (this.allAbilities[3]) {
+                        this.abilities.push(this.allAbilities[3]);
+                    }
+                    break;
+            }
         }
     }
 
@@ -210,12 +254,12 @@ class Entity { // this. is selectedChar
         }
     }
 
-    withinAttackRange() {
+    withinAttackRange(target) {
         if (this.range === 'infinite') { return true; }
-        const widthAddition = Math.floor((this.img.width / 2) + (this.target.img.width / 2));
-        if (this.pos[0] > this.target.pos[0] - widthAddition - this.range && this.pos[0] < this.target.pos[0] + widthAddition + this.range) {
+        const widthAddition = Math.floor((this.img.width / 2) + (target.img.width / 2));
+        if (this.pos[0] > target.pos[0] - widthAddition - this.range && this.pos[0] < target.pos[0] + widthAddition + this.range) {
             const heightAddition = Math.floor(this.img.height / 4);
-            if (this.pos[1] > this.target.pos[1] - heightAddition && this.pos[1] < this.target.pos[1] + heightAddition) {
+            if (this.pos[1] > target.pos[1] - heightAddition && this.pos[1] < target.pos[1] + heightAddition) {
                 return true;
             }
         }
@@ -238,6 +282,14 @@ class Entity { // this. is selectedChar
         if (rightWidth < 0) rightWidth = 0;
         this.hpContainerLeft.style.width = leftWidth + '%';
         this.hpContainerRight.style.width = rightWidth + '%';
+        let rightInnerWidth = Math.floor((this.tempHP / this.hp) * 100);
+        let leftInnerWidth = 100 - leftInnerWidth;
+        if (leftInnerWidth < 0) leftInnerWidth = 0;
+        if (rightInnerWidth < 0) rightInnerWidth = 0;
+        const innerLeftBar = document.getElementById(this.imgName + '-inner-leftHP-bar');
+        const innerTempBar = document.getElementById(this.imgName + '-inner-tempHP-bar');
+        innerLeftBar.style.width = leftInnerWidth + '%';
+        innerTempBar.style.width = rightInnerWidth + '%';
     }
 
     setTargetAndAttack() {
@@ -390,75 +442,94 @@ class Entity { // this. is selectedChar
                 if (this.extraAttackAnimation) {
                     this.extraAttackAnimation(this, this.target);
                 }
-                this.attack();
+                this.attack(this.target);
+            }
+            if (!this.allied && this.baseDMG < 0) {
+                let lowest = 500;
+                let newTarg;
+                for (let i = 0; i < this.allies.length; i++) {
+                    if (this.allies[i].hp > 0 && this.allies[i].hp < lowest) {
+                        lowest = this.allies[i].hp;
+                        newTarg = this.allies[i];
+                    }
+                }
+                this.target = newTarg;
             }
             this.imgCycle = this.imgCycle % this.attackImages.length;
             this.img.src = this.attackImages[this.imgCycle].src;
         }
     }
 
-    attack() {
-        if (!this.withinAttackRange(this.target)) {
-            this.trackTarget(this.target);
+    attack(target) {
+        if (!this.withinAttackRange(target)) {
+            this.trackTarget(target);
             return;
         } else {
             if (this.dmg > 0) {
-                this.target.hp -= (this.dmg * 15 / this.target.defense);
-                if (!this.target.isMoving && !this.target.isAttacking && this.target.allied && this.target.dmg > 0) {
-                    this.target.target = this;
-                    this.target.autoAttack(this);
+                if (target.tempHP > 0) {
+                    target.tempHP -= this.dmg;
+                    if (target.tempHP < 0) {
+                        target.hp += target.tempHP;
+                        target.tempHP = 0;
+                    }
+                } else {
+                    target.hp -= (this.dmg * 15 / target.defense);
+                }
+                if (!target.isMoving && !target.isAttacking && target.allied && target.dmg > 0) {
+                    target.target = this;
+                    target.autoAttack(this);
                 }
             } else {
-                this.target.hp -= this.dmg;
+                target.hp -= this.dmg;
             }
             if (this.attackOverlay) {
-                if (this.attackOverlay[1] === 1) {
+                if (this.attackOverlay === 1) {
                     this.setOverlay(this);
                 } else {
-                    this.setOverlay(this.target);
+                    this.setOverlay(target);
                 }
             }
-            if (this.target.hp > this.target.baseHP) { this.target.hp = this.target.baseHP; }
-            if (!this.target.allied && this.allied && this.target.baseDMG > 0 && this.defense > this.target.target.defense) {
-                this.target.target = this;
-                this.target.autoAttack(this);
+            if (target.hp > target.baseHP) { target.hp = target.baseHP; }
+            if (!target.allied && this.allied && target.baseDMG > 0 && this.defense > target.target.defense) {
+                target.target = this;
+                target.autoAttack(this);
             }
-            this.target.setHpBars();
+            target.setHpBars();
 
-            if (this.target.hp <= 0) {
-                this.killEntitiy(this.target);
+            if (target.hp <= 0) {
+                this.killEntitiy(target);
                 if (!this.allied) {
                     // chose another hero to attack
                     this.setTargetAndAttack();
                 }
             }
-            // console.log("border style: ", this.target.img.style.border);
-            if (this.target.img.style.border !== "5px solid gold") {
+            // console.log("border style: ", target.img.style.border);
+            if (target.img.style.border !== "5px solid gold") {
                 if (this.baseDMG > 0) {
-                    this.target.img.style.border = "3px solid red";
+                    target.img.style.border = "3px solid red";
                 } else {
-                    this.target.img.style.border = "3px solid green";
+                    target.img.style.border = "3px solid green";
                 } 
                 setTimeout(() => {
-                    if (this.target && this.target.img.style.border !== "5px solid gold") {
-                        this.target.img.style.border = "none";
+                    if (target && target.img.style.border !== "5px solid gold") {
+                        target.img.style.border = "none";
                     }
                 }, 500);
             }
             if (this.range !== 'infinite' && this.charactersStacked()) {
                 this.movingOutTheWay = true;
                 const widthAddition = Math.floor(this.container.offsetWidth / 2);
-                const eWidthAddition = Math.floor(this.target.container.offsetWidth);
+                const eWidthAddition = Math.floor(target.container.offsetWidth);
                 // const heightAddition = Math.floor(this.container.offsetHeight / 2);
-                const eHeightAddition = Math.floor(this.target.container.offsetHeight / 2);
+                const eHeightAddition = Math.floor(target.container.offsetHeight / 2);
                 if (this.img.style.transform === "scaleX(-1)") {
                     // move to left side of target
                     this.img.style.transform = "scaleX(1)";
-                    this.move([this.target.pos[0] - widthAddition, this.target.pos[1] + eHeightAddition], this.target)
+                    this.move([target.pos[0] - widthAddition, target.pos[1] + eHeightAddition], target)
                 } else {
                     // move to right side of target;
                     this.img.style.transform = "scaleX(-1)";
-                    this.move([this.target.pos[0] + (widthAddition + eWidthAddition), this.target.pos[1] + eHeightAddition], this.target)
+                    this.move([target.pos[0] + (widthAddition + eWidthAddition), target.pos[1] + eHeightAddition], target)
                 }
             }
         }

@@ -16,6 +16,8 @@ export function fadeOut(element, action = null, iterations=40) {
 }
 
 export function fadeIn(element, action = null, iterations=40) {
+    element.style.opacity = 0;
+    element.style.display = '';
     let op = 0;
     let timerUp = setInterval(function () {
         if (op >= iterations) {

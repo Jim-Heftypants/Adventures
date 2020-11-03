@@ -40,6 +40,7 @@ body {
 
 .entity-container {
     display: flex;
+    position: absolute;
     flex-direction: column;
     opacity: 0;
 }
@@ -63,12 +64,7 @@ body {
 
 .hp-percentage-left {
     width: 100%;
-    background-color: blue;
-}
-
-.hp-percentage-left-e {
-    width: 100%;
-    background-color: red;
+    display: flex;
 }
 
 .hp-percentage-right {
@@ -173,8 +169,7 @@ body {
     color: red;
     font-size: 80px;
     font-size: 5vw;
-    padding-bottom: 0.5vw;
-    padding-top: 0.5vw;
+    padding: 1vw;
     text-align: center;
 }
 
@@ -193,11 +188,11 @@ body {
     border: 5px solid blue;
     background-color: white;
     cursor: default;
-    width: 19vw;
-    height: 19vw;
+    width: 35vh;
+    height: 35vh;
     opacity: 60%;
     font-size: 70px;
-    font-size: 4.5vw;
+    font-size: 7vh;
     color: purple;
     word-wrap: break-word;
 }
@@ -226,7 +221,7 @@ body {
     position: relative;
     top: 15%;
     margin: auto;
-    width: 340px;
+    width: 40vw;
 }
 
 #begin-level-button {
@@ -236,7 +231,7 @@ body {
     position: relative;
     text-align: center;
     font-size: 60px;
-    font-size: 4vw;
+    font-size: 5vw;
     background-color: blueviolet;
     color: black;
     cursor: pointer;
@@ -529,13 +524,14 @@ body {
 }
 
 .character-name-dispay {
-    width: 24vw;
-    height: 10vw;
-    margin-left: 0.5vw;
-    margin-right: 0.5vw;
-    margin-top: 1vh;
-    margin-bottom: 1vh;
-    font-size: 6vw;
+    /* width: 24vw;
+    height: 10vw; */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    font-size: 7vw;
+    padding: 1vw;
     text-align: center;
     background-color: lightskyblue;
     color: green;

@@ -10,6 +10,8 @@ let maxLevelNumber = 1; // change on pushed ver
 const characters = levels[0].characterList.slice();
 let party = levels[4].characterList.slice();
 
+let levelXPGain = 0;
+
 let selectedChar;
 
 let countToReach = 0;
@@ -38,6 +40,13 @@ window.addEventListener('load', () => {
     const partySelectorContainer = document.getElementById('party-selector-container');
     const partySelectorNames = document.getElementsByClassName('party-selector-name');
     const characterNameDisplays = document.getElementsByClassName('character-name-dispay');
+    for (let i = 1; i < levels.length; i++) {
+        let button = document.createElement("button");
+        button.classList.add("level-button");
+        button.id = `level-${i}-button`;
+        button.innerHTML = levels[i].name;
+        document.getElementById("level-button-container").appendChild(button);
+    }
     abDescShader.addEventListener('click', () => {
         currentShowingAbilityDescription.style.display = 'none';
         currentShowingAbilityDescription = null;
@@ -137,11 +146,15 @@ window.addEventListener('load', () => {
                 if (party[j].klass === partyCharSelected.klass) {
                     party[j] = party[i];
                     partySelectorNames[j].innerHTML = party[j].klass;
+                    party[j].imgName = 'a' + (j+1);
+                    // party[j].addInlineStyle();
                     // console.log(party);
                 }
             }
             partySelectorNames[i].innerHTML = partyCharSelected.klass;
             party[i] = partyCharSelected;
+            party[i].imgName = 'a' + (i+1);
+            // party[i].addInlineStyle();
             characterNameDisplays[partyCharIdx].style.border = '2px solid black';
             partyCharIdx = null;
             partyCharSelected = null;
@@ -190,7 +203,7 @@ window.addEventListener('load', () => {
         const dmgStat = document.getElementById(`stats-dmg-${sideNum}`);
         const defenseStat = document.getElementById(`stats-defense-${sideNum}`);
         if (statImg.style.display === 'none') { statImg.style.display = ''; }
-        statImg.src = char.baseImg.src;
+        statImg.src = document.getElementsByClassName(char.klass)[0].src;
         nameStat.innerHTML = `Level: ${char.level}`;
         levelStat.innerHTML = char.klass;
         hpStat.innerHTML = `Health: ${char.baseHP}`;
@@ -238,6 +251,7 @@ function addDeathListener(entity) {
                 if (entity.allied) {
                     delete livingChars[entity.imgName];
                 } else {
+                    levelXPGain += (livingEnemies[entity.imgName].level * 50);
                     delete livingEnemies[entity.imgName];
                 }
                 const c = Object.values(livingChars);
@@ -288,7 +302,7 @@ function addEntityEvents(entity, allies, enemies) {
         if (entity.baseDMG > 0) { cloneArr.splice(selfIndex, 1); }
         entity.allies = cloneArr;
     } else {
-        // console.log('broken image passed in for', entity.imgName);
+        console.log('broken image passed in for', entity.imgName);
     }
 }
 
@@ -340,11 +354,13 @@ function selectChar(entity) {
         return;
     }
     if (selectedChar && selectedChar.baseDMG < 0) {
-        if (!selectedChar.target || selectedChar.target.klass !== entity.klass || !selectedChar.isAttacking) {
-            selectedChar.autoAttack(entity);
+        if (selectedChar.isAttacking) {
+            // console.log('no change. Target: ', selectedChar.target, ' entity: ', entity);
+            selectedChar.target = entity;
+        } else {
             // console.log('heal target switched');
+            selectedChar.autoAttack(entity);
         }
-        // console.log('no change. Target: ', selectedChar.target, ' entity: ', entity);
         deSelect();
         return;
     }
@@ -360,30 +376,33 @@ function selectEnemy(entity) {
         return;
     }
     if (selectedChar.allied && selectedChar.baseDMG > 0) {
-        selectedChar.autoAttack(entity);
+        if (selectedChar.isAttacking && selectedChar.withinAttackRange(entity)) {
+            selectedChar.target = entity;
+        } else {
+            selectedChar.autoAttack(entity);
+        }
         for (let i = 0; i < selectedChar.abilities.length; i++) {
             if (selectedChar.abilityShouldCast[i]) {
                 selectedChar.abilityShouldCast[i] = false;
                 selectedChar.useAbility(i);
-                console.log('ability used on click event');
+                // console.log('ability used on click event');
             }
         }
     }
 }
 
-const allyClickEvents = (e) => {
-    // console.log('character click');
-    const entityName = e.target.className.slice(0, 2);
-    const entity = livingChars[entityName];
+const clickEvents = (e) => {
+    // console.log(e);
+    const entityName = e.target.id.slice(0, 2);
+    // console.log(entityName);
+    if (entityName[0] === 'a') {
+        const entity = livingChars[entityName];
+        selectChar(entity);
+    } else {
+        const entity = livingEnemies[entityName];
+        selectEnemy(entity);
+    }
     e.stopPropagation();
-    selectChar(entity);
-}
-
-const enemyClickEvents = (e) => {
-    const entityName = e.target.className.slice(0, 2);
-    const entity = livingEnemies[entityName];
-    e.stopPropagation();
-    selectEnemy(entity);
 }
 
 function keydownEvent (e) {
@@ -438,20 +457,14 @@ function initializeGameOpening() {
         // console.log(e);
         if (selectedChar) {
             if (selectedChar.hp < 0) {
-                selectedChar = null;
+                deSelect();
                 return;
             }
-            clearInterval(selectedChar.currentAction);
-            clearInterval(selectedChar.currentAnimation);
-            selectedChar.img.style.border = 'none';
-            currentAbilityBoxes.style.display = 'none';
-            currentAbilityBoxes = null;
             if (selectedChar.range === 'infinite') {
                 selectedChar.move([e.x, e.y], selectedChar.target);
             } else {
                 selectedChar.move([e.x, e.y]);
             }
-            selectedChar = null;
         }
     })
     window.addEventListener('keypress', (e) => {
@@ -481,19 +494,22 @@ function loadLevel(levelNumber) {
     }
     levelHasEnded = false;
     currentLevelNumber = levelNumber;
-    level.action();
+    const shouldRandomizeEnemySpawns = level.action(level.characterList, level.enemyList);
+    // console.log(shouldRandomizeEnemySpawns);
+    if (shouldRandomizeEnemySpawns) {
+        for (let i = 0; i < level.enemyList.length; i++) {
+            level.enemyList[i].basePos = null;
+            // console.log(level.enemyList[i]);
+        }
+    }
     // console.log('level selected: ', levelNumber);
     document.getElementById('return-button').style.display = '';
     document.getElementById('level-button-container').style.display = 'none';
     document.getElementById('level-button-container-header').style.display = 'none';
     const levelNameDisp = document.getElementById(`level-name-display`);
-    levelNameDisp.style.opacity = 0;
-    levelNameDisp.style.display = '';
-    levelNameDisp.innerHTML = 'Level ' + level.name;
+    levelNameDisp.innerHTML = level.name;
     const levelMessage = document.getElementById('tutorial-message');
     levelMessage.innerHTML = level.message;
-    levelMessage.style.opacity = 0;
-    levelMessage.style.display = '';
     // const secondAction = () => beginLevel(level.characterList, level.enemyList, levelNumber);
     fadeIn(levelNameDisp);
     // const levelNameAction = () => { fadeIn(beginLevel); }
@@ -502,8 +518,6 @@ function loadLevel(levelNumber) {
         fadeIn(beginLevel);
     }
     const beginLevel = document.getElementById('begin-level-button');
-    beginLevel.style.opacity = 0;
-    beginLevel.style.display = '';
     fadeIn(levelMessage, action);
 }
 
@@ -522,8 +536,7 @@ function setInitialTargets(chars, enemies) {
             const targetIndex = Math.floor(Math.random() * enemies.length);
             enemies[i].target = enemies[targetIndex];
         }
-        // console.log(enemies[i].imgName, "has target set to", enemies[i].target);
-        // randomizeEnemySpawnLocation(enemies[i]);
+        // console.log(enemies[i], " has target set to: ", enemies[i].target);
     }
 }
 
@@ -541,20 +554,19 @@ function setAvailableAbilities(char) {
     }
 }
 
-function touchingVertically(pos, char, entity) {
-    return ((pos[1] < entity.pos[1] && pos[1] + char.container.offsetHeight > entity.pos[1]) ||
-        (pos[1] < entity.pos[1] + entity.container.offsetHeight && pos[1] + char.container.offsetHeight > entity.pos[1] + entity.container.offsetHeight))
+function imagesTochingSide(topLeft1, sizes1, topLeft2, sizes2, i) {
+    return ((topLeft1[i] < topLeft2[i] && topLeft1[i] + sizes1[i] > topLeft2[i])
+        || (topLeft1[i] < topLeft2[i] + sizes2[i] && topLeft1[i] + sizes1[i] > topLeft2[i] + sizes2[i]));
 }
 
-function checkPosBox(pos, char, entity) {
-    if (pos[0] < entity.pos[0] && pos[0] + char.container.offsetWidth > entity.pos[0] && touchingVertically(pos, char, entity)) {
-        return true;
+function imagesTouching(topLeft1, sizes1, topLeft2, sizes2) {
+    if (topLeft1[0] === topLeft2[0] || topLeft1[1] === topLeft2[1]) { return true; }
+    for (let i = 0; i < 2; i++) {
+        if (!imagesTochingSide(topLeft1, sizes1, topLeft2, sizes2, i)) {
+            return false;
+        }
     }
-    if (pos[0] < entity.pos[0] + entity.container.offsetWidth && pos[0] + char.container.offsetWidth > entity.pos[0] + entity.container.offsetWidth &&
-        touchingVertically(pos, char, entity)) {
-        return true;
-    }
-    return false;
+    return true;
 }
 
 function setRandomSpawn(enemy, checkPositions) {
@@ -574,24 +586,80 @@ function setRandomSpawn(enemy, checkPositions) {
         position = [Math.floor(width * p2), Math.floor(height * p1)];
         // console.log(position);
         for (let i = 0; i < checkPositions.length; i++) {
-            if (checkPosBox(position, enemy, checkPositions[i])) {
+            const cPos = checkPositions[i].basePos;
+            const cSizes = [checkPositions[i].container.offsetWidth, checkPositions[i].container.offsetHeight];
+            // const eSizes = [enemy.container.offsetWidth, enemy.container.offsetHeight];
+            const eSizes = [150, 200]; // needs to be changed eventually for diff sized boxes
+            // console.log(position, eSizes, cPos, cSizes);
+            if (imagesTouching(position, eSizes, cPos, cSizes)) {
+                // console.log('position was bad');
                 positionFound = false;
                 break;
             }
         }
     }
-    enemy.pos[0] = position[0];
-    enemy.pos[1] = position[1];
-    enemy.container.style.left = enemy.pos[0] + 'px';
-    enemy.container.style.top = enemy.pos[1] + 'px';
+    // console.log('pos found');
+    enemy.basePos = position;
+    enemy.pos = position;
+    // enemy.container.style.left = enemy.pos[0] + 'px';
+    // enemy.container.style.top = enemy.pos[1] + 'px';
+}
+
+function reZeroStats(arr) {
+    for (let i = 0; i < arr.length; i++) {
+        arr[i].hp = arr[i].baseHP; arr[i].dmg = arr[i].baseDMG; arr[i].defense = arr[i].baseDefense;
+        arr[i].ms = arr[i].baseMS; arr[i].stunned = false; arr[i].rooted = false; arr[i].slowed = false;
+        arr[i].isAttacking = false; arr[i].isMoving = false;
+        if (arr[i].allied) {
+            arr[i].target = null;
+        }
+        if (arr[i].basePos) {
+            arr[i].pos[0] = arr[i].basePos[0]; arr[i].pos[1] = arr[i].basePos[1];
+        }
+    }
+}
+
+function loadInEntity(entity, num, allies, enemies) {
+    // console.log(entity);
+    if (entity.allied) {
+        entity.imgName = 'a' + (num);
+        livingChars[entity.imgName] = entity;
+    } else {
+        entity.imgName = 'e' + (num);
+        livingEnemies[entity.imgName] = entity;
+    }
+    addEntityEvents(entity, allies, enemies);
+    if (!entity.basePos) {
+        setRandomSpawn(entity, boxEntities.slice());
+    }
+    entity.addInlineStyle();
+    hotkeys[entity.hotkey] = entity;
+    entity.container.addEventListener('click', clickEvents);
+    boxEntities.push(entity);
+    if (entity.allied) {
+        document.getElementById(`a${num}-class-name`).innerHTML = entity.klass;
+        const abilityNames = document.getElementsByClassName(`a${num}-ability-labels`);
+        setAvailableAbilities(entity);
+        for (let j = 0; j < abilityNames.length; j++) {
+            if (entity.abilityNames[j]) {
+                abilityNames[j].innerHTML = entity.abilityNames[j];
+            } else {
+                abilityNames[j].innerHTML = 'No Ability';
+            }
+        }
+        fadeIn(entity.container);
+    } else {
+        // console.log(entity.target);
+        const action = () => entity.autoAttack(entity.target);
+        fadeIn(entity.container, action); // begin attacking target
+    }
+    observerObserve(entity);
 }
 
 let boxEntities = [];
 function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     document.getElementById('return-button').style.display = 'none';
     const deSelectButton = document.getElementById('test');
-    deSelectButton.style.opacity = 0;
-    deSelectButton.style.display = '';
     fadeIn(deSelectButton);
     const backgroundImg = document.getElementById('background-image');
     if (levelNumber < 4) {
@@ -601,74 +669,22 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
     } else {
         backgroundImg.src = document.getElementById('dungeon').src;
     }
-    backgroundImg.style.opacity = 0;
-    backgroundImg.style.display = '';
     fadeIn(backgroundImg);
+    if (levels[levelNumber].shouldSetLevels) {
+        levels[levelNumber].setEnemyLevels(levels[levelNumber].level/2);
+    }
     for (let i = 0; i < 4; i++) {
         const abilityHotkey = document.getElementById(`ab${i + 1}-keybind`);
         hotkeys[abilityHotkey.value] = i;
     }
+    reZeroStats(charactersArr);
+    reZeroStats(enemiesArr);
     for (let i = 0; i < charactersArr.length; i++) {
-        if (!charactersArr[i].observer) {
-            addEntityEvents(charactersArr[i], charactersArr, enemiesArr);
-        }
-        livingChars[charactersArr[i].imgName] = charactersArr[i];
-        charactersArr[i].container.style.top = charactersArr[i].pos[1] + 'px';
-        charactersArr[i].container.style.left = charactersArr[i].pos[0] + 'px';
-        charactersArr[i].container.style.opacity = 0;
-        charactersArr[i].container.style.display = '';
-        boxEntities.push(charactersArr[i]);
-        const hpBar = document.getElementById(`${charactersArr[i].imgName}-hp-bar`);
-        hpBar.style.display = "flex";
-        // charactersArr[i].hotkeyDisplay.innerHTML = charactersArr[i].hotkey;
-        // hotkeys[charactersArr[i].hotkey] = charactersArr[i];
-        const hotkeyInput = document.getElementById(`a${i+1}-keybind`);
-        charactersArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
-        hotkeys[hotkeyInput.value] = charactersArr[i];
-        const abilityClassName = document.getElementById(`a${i+1}-class-name`);
-        abilityClassName.innerHTML = charactersArr[i].klass;
-        const abilityNames = document.getElementsByClassName(`a${i+1}-ability-labels`);
-        setAvailableAbilities(charactersArr[i]);
-        for (let j = 0; j < abilityNames.length; j++) {
-            if (charactersArr[i].abilityNames[j]) {
-                abilityNames[j].innerHTML = charactersArr[i].abilityNames[j];
-            } else {
-                abilityNames[j].innerHTML = 'No Ability';
-            }
-        }
-        // const actionEvent = () => { charactersArr[i].container.addEventListener('click', allyClickEvents);}
-        charactersArr[i].container.addEventListener('click', allyClickEvents);
-        charactersArr[i].img.src = charactersArr[i].baseImg.src;
-        if (charactersArr[i].pos === null) {
-            setRandomSpawn(charactersArr[i], boxEntities.slice());
-        }
-        boxEntities.push(charactersArr[i]);
-        fadeIn(charactersArr[i].container);
-        observerObserve(charactersArr[i]);
+        loadInEntity(charactersArr[i], i+1, charactersArr, enemiesArr);
     }
+    // console.log(enemiesArr);
     for (let i = 0; i < enemiesArr.length; i++) {
-        if (!enemiesArr[i].observer) {
-            addEntityEvents(enemiesArr[i], enemiesArr, charactersArr);
-        }
-        livingEnemies[enemiesArr[i].imgName] = enemiesArr[i];
-        enemiesArr[i].container.style.top = enemiesArr[i].pos[1] + 'px';
-        enemiesArr[i].container.style.left = enemiesArr[i].pos[0] + 'px';
-        enemiesArr[i].container.style.opacity = 0;
-        enemiesArr[i].container.style.display = '';
-        const hpBar = document.getElementById(`${enemiesArr[i].imgName}-hp-bar`);
-        hpBar.style.display = "flex";
-        const hotkeyInput = document.getElementById(`e${i+1}-keybind`);
-        enemiesArr[i].hotkeyDisplay.innerHTML = hotkeyInput.value;
-        hotkeys[hotkeyInput.value] = enemiesArr[i];
-        enemiesArr[i].container.addEventListener('click', enemyClickEvents);
-        enemiesArr[i].img.src = enemiesArr[i].baseImg.src;
-        if (enemiesArr[i].pos === null) {
-            setRandomSpawn(enemiesArr[i], boxEntities.slice());
-        }
-        boxEntities.push(enemiesArr[i]);
-        const action = () => enemiesArr[i].autoAttack(enemiesArr[i].target);
-        fadeIn(enemiesArr[i].container, action); // begin attacking target
-        observerObserve(enemiesArr[i]);
+        loadInEntity(enemiesArr[i], i+1, enemiesArr, charactersArr);
     }
     // console.log("hotkeys: ", hotkeys);
 }
@@ -682,7 +698,6 @@ function observerObserve(entity) {
 
 
 function endGame(charsList, enemyList) {
-    boxEntities = [];
     hotkeys = {};
     if (currentAbilityBoxes) {
         currentAbilityBoxes.style.display = 'none';
@@ -701,22 +716,16 @@ function endGame(charsList, enemyList) {
     const allEnemyList = levels[currentLevelNumber].enemyList;
     for (let i = 0; i < allCharsList.length; i++) {
         allCharsList[i].observer.disconnect();
-        if (allCharsList[i].currentAction) { clearInterval(allCharsList[i].currentAction); }
-        if (allCharsList[i].currentAnimation) { clearInterval(allCharsList[i].currentAnimation); }
-        allCharsList[i].isAttacking = false;
-        allCharsList[i].isMoving = false;
-        allCharsList[i].target = null;
-        allCharsList[i].container.removeEventListener('click', allyClickEvents);
+        clearInterval(allCharsList[i].currentAction);
+        clearInterval(allCharsList[i].currentAnimation);
+        allCharsList[i].container.removeEventListener('click', clickEvents);
         allCharsList[i].img.src = allCharsList[i].baseImg.src;
     }
     for (let i = 0; i < allEnemyList.length; i++) {
         allEnemyList[i].observer.disconnect();
-        if (allEnemyList[i].currentAction) { clearInterval(allEnemyList[i].currentAction); }
-        if (allEnemyList[i].currentAnimation) { clearInterval(allEnemyList[i].currentAnimation); }
-        allEnemyList[i].isAttacking = false;
-        allEnemyList[i].isMoving = false;
-        allEnemyList[i].target = null;
-        allEnemyList[i].container.removeEventListener('click', enemyClickEvents);
+        clearInterval(allEnemyList[i].currentAction);
+        clearInterval(allEnemyList[i].currentAnimation);
+        allEnemyList[i].container.removeEventListener('click', clickEvents);
         allEnemyList[i].img.src = allEnemyList[i].baseImg.src;
     }
 
@@ -762,7 +771,8 @@ function addCharXP() {
         c[i].xpObserver.disconnect();
         const expWords = document.getElementById(c[i].imgName + '-exp-words');
         expWords.innerHTML = 'Level: ' + c[i].level;
-        c[i].hpContainerLeft.style.backgroundColor = 'gold';
+        const leftBar = document.getElementById(c[i].imgName + '-inner-leftHP-bar');
+        leftBar.style.backgroundColor = 'gold';
         const xpPercent = Math.floor((c[i].xp / c[i].nextLevelXP) * 100);
         c[i].hpContainerLeft.style.width = `${xpPercent}%`;
         c[i].hpContainerRight.style.width = `${100 - xpPercent}%`;
@@ -771,7 +781,7 @@ function addCharXP() {
         levelUpDisp.style.left = Math.floor(c[i].pos[0]) + 'px';
     }
     fadeOutGame(true);
-    const xpPerC = levels[currentLevelNumber].xp / c.length;
+    const xpPerC = levelXPGain / c.length;
     const xpPerInterval = xpPerC / 60; // 4 seconds for the animation, .05 sec intervals
     let timeCount = 0;
     const xpInterval = setInterval(() => {
@@ -789,7 +799,7 @@ function addCharXP() {
         for (let i = 0; i < c.length; i++) {
             c[i].xp += xpPerInterval;
             if (c[i].xp > c[i].nextLevelXP) {
-                c[i].levelUp();
+                c[i].setLevel(c[i].level + 1);
                 const expWords = document.getElementById(c[i].imgName + '-exp-words');
                 expWords.innerHTML = 'Level: ' + c[i].level;
             }
@@ -848,26 +858,13 @@ function resetGame(won) {
     const levChars = levels[currentLevelNumber].characterList;
     const levEnems = levels[currentLevelNumber].enemyList;
     for (let i = 0; i < levChars.length; i++) {
-        levChars[i].hp = levChars[i].baseHP; levChars[i].dmg = levChars[i].baseDMG; levChars[i].defense = levChars[i].baseDefense;
-        levChars[i].ms = levChars[i].baseMS; levChars[i].stunned = false; levChars[i].rooted = false;
-        levChars[i].pos[0] = levChars[i].basePos[0]; levChars[i].pos[1] = levChars[i].basePos[1];
-        levChars[i].container.style.top = levChars[i].pos[1] + 'px';
-        levChars[i].container.style.left = levChars[i].pos[0] + 'px';
-        levChars[i].hpContainerLeft.style.backgroundColor = 'blue';
-        const expWords = document.getElementById(levChars[i].imgName + '-exp-words');
-        expWords.innerHTML = '';
-        levChars[i].img.style.border = 'none';
-        levChars[i].setHpBars();
+        levChars[i].container.remove();
     }
     for (let i = 0; i < levEnems.length; i++) {
-        levEnems[i].hp = levEnems[i].baseHP; levEnems[i].dmg = levEnems[i].baseDMG; levEnems[i].defense = levEnems[i].baseDefense;
-        levEnems[i].ms = levEnems[i].baseMS; levEnems[i].stunned = false; levEnems[i].rooted = false;
-        levEnems[i].pos[0] = levEnems[i].basePos[0]; levEnems[i].pos[1] = levEnems[i].basePos[1];
-        levEnems[i].container.style.top = levEnems[i].pos[1] + 'px';
-        levEnems[i].container.style.left = levEnems[i].pos[0] + 'px';
-        levEnems[i].img.style.border = 'none';
-        levEnems[i].setHpBars();
+        levEnems[i].container.remove();
     }
+    levelXPGain = 0;
+    boxEntities = [];
 }
 
 export default loadLevel;

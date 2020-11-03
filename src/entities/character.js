@@ -29,7 +29,6 @@ MS
 AS
 DMG
 true
-imgName
 pos
 defense
 hasOverlay? 1=self 2=target
@@ -39,17 +38,17 @@ abNames
 */
 
 // tank
-const Warrior = new classCreator('Warrior', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, null, null, warriorAbilities, waAbNames);
-const Paladin = new classCreator('Paladin', 10, 100, 10, 1000, 10, true, "a1", [100, 400], 20, null, null, paladinAbilities, pAbNames);
+const Warrior = new classCreator('Warrior', 10, 100, 10, 1000, 10, true, [100, 400], 20, null, null, warriorAbilities, waAbNames);
+const Paladin = new classCreator('Paladin', 10, 100, 10, 1000, 10, true, [100, 400], 20, null, null, paladinAbilities, pAbNames);
 
 // heals
-const Cleric = new classCreator('Cleric', 'infinite', 100, 10, 1500, -8, true, "a2", [400, 100], 12, 2, null, clericAbilities, cAbNames);
+const Cleric = new classCreator('Cleric', 'infinite', 100, 10, 1500, -8, true, [400, 100], 12, 2, null, clericAbilities, cAbNames);
 
 // rdps
-const Wizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 20, true, "a3", [100, 100], 14, null, wizardAttackEffect, wizardAbilities, wiAbNames);
+const Wizard = new classCreator('Wizard', "infinite", 100, 10, 2000, 20, true, [100, 100], 14, null, wizardAttackEffect, wizardAbilities, wiAbNames);
 
 // mdps
-const Rogue = new classCreator("Rogue", 10, 100, 10, 800, 10, true, "a4", [900, 500], 16, null, null, rogueAbilities, rAbNames);
+const Rogue = new classCreator("Rogue", 10, 100, 10, 800, 10, true, [900, 500], 16, null, null, rogueAbilities, rAbNames);
 
-const charactersArr = [Warrior, Cleric, Wizard, Rogue];
+const charactersArr = [Warrior, Cleric, Wizard, Rogue, Paladin];
 export default charactersArr;
