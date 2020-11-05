@@ -16,7 +16,7 @@ const waAbNames = ['Concussive Blow', 'Charge'];
 const cAbNames = ['Prayer of Healing', "Protection"];
 const wiAbNames = ['Fire Bomb', 'Freeze'];
 const rAbNames = ['Poison Shiv', 'Backstab'];
-const pAbNames = [];
+const pAbNames = ['Word of Healing', 'Holy Sword'];
 
 const specialAttackEffects = abilityList[1];
 const wizardAttackEffect = specialAttackEffects[0];

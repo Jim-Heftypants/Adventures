@@ -1,13 +1,101 @@
+//                              Paladin Abiities
+
+const wordOfHealing = (entity) => {
+    // console.log(entity.allies);
+    let idx = 0;
+    let lowest = 2000;
+    for (let i = 0; i < entity.allies.length; i++) {
+        if (entity.allies[i].hp > 0 && entity.allies[i].hp < lowest) {
+            lowest = entity.allies[i].hp;
+            idx = i;
+        }
+    }
+    // console.log('lowest hp: ', lowest);
+    // console.log('idx: ', idx);
+    if (entity.hp < lowest) {
+        // console.log(entity.klass);
+        // console.log('hp: ', entity.hp);
+        entity.hp += Math.floor(entity.dmg * 2.5);
+        if (entity.hp > entity.baseHP) {
+            entity.hp = entity.baseHP;
+        }
+        entity.setHpBars();
+        setBorder(entity, "green");
+        // console.log('hp: ', entity.hp);
+    } else {
+        // console.log(entity.allies[idx].klass);
+        // console.log('hp: ', entity.allies[idx].hp);
+        entity.allies[idx].hp += Math.floor(entity.dmg * 2.5);
+        if (entity.allies[idx].hp > entity.allies[idx].baseHP) {
+            entity.allies[idx].hp = entity.allies[idx].baseHP;
+        }
+        entity.allies[idx].setHpBars();
+        setBorder(entity.allies[idx], "green");
+        // console.log('hp: ', entity.allies[idx].hp);
+    }
+    return 15;
+}
+
+const holySword = (entity, tar) => {
+    if (entity.abilityShouldCast[1] === 1) {
+        const ali = entity.target.allies;
+        let diff = -1;
+        let idx = -1;
+        for (let i = 0; i < ali.length; i++) {
+            if (ali[i].imgName === tar.imgName || ali[i].hp <= 0) { continue; }
+            const dist = Math.floor(Math.sqrt(Math.pow(tar.pos[0] - ali[i].pos[0], 2) + Math.pow(tar.pos[1] - ali[i].pos[1], 2)));
+            if (dist > diff) {
+                diff = dist
+                idx = i;
+            }
+        }
+        if (idx === -1) {
+            return;
+        }
+        if (ali[idx].tempHP > 0) {
+            ali[idx].tempHP -= entity.dmg;
+            if (ali[idx].tempHP < 0) {
+                ali[idx].hp += ali[idx].tempHP;
+                ali[idx].tempHP = 0;
+            }
+        } else {
+            ali[idx].hp -= (entity.dmg * 15 / ali[idx].defense);
+        }
+        if (!ali[idx].allied && entity.allied && ali[idx].baseDMG > 0 && entity.defense > ali[idx].target.defense) {
+            ali[idx].target = entity;
+            ali[idx].autoAttack(entity);
+        }
+        ali[idx].setHpBars();
+        setBorder(ali[idx], "red");
+        if (ali[idx].hp <= 0) {
+            entity.killEntity(ali[idx]);
+        }
+        const div = drawLine(tar.pos[0] + tar.container.offsetWidth / 2, tar.pos[1] + tar.container.offsetHeight / 2,
+            ali[idx].pos[0] + ali[idx].container.offsetWidth / 2, ali[idx].pos[1] + ali[idx].container.offsetHeight / 2, "gold");
+        // console.log(ali[idx].klass);
+        // console.log(div);
+        const maxTime = Math.floor(entity.as / 8);
+        setTimeout(() => { div.remove(); }, maxTime);
+    } else {
+        entity.abilityShouldCast[1] = 1;
+        console.log(entity.klass, " has ab1 === ", entity.abilityShouldCast[1]);
+        setTimeout(() => {
+            entity.abilityShouldCast[1] = false;
+        }, 10000)
+        return 20;
+    }
+}
+
 //                              Cleric Abilities
 
 const groupHeal = (entity) => {
     for (let i = 0; i < entity.allies.length; i++) {
         if (entity.allies[i].hp > 0) {
             entity.allies[i].hp -= entity.dmg * 2;
-            if (entity.allies[i].hp > 100) { entity.allies[i].hp = 100; }
+            if (entity.allies[i].hp > entity.allies[i].baseHP) { entity.allies[i].hp = entity.allies[i].baseHP; }
             entity.setOverlay(entity.allies[i]);
             entity.allies[i].setHpBars();
-            setBorder(entity.allies[i]);
+            setBorder(entity.allies[i], "green");
         }
     }
     return 16;
@@ -52,9 +140,9 @@ const powerSwing = (entity, target) => {
     target.stunned = true;
     target.img.src = target.baseImg.src;
     target.imgCycle = 0;
-    setBorder(target);
+    setBorder(target, "red");
     if (target.hp <= 0) {
-        entity.killEntitiy(target);
+        entity.killEntity(target);
     }
     setTimeout(() => {
         target.stunned = false;
@@ -100,9 +188,9 @@ const poisonDagger = (entity, target) => {
         timer++;
         target.hp -= Math.floor(Math.ceil(entity.dmg * 3) / 6);
         target.setHpBars();
-        setBorder(target);
+        setBorder(target, "purple");
         if (target.hp <= 0) {
-            entity.killEntitiy(target);
+            entity.killEntity(target);
             clearInterval(int)
         }
         if (timer > 5) {
@@ -122,9 +210,9 @@ const backstab = (entity, target) => {
         target.hp -= Math.ceil(entity.dmg * 5);
     }
     target.setHpBars();
-    setBorder(target);
+    setBorder(target, "black");
     if (target.hp <= 0) {
-        entity.killEntitiy(target);
+        entity.killEntity(target);
     }
     return 15;
 }
@@ -168,19 +256,14 @@ const freeze = (entity, target) => {
 
 
 
-function setBorder(target) {
+function setBorder(target, color) {
     if (target && !target.container.style.display === 'none') {
         if (target.img.style.border !== "5px solid gold") {
-            if (entity.baseDMG > 0) {
-                target.img.style.border = "4px solid red";
-            } else {
-                target.img.style.border = "4px solid green";
-            }
-            let borderInterval = setInterval(() => {
+            target.img.style.border = "4px solid " + color;
+            setTimeout(() => {
                 if (target.img.style.border !== "5px solid gold") {
                     target.img.style.border = "none";
                 }
-                clearInterval(borderInterval);
             }, 500);
         }
     }
@@ -190,7 +273,7 @@ const warriorAbilities = [powerSwing, charge];
 const clericAbilities = [groupHeal, protection];
 const wizardAbilities = [meteor, freeze];
 const rogueAbilities = [poisonDagger, backstab];
-const paladinAbilities = [];
+const paladinAbilities = [wordOfHealing, holySword];
 const bardAbilities = [];
 const rangerAbilities = [];
 const warlockAbilities = [];
@@ -212,7 +295,7 @@ const lightningAutoAttack = (entity, target) => {
     if (entity.img.style.transform === "scaleX(-1)") {
         pos[0] -= 60
     }
-    const div = drawLine(pos[0], pos[1], target.pos[0] + target.img.width/2, target.pos[1] + target.img.height/2);
+    const div = drawLine(pos[0], pos[1], target.pos[0] + target.img.width/2, target.pos[1] + target.img.height/2, "purple");
     const maxTime = Math.floor(entity.as / 8);
     setTimeout(() => { div.remove(); }, maxTime);
 }
@@ -257,9 +340,9 @@ function causeAoEEffect(entity, width, height, target) {
                 // console.log('entity hit by fireball: ', entity.enemies[i].klass);
                 entity.enemies[i].hp -= Math.ceil(entity.dmg * 1.5);
                 entity.enemies[i].setHpBars();
-                setBorder(entity.enemies[i]);
+                setBorder(entity.enemies[i], "red");
                 if (entity.enemies[i].hp <= 0) {
-                    entity.killEntitiy(entity.enemies[i]);
+                    entity.killEntity(entity.enemies[i]);
                 }
             }
         }
@@ -285,7 +368,7 @@ function imagesTouching(topLeft1, sizes1, topLeft2, sizes2) {
     return true;
 }
 
-function createLineElement(x, y, length, angle) {
+function createLineElement(x, y, length, angle, color) {
     var styles = 'width: ' + length + 'px; '
         + 'height: 0px; '
         + '-moz-transform: rotate(' + angle + 'rad); '
@@ -295,7 +378,7 @@ function createLineElement(x, y, length, angle) {
         + 'position: absolute; '
         + 'top: ' + y + 'px; '
         + 'left: ' + x + 'px; '
-        + 'border: 2px solid purple; ';
+        + 'border: 2px solid ' + color + '; ';
     let div = document.createElement("div");
     div.setAttribute('style', styles);
     div.classList.add("extra-attack-effect");
@@ -304,7 +387,7 @@ function createLineElement(x, y, length, angle) {
     
 }
 
-function drawLine(x1, y1, x2, y2) {
+function drawLine(x1, y1, x2, y2, color) {
     const a = x1 - x2,
         b = y1 - y2,
         c = Math.sqrt(a * a + b * b);
@@ -317,7 +400,7 @@ function drawLine(x1, y1, x2, y2) {
 
     const alpha = Math.PI - Math.atan2(-b, a);
 
-    return createLineElement(x, y, c, alpha);
+    return createLineElement(x, y, c, alpha, color);
 }
 
 function spellTrack(img, entity, target, action) {

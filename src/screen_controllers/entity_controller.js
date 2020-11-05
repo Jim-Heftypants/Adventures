@@ -382,7 +382,7 @@ function selectEnemy(entity) {
             selectedChar.autoAttack(entity);
         }
         for (let i = 0; i < selectedChar.abilities.length; i++) {
-            if (selectedChar.abilityShouldCast[i]) {
+            if (selectedChar.abilityShouldCast[i] === true) {
                 selectedChar.abilityShouldCast[i] = false;
                 selectedChar.useAbility(i);
                 // console.log('ability used on click event');
@@ -412,7 +412,9 @@ function keydownEvent (e) {
     } else if (entity && entity.klass) {
         selectEnemy(entity);
     } else if ((entity === 0 || entity) && selectedChar) {
-        selectedChar.useAbility(entity);
+        if (selectedChar.abilityShouldCast[entity] !== 1) {
+            selectedChar.useAbility(entity);
+        }
     } else {
         // console.log('invalid key press of: ', e.key);
         // console.log('value is: ', entity);
@@ -423,7 +425,9 @@ function keydownEvent (e) {
 function abilityClick(arr) {
     const entity = livingChars['a'+arr[0]];
     if (entity) {
-        entity.useAbility(arr[1]);
+        if (entity.abilityShouldCast[arr[1]] !== 1) {
+            entity.useAbility(arr[1]);
+        }
     } else {
         // console.log('invalid entity for ability use');
     }

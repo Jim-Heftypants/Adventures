@@ -266,7 +266,7 @@ class Entity { // this. is selectedChar
         return false;
     }
 
-    killEntitiy(entity) {
+    killEntity(entity) {
         // console.log(entity.klass, "killed");
         self.lockedIntoAbility = false;
         entity.clearIntervals();
@@ -411,7 +411,7 @@ class Entity { // this. is selectedChar
         if (this.allied) {
             for (let i = 0; i < 4; i++) {
                 // console.log(this.abilityShouldCast[i]);
-                if (this.abilityShouldCast[i]) {
+                if (this.abilityShouldCast[i] === true) {
                     this.abilityShouldCast[i] = false;
                     this.useAbility(i);
                 }
@@ -441,6 +441,15 @@ class Entity { // this. is selectedChar
             if (this.imgCycle === 3) {
                 if (this.extraAttackAnimation) {
                     this.extraAttackAnimation(this, this.target);
+                }
+                if (this.allied) {
+                    for (let j = 0; j < 4; j++) {
+                        if (this.abilityShouldCast[j] === 1) {
+                            // console.log(this.klass);
+                            // console.log(this.abilityShouldCast[j]);
+                            this.useAbility(j);
+                        }
+                    }
                 }
                 this.attack(this.target);
             }
@@ -497,7 +506,7 @@ class Entity { // this. is selectedChar
             target.setHpBars();
 
             if (target.hp <= 0) {
-                this.killEntitiy(target);
+                this.killEntity(target);
                 if (!this.allied) {
                     // chose another hero to attack
                     this.setTargetAndAttack();
@@ -560,12 +569,15 @@ class Entity { // this. is selectedChar
     }
 
     useAbility(n) {
-        if (!this.abilityAvailable[n] || this.abilities.length === 0) {
+        const ab = this.abilities[n];
+        if (this.abilityShouldCast[n] === 1) {
+            ab(this, this.target);
+            return;
+        } else if (!this.abilityAvailable[n] || this.abilities.length === 0) {
             return;
         }
         // console.log('ability', n, 'attempted');
         this.abilityAvailable[n] = false;
-        const ab = this.abilities[n];
         // console.log('ability: ', ab);
         const cdTime = ab(this, this.target);
         if (cdTime === false) {
@@ -575,7 +587,6 @@ class Entity { // this. is selectedChar
         }
         // console.log('seconds for ability cd: ', cdTime);
         const innerBoxes = document.getElementsByClassName(this.imgName + '-inner-ability-divs');
-        // innerBoxes[n].style.animation = `inner-ability-animate ${cdTime}s linear 0s 1`; // didnt work
         colorFade(innerBoxes[n], cdTime, [255, 0, 0], [0, 0, 255]);
         let CDTimer = setInterval(() => {
             this.abilityAvailable[n] = true;

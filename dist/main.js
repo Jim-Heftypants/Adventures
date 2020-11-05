@@ -97,19 +97,124 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "allAbilities", function() { return allAbilities; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "specialAttackEffects", function() { return specialAttackEffects; });
-//                              Cleric Abilities
+//                              Paladin Abiities
+var wordOfHealing = function wordOfHealing(entity) {
+  // console.log(entity.allies);
+  var idx = 0;
+  var lowest = 2000;
+
+  for (var i = 0; i < entity.allies.length; i++) {
+    if (entity.allies[i].hp > 0 && entity.allies[i].hp < lowest) {
+      lowest = entity.allies[i].hp;
+      idx = i;
+    }
+  } // console.log('lowest hp: ', lowest);
+  // console.log('idx: ', idx);
+
+
+  if (entity.hp < lowest) {
+    // console.log(entity.klass);
+    // console.log('hp: ', entity.hp);
+    entity.hp += Math.floor(entity.dmg * 2.5);
+
+    if (entity.hp > entity.baseHP) {
+      entity.hp = entity.baseHP;
+    }
+
+    entity.setHpBars();
+    setBorder(entity, "green"); // console.log('hp: ', entity.hp);
+  } else {
+    // console.log(entity.allies[idx].klass);
+    // console.log('hp: ', entity.allies[idx].hp);
+    entity.allies[idx].hp += Math.floor(entity.dmg * 2.5);
+
+    if (entity.allies[idx].hp > entity.allies[idx].baseHP) {
+      entity.allies[idx].hp = entity.allies[idx].baseHP;
+    }
+
+    entity.allies[idx].setHpBars();
+    setBorder(entity.allies[idx], "green"); // console.log('hp: ', entity.allies[idx].hp);
+  }
+
+  return 15;
+};
+
+var holySword = function holySword(entity, tar) {
+  if (entity.abilityShouldCast[1] === 1) {
+    var ali = entity.target.allies;
+    var diff = -1;
+    var idx = -1;
+
+    for (var i = 0; i < ali.length; i++) {
+      if (ali[i].imgName === tar.imgName || ali[i].hp <= 0) {
+        continue;
+      }
+
+      var dist = Math.floor(Math.sqrt(Math.pow(tar.pos[0] - ali[i].pos[0], 2) + Math.pow(tar.pos[1] - ali[i].pos[1], 2)));
+
+      if (dist > diff) {
+        diff = dist;
+        idx = i;
+      }
+    }
+
+    if (idx === -1) {
+      return;
+    }
+
+    if (ali[idx].tempHP > 0) {
+      ali[idx].tempHP -= entity.dmg;
+
+      if (ali[idx].tempHP < 0) {
+        ali[idx].hp += ali[idx].tempHP;
+        ali[idx].tempHP = 0;
+      }
+    } else {
+      ali[idx].hp -= entity.dmg * 15 / ali[idx].defense;
+    }
+
+    if (!ali[idx].allied && entity.allied && ali[idx].baseDMG > 0 && entity.defense > ali[idx].target.defense) {
+      ali[idx].target = entity;
+      ali[idx].autoAttack(entity);
+    }
+
+    ali[idx].setHpBars();
+    setBorder(ali[idx], "red");
+
+    if (ali[idx].hp <= 0) {
+      entity.killEntity(ali[idx]);
+    }
+
+    var div = drawLine(tar.pos[0] + tar.container.offsetWidth / 2, tar.pos[1] + tar.container.offsetHeight / 2, ali[idx].pos[0] + ali[idx].container.offsetWidth / 2, ali[idx].pos[1] + ali[idx].container.offsetHeight / 2, "gold"); // console.log(ali[idx].klass);
+    // console.log(div);
+
+    var maxTime = Math.floor(entity.as / 8);
+    setTimeout(function () {
+      div.remove();
+    }, maxTime);
+  } else {
+    entity.abilityShouldCast[1] = 1;
+    console.log(entity.klass, " has ab1 === ", entity.abilityShouldCast[1]);
+    setTimeout(function () {
+      entity.abilityShouldCast[1] = false;
+    }, 10000);
+    return 20;
+  }
+}; //                              Cleric Abilities
+
+
 var groupHeal = function groupHeal(entity) {
   for (var i = 0; i < entity.allies.length; i++) {
     if (entity.allies[i].hp > 0) {
       entity.allies[i].hp -= entity.dmg * 2;
 
-      if (entity.allies[i].hp > 100) {
-        entity.allies[i].hp = 100;
+      if (entity.allies[i].hp > entity.allies[i].baseHP) {
+        entity.allies[i].hp = entity.allies[i].baseHP;
       }
 
       entity.setOverlay(entity.allies[i]);
       entity.allies[i].setHpBars();
-      setBorder(entity.allies[i]);
+      setBorder(entity.allies[i], "green");
     }
   }
 
@@ -161,10 +266,10 @@ var powerSwing = function powerSwing(entity, target) {
   target.stunned = true;
   target.img.src = target.baseImg.src;
   target.imgCycle = 0;
-  setBorder(target);
+  setBorder(target, "red");
 
   if (target.hp <= 0) {
-    entity.killEntitiy(target);
+    entity.killEntity(target);
   }
 
   setTimeout(function () {
@@ -221,10 +326,10 @@ var poisonDagger = function poisonDagger(entity, target) {
     timer++;
     target.hp -= Math.floor(Math.ceil(entity.dmg * 3) / 6);
     target.setHpBars();
-    setBorder(target);
+    setBorder(target, "purple");
 
     if (target.hp <= 0) {
-      entity.killEntitiy(target);
+      entity.killEntity(target);
       clearInterval(_int);
     }
 
@@ -250,10 +355,10 @@ var backstab = function backstab(entity, target) {
   }
 
   target.setHpBars();
-  setBorder(target);
+  setBorder(target, "black");
 
   if (target.hp <= 0) {
-    entity.killEntitiy(target);
+    entity.killEntity(target);
   }
 
   return 15;
@@ -303,21 +408,14 @@ var freeze = function freeze(entity, target) {
   return 25;
 };
 
-function setBorder(target) {
+function setBorder(target, color) {
   if (target && !target.container.style.display === 'none') {
     if (target.img.style.border !== "5px solid gold") {
-      if (entity.baseDMG > 0) {
-        target.img.style.border = "4px solid red";
-      } else {
-        target.img.style.border = "4px solid green";
-      }
-
-      var borderInterval = setInterval(function () {
+      target.img.style.border = "4px solid " + color;
+      setTimeout(function () {
         if (target.img.style.border !== "5px solid gold") {
           target.img.style.border = "none";
         }
-
-        clearInterval(borderInterval);
       }, 500);
     }
   }
@@ -327,7 +425,7 @@ var warriorAbilities = [powerSwing, charge];
 var clericAbilities = [groupHeal, protection];
 var wizardAbilities = [meteor, freeze];
 var rogueAbilities = [poisonDagger, backstab];
-var paladinAbilities = [];
+var paladinAbilities = [wordOfHealing, holySword];
 var bardAbilities = [];
 var rangerAbilities = [];
 var warlockAbilities = [];
@@ -352,7 +450,7 @@ var lightningAutoAttack = function lightningAutoAttack(entity, target) {
     pos[0] -= 60;
   }
 
-  var div = drawLine(pos[0], pos[1], target.pos[0] + target.img.width / 2, target.pos[1] + target.img.height / 2);
+  var div = drawLine(pos[0], pos[1], target.pos[0] + target.img.width / 2, target.pos[1] + target.img.height / 2, "purple");
   var maxTime = Math.floor(entity.as / 8);
   setTimeout(function () {
     div.remove();
@@ -399,10 +497,10 @@ function causeAoEEffect(entity, width, height, target) {
         // console.log('entity hit by fireball: ', entity.enemies[i].klass);
         entity.enemies[i].hp -= Math.ceil(entity.dmg * 1.5);
         entity.enemies[i].setHpBars();
-        setBorder(entity.enemies[i]);
+        setBorder(entity.enemies[i], "red");
 
         if (entity.enemies[i].hp <= 0) {
-          entity.killEntitiy(entity.enemies[i]);
+          entity.killEntity(entity.enemies[i]);
         }
       }
     }
@@ -427,8 +525,8 @@ function imagesTouching(topLeft1, sizes1, topLeft2, sizes2) {
   return true;
 }
 
-function createLineElement(x, y, length, angle) {
-  var styles = 'width: ' + length + 'px; ' + 'height: 0px; ' + '-moz-transform: rotate(' + angle + 'rad); ' + '-webkit-transform: rotate(' + angle + 'rad); ' + '-o-transform: rotate(' + angle + 'rad); ' + '-ms-transform: rotate(' + angle + 'rad); ' + 'position: absolute; ' + 'top: ' + y + 'px; ' + 'left: ' + x + 'px; ' + 'border: 2px solid purple; ';
+function createLineElement(x, y, length, angle, color) {
+  var styles = 'width: ' + length + 'px; ' + 'height: 0px; ' + '-moz-transform: rotate(' + angle + 'rad); ' + '-webkit-transform: rotate(' + angle + 'rad); ' + '-o-transform: rotate(' + angle + 'rad); ' + '-ms-transform: rotate(' + angle + 'rad); ' + 'position: absolute; ' + 'top: ' + y + 'px; ' + 'left: ' + x + 'px; ' + 'border: 2px solid ' + color + '; ';
   var div = document.createElement("div");
   div.setAttribute('style', styles);
   div.classList.add("extra-attack-effect");
@@ -436,7 +534,7 @@ function createLineElement(x, y, length, angle) {
   return div;
 }
 
-function drawLine(x1, y1, x2, y2) {
+function drawLine(x1, y1, x2, y2, color) {
   var a = x1 - x2,
       b = y1 - y2,
       c = Math.sqrt(a * a + b * b);
@@ -445,7 +543,7 @@ function drawLine(x1, y1, x2, y2) {
   var x = sx - c / 2,
       y = sy;
   var alpha = Math.PI - Math.atan2(-b, a);
-  return createLineElement(x, y, c, alpha);
+  return createLineElement(x, y, c, alpha, color);
 }
 
 function spellTrack(img, entity, target, action) {
@@ -545,7 +643,7 @@ var waAbNames = ['Concussive Blow', 'Charge'];
 var cAbNames = ['Prayer of Healing', "Protection"];
 var wiAbNames = ['Fire Bomb', 'Freeze'];
 var rAbNames = ['Poison Shiv', 'Backstab'];
-var pAbNames = [];
+var pAbNames = ['Word of Healing', 'Holy Sword'];
 var specialAttackEffects = abilityList[1];
 var wizardAttackEffect = specialAttackEffects[0];
 /*
@@ -1033,8 +1131,8 @@ var Entity = /*#__PURE__*/function () {
       return false;
     }
   }, {
-    key: "killEntitiy",
-    value: function killEntitiy(entity) {
+    key: "killEntity",
+    value: function killEntity(entity) {
       // console.log(entity.klass, "killed");
       self.lockedIntoAbility = false;
       entity.clearIntervals();
@@ -1230,7 +1328,7 @@ var Entity = /*#__PURE__*/function () {
       if (this.allied) {
         for (var i = 0; i < 4; i++) {
           // console.log(this.abilityShouldCast[i]);
-          if (this.abilityShouldCast[i]) {
+          if (this.abilityShouldCast[i] === true) {
             this.abilityShouldCast[i] = false;
             this.useAbility(i);
           }
@@ -1270,6 +1368,16 @@ var Entity = /*#__PURE__*/function () {
         if (this.imgCycle === 3) {
           if (this.extraAttackAnimation) {
             this.extraAttackAnimation(this, this.target);
+          }
+
+          if (this.allied) {
+            for (var j = 0; j < 4; j++) {
+              if (this.abilityShouldCast[j] === 1) {
+                // console.log(this.klass);
+                // console.log(this.abilityShouldCast[j]);
+                this.useAbility(j);
+              }
+            }
           }
 
           this.attack(this.target);
@@ -1340,7 +1448,7 @@ var Entity = /*#__PURE__*/function () {
         target.setHpBars();
 
         if (target.hp <= 0) {
-          this.killEntitiy(target);
+          this.killEntity(target);
 
           if (!this.allied) {
             // chose another hero to attack
@@ -1415,13 +1523,17 @@ var Entity = /*#__PURE__*/function () {
     value: function useAbility(n) {
       var _this4 = this;
 
-      if (!this.abilityAvailable[n] || this.abilities.length === 0) {
+      var ab = this.abilities[n];
+
+      if (this.abilityShouldCast[n] === 1) {
+        ab(this, this.target);
+        return;
+      } else if (!this.abilityAvailable[n] || this.abilities.length === 0) {
         return;
       } // console.log('ability', n, 'attempted');
 
 
-      this.abilityAvailable[n] = false;
-      var ab = this.abilities[n]; // console.log('ability: ', ab);
+      this.abilityAvailable[n] = false; // console.log('ability: ', ab);
 
       var cdTime = ab(this, this.target);
 
@@ -1432,8 +1544,7 @@ var Entity = /*#__PURE__*/function () {
       } // console.log('seconds for ability cd: ', cdTime);
 
 
-      var innerBoxes = document.getElementsByClassName(this.imgName + '-inner-ability-divs'); // innerBoxes[n].style.animation = `inner-ability-animate ${cdTime}s linear 0s 1`; // didnt work
-
+      var innerBoxes = document.getElementsByClassName(this.imgName + '-inner-ability-divs');
       colorFade(innerBoxes[n], cdTime, [255, 0, 0], [0, 0, 255]);
       var CDTimer = setInterval(function () {
         _this4.abilityAvailable[n] = true; // console.log(this.imgName, ' ability ', n, ' off CD');
@@ -2404,7 +2515,7 @@ function selectEnemy(entity) {
     }
 
     for (var i = 0; i < selectedChar.abilities.length; i++) {
-      if (selectedChar.abilityShouldCast[i]) {
+      if (selectedChar.abilityShouldCast[i] === true) {
         selectedChar.abilityShouldCast[i] = false;
         selectedChar.useAbility(i); // console.log('ability used on click event');
       }
@@ -2435,7 +2546,9 @@ function keydownEvent(e) {
   } else if (entity && entity.klass) {
     selectEnemy(entity);
   } else if ((entity === 0 || entity) && selectedChar) {
-    selectedChar.useAbility(entity);
+    if (selectedChar.abilityShouldCast[entity] !== 1) {
+      selectedChar.useAbility(entity);
+    }
   } else {// console.log('invalid key press of: ', e.key);
     // console.log('value is: ', entity);
     // console.log(hotkeys);
@@ -2446,7 +2559,9 @@ function abilityClick(arr) {
   var entity = livingChars['a' + arr[0]];
 
   if (entity) {
-    entity.useAbility(arr[1]);
+    if (entity.abilityShouldCast[arr[1]] !== 1) {
+      entity.useAbility(arr[1]);
+    }
   } else {// console.log('invalid entity for ability use');
   }
 }
