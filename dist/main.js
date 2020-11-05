@@ -656,6 +656,17 @@ var wlAbNames = [];
 var specialAttackEffects = abilityList[1];
 var wizardAttackEffect = specialAttackEffects[0];
 /*
+Character names:
+Warrior: Jim
+Wizard: Hank
+Warlock: Stache
+Cleric: Gyros
+
+Bard: Larry
+
+*/
+
+/*
 className
 range
 maxHP
@@ -1682,12 +1693,16 @@ function slowFade(element) {
 }
 
 window.addEventListener('load', function () {
+  var dispLevelsScreenMessage = true;
+  var dispHeroesScreenMessage = true;
+  var dispPartyScreenMessage = true;
   var gameTag = document.getElementById('game-tag');
   gameTag.style.opacity = 0;
   gameTag.style.display = '';
   var charsDisp = document.getElementById('title-screen-chars');
   var closeButton = document.getElementById('close-button');
-  var hButtons = document.getElementsByClassName('h-button');
+  var hButtons = document.getElementsByClassName('h-buttons')[0];
+  var hButton = document.getElementsByClassName('h-button');
   var keybindContainer = document.getElementById('full-keybind-container');
   var levelButtonContainer = document.getElementById('level-button-container');
   var levelButtonHeader = document.getElementById("level-button-container-header");
@@ -1697,6 +1712,16 @@ window.addEventListener('load', function () {
   var titleBackground = document.getElementById('title');
   var gameContainer = document.getElementById('game-container');
   var partySelectorContainer = document.getElementById('party-selector-container');
+  var storyContainer = document.getElementById('story-container');
+  var shader = document.getElementById('first-description-shader');
+  var screenDescriptions = document.getElementsByClassName('screen-description');
+  shader.addEventListener('click', function () {
+    for (var i = 0; i < screenDescriptions.length; i++) {
+      screenDescriptions[i].style.display = 'none';
+    }
+
+    shader.style.display = 'none';
+  });
   var keybindInputs = document.getElementsByClassName('keybind-input');
 
   var _loop = function _loop(i) {
@@ -1728,10 +1753,7 @@ window.addEventListener('load', function () {
 
     function closeAction() {
       // controlsContainer.style.display = 'none';
-      for (var _i = 0; _i < hButtons.length; _i++) {
-        hButtons[_i].style.display = '';
-      } // controlsButton.style.display = '';
-
+      hButtons.style.display = ''; // controlsButton.style.display = '';
 
       levelButtonHeader.style.display = 'none';
       levelButtonContainer.style.display = 'none';
@@ -1739,6 +1761,7 @@ window.addEventListener('load', function () {
       statsContainer.style.display = 'none';
       closeButton.style.display = 'none';
       partySelectorContainer.style.display = 'none';
+      storyContainer.style.display = 'none';
       charsDisp.style.display = '';
       backgroundImage.src = titleBackground.src;
       backgroundImage.style.opacity = 100;
@@ -1747,8 +1770,8 @@ window.addEventListener('load', function () {
 
     closeAction();
 
-    var _loop2 = function _loop2(_i2) {
-      levelButtons[_i2].addEventListener('click', function () {
+    var _loop2 = function _loop2(_i) {
+      levelButtons[_i].addEventListener('click', function () {
         closeButton.style.display = 'none'; // closeButton.removeEventListener('click', closeAction);
 
         charsDisp.style.display = 'none';
@@ -1756,12 +1779,12 @@ window.addEventListener('load', function () {
         gameContainer.style.height = '88%';
         document.getElementById('background-image').style.height = gameContainer.offsetHeight + 'px';
         document.getElementById('all-characters-ability-container').style.height = '12%';
-        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i2 + 1);
+        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i + 1);
       });
     };
 
-    for (var _i2 = 0; _i2 < levelButtons.length; _i2++) {
-      _loop2(_i2);
+    for (var _i = 0; _i < levelButtons.length; _i++) {
+      _loop2(_i);
     }
 
     levelButtons[0].style.opacity = 100;
@@ -1769,31 +1792,49 @@ window.addEventListener('load', function () {
     closeButton.addEventListener('click', closeAction);
 
     var hButtonPartialAction = function hButtonPartialAction() {
-      for (var _i3 = 0; _i3 < hButtons.length; _i3++) {
-        hButtons[_i3].style.display = 'none';
-      }
-
+      hButtons.style.display = 'none';
       closeButton.style.display = '';
       charsDisp.style.display = 'none';
       backgroundImage.style.display = 'none';
     };
 
-    hButtons[0].addEventListener('click', function () {
+    hButton[0].addEventListener('click', function () {
       hButtonPartialAction();
-      levelButtonContainer.style.display = '';
-      levelButtonHeader.style.display = '';
+
+      if (hButton[3].style.display === '') {
+        storyContainer.style.display = '';
+      } else {
+        levelButtonContainer.style.display = '';
+        levelButtonHeader.style.display = '';
+      }
+
+      if (dispLevelsScreenMessage) {
+        document.getElementById('levels-screen-description').style.display = '';
+        shader.style.display = '';
+        dispLevelsScreenMessage = false;
+      }
     });
-    hButtons[1].addEventListener('click', function () {
+    hButton[1].addEventListener('click', function () {
       hButtonPartialAction();
       keybindContainer.style.display = '';
     });
-    hButtons[2].addEventListener('click', function () {
+    hButton[2].addEventListener('click', function () {
       hButtonPartialAction();
       statsContainer.style.display = '';
+
+      if (dispHeroesScreenMessage) {
+        document.getElementById('heroes-screen-description').style.display = '';
+        shader.style.display = '';
+        dispHeroesScreenMessage = false;
+      }
     });
-    hButtons[3].addEventListener('click', function () {
+    hButton[3].addEventListener('click', function () {
       hButtonPartialAction();
-      partySelectorContainer.style.display = '';
+      partySelectorContainer.style.display = ''; // if (dispPartyScreenMessage) {
+      //     document.getElementById('party-screen-description').style.display = '';
+      //     shader.style.display = '';
+      //     dispPartyScreenMessage = false;
+      // }
     });
   }
 
@@ -2071,6 +2112,7 @@ var livingEnemies = {};
 var livingChars = {};
 var currentAbilityBoxes;
 var hotkeys = {};
+var storyPage = 0;
 window.addEventListener('load', function () {
   var statChar1;
   var statChar2;
@@ -2082,7 +2124,7 @@ window.addEventListener('load', function () {
   var statImages = document.getElementsByClassName('stats-img');
   var statAbilities1 = document.getElementsByClassName('stat-ability-div-1');
   var statAbilities2 = document.getElementsByClassName('stat-ability-div-2');
-  var abDescShader = document.getElementsByClassName('ability-description-shader')[0];
+  var abDescShader = document.getElementById('ability-description-shader');
   var partySelectorButton = document.getElementById('party-button');
   var partySelectorContainer = document.getElementById('party-selector-container');
   var partySelectorNames = document.getElementsByClassName('party-selector-name');
@@ -2097,8 +2139,11 @@ window.addEventListener('load', function () {
   }
 
   abDescShader.addEventListener('click', function () {
-    currentShowingAbilityDescription.style.display = 'none';
-    currentShowingAbilityDescription = null;
+    if (currentShowingAbilityDescription) {
+      currentShowingAbilityDescription.style.display = 'none';
+      currentShowingAbilityDescription = null;
+    }
+
     abDescShader.style.display = 'none';
   });
 
@@ -2148,8 +2193,8 @@ window.addEventListener('load', function () {
         var dmgStat = document.getElementById("stats-dmg-".concat(_i2 + 1));
         var defenseStat = document.getElementById("stats-defense-".concat(_i2 + 1));
         statImg.src = _char.baseImg.src;
-        nameStat.innerHTML = "Level: ".concat(_char.level);
-        levelStat.innerHTML = _char.klass;
+        nameStat.innerHTML = _char.klass;
+        levelStat.innerHTML = "Level: ".concat(_char.level);
         hpStat.innerHTML = "Health: ".concat(_char.baseHP);
         dmgStat.innerHTML = "Power: ".concat(Math.abs(_char.baseDMG));
         defenseStat.innerHTML = "Defense: ".concat(_char.baseDefense);
@@ -3098,6 +3143,15 @@ function resetGame(won) {
     maxLevelNumber++;
   }
 
+  if (maxLevelNumber > 8) {
+    document.getElementById('level-button-container').style.display = 'none';
+    document.getElementById('level-button-container-header').style.display = 'none';
+    document.getElementById('first-description-shader').style.display = '';
+    document.getElementById('tutorial-levels-finished-description').style.display = '';
+    document.getElementById('story-container').style.display = '';
+    document.getElementById('party-button').style.display = '';
+  }
+
   var levChars = levels[currentLevelNumber].characterList;
   var levEnems = levels[currentLevelNumber].enemyList;
 
@@ -3114,6 +3168,83 @@ function resetGame(won) {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (loadLevel);
+window.addEventListener('load', function () {
+  var storyContainer = document.getElementById('story-container');
+  var storyElements = document.getElementsByClassName('story-page');
+  var nextScreenButton = document.getElementById('next-page-button');
+  var prevScreenButton = document.getElementById('prev-page-button');
+  var openPartyScreenButton = document.getElementById('open-party-interface');
+
+  function prevScreenAvailable() {
+    if (storyPage === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function nextScreenAvailable() {
+    if (storyPage === storyElements.length - 1) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function setScreen(e) {
+    storyElements[storyPage].style.display = 'none'; // console.log(e.currentTarget);
+
+    if (e.currentTarget.id.substr(0, 1) === 'n') {
+      storyPage++;
+    } else {
+      storyPage--;
+    }
+
+    storyElements[storyPage].style.display = '';
+
+    if (prevScreenAvailable()) {
+      prevScreenButton.style.display = '';
+    } else {
+      prevScreenButton.style.display = 'none';
+    }
+
+    if (nextScreenAvailable()) {
+      nextScreenButton.style.display = '';
+    } else {
+      nextScreenButton.style.display = 'none';
+    }
+  }
+
+  nextScreenButton.addEventListener('click', function (e) {
+    setScreen(e);
+  });
+  prevScreenButton.addEventListener('click', function (e) {
+    setScreen(e);
+  });
+  var characterNameDisplays = document.getElementsByClassName('character-name-dispay');
+  var partySelectorNames = document.getElementsByClassName('party-selector-name');
+  openPartyScreenButton.addEventListener('click', function () {
+    for (var i = 0; i < characterNameDisplays.length; i++) {
+      if (characters[i]) {
+        characterNameDisplays[i].innerHTML = characters[i].klass;
+        characterNameDisplays[i].style.display = '';
+      } else {
+        characterNameDisplays[i].style.display = 'none';
+      }
+    }
+
+    for (var _i18 = 0; _i18 < partySelectorNames.length; _i18++) {
+      if (party[_i18]) {
+        partySelectorNames[_i18].innerHTML = party[_i18].klass;
+      }
+    }
+
+    storyContainer.style.display = 'none';
+    document.getElementById('party-selector-container').style.display = '';
+    document.getElementById('party-screen-description').style.display = '';
+    document.getElementById('first-description-shader').style.display = '';
+  });
+});
 
 /***/ }),
 

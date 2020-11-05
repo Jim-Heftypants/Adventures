@@ -108,6 +108,15 @@ body {
     padding: 0;
 }
 
+.h-buttons {
+    display: flex;
+    flex-direction: column;
+    /* min-height: 70vh; */
+    height: 94vh;
+    margin-top: 3vh;
+    margin-bottom: 3vh;
+}
+
 .h-button {
     cursor: pointer;
     text-align: center;
@@ -145,6 +154,7 @@ body {
   width: 32px;
   height: 32px;
   opacity: 0.3;
+  z-index: 71;
 }
 .close:hover {
   opacity: 1;
@@ -155,7 +165,7 @@ body {
   content: ' ';
   height: 33px;
   width: 2px;
-  background-color: #333;
+  background-color: red;
 }
 .close:before {
   transform: rotate(45deg);
@@ -591,14 +601,14 @@ body {
     margin-right: 1.1vw;
 }
 
-.ability-description-shader {
+.description-shader {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: grey;
-    opacity: 90%;
+    opacity: 95%;
     z-index: 49;
 }
 
@@ -636,6 +646,88 @@ body {
 
 .ability-description:last-child {
     margin-bottom: auto;
+}
+
+.screen-description {
+    width: 90vw;
+    height: 100vh;
+    margin-left: 5vw;
+    position: absolute;
+    z-index: 50;
+    pointer-events: none;
+}
+
+.screen-description p {
+    margin-top: 20vh;
+    width: 100%;
+    text-align: center;
+    font-size: 5vw;
+    color: indigo;
+}
+
+.arrow-button {
+    position: absolute;
+    width: 15vw;
+    height: 10vh;
+    bottom: 1vh;
+    right: 1vh;
+    z-index: 25;
+}
+
+.arrow-button-image {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+#prev-page-button {
+    transform: scaleX(-1);
+    left: 1vh;
+}
+
+#story-container {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    z-index: 10;
+    background-color: black;
+    color: red;
+    display: flex;
+}
+
+.story-pages {
+    height: 90vh;
+    width: 94vw;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.story-page {
+    /* width: 94vw; */
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    /* height: 90vh; */
+}
+
+.story-page-element {
+    margin: auto;
+    font-size: 7vh;
+    margin-top: 0.5vh;
+    margin-bottom: 0.5vh;
+    padding: 0.5vh;
+    text-align: center;
+    cursor: default;
+}
+
+.story-page-button {
+    margin-top: 1.5vh;
+    border: 5px solid silver;
+    background-color: mediumvioletred;
+    cursor: pointer;
+    color: black;
+    padding: 12px;
 }
 
 

@@ -24,6 +24,8 @@ let currentAbilityBoxes;
 
 let hotkeys = {};
 
+let storyPage = 0;
+
 window.addEventListener('load', () => {
     let statChar1;
     let statChar2;
@@ -35,7 +37,7 @@ window.addEventListener('load', () => {
     const statImages = document.getElementsByClassName('stats-img');
     const statAbilities1 = document.getElementsByClassName('stat-ability-div-1');
     const statAbilities2 = document.getElementsByClassName('stat-ability-div-2');
-    const abDescShader = document.getElementsByClassName('ability-description-shader')[0];
+    const abDescShader = document.getElementById('ability-description-shader');
     const partySelectorButton = document.getElementById('party-button');
     const partySelectorContainer = document.getElementById('party-selector-container');
     const partySelectorNames = document.getElementsByClassName('party-selector-name');
@@ -48,8 +50,10 @@ window.addEventListener('load', () => {
         document.getElementById("level-button-container").appendChild(button);
     }
     abDescShader.addEventListener('click', () => {
-        currentShowingAbilityDescription.style.display = 'none';
-        currentShowingAbilityDescription = null;
+        if (currentShowingAbilityDescription) {
+            currentShowingAbilityDescription.style.display = 'none';
+            currentShowingAbilityDescription = null;
+        }
         abDescShader.style.display = 'none';
     })
     function showAbilityDescription(side, num) {
@@ -78,8 +82,8 @@ window.addEventListener('load', () => {
                 const dmgStat = document.getElementById(`stats-dmg-${i + 1}`);
                 const defenseStat = document.getElementById(`stats-defense-${i + 1}`);
                 statImg.src = char.baseImg.src;
-                nameStat.innerHTML = `Level: ${char.level}`;
-                levelStat.innerHTML = char.klass;
+                nameStat.innerHTML = char.klass;
+                levelStat.innerHTML = `Level: ${char.level}`;
                 hpStat.innerHTML = `Health: ${char.baseHP}`;
                 dmgStat.innerHTML = `Power: ${Math.abs(char.baseDMG)}`
                 defenseStat.innerHTML = `Defense: ${char.baseDefense}`;
@@ -862,6 +866,14 @@ function resetGame(won) {
         }
         maxLevelNumber++;
     }
+    if (maxLevelNumber > 8) {
+        document.getElementById('level-button-container').style.display = 'none';
+        document.getElementById('level-button-container-header').style.display = 'none';
+        document.getElementById('first-description-shader').style.display = '';
+        document.getElementById('tutorial-levels-finished-description').style.display = '';
+        document.getElementById('story-container').style.display = '';
+        document.getElementById('party-button').style.display = '';
+    }
     const levChars = levels[currentLevelNumber].characterList;
     const levEnems = levels[currentLevelNumber].enemyList;
     for (let i = 0; i < levChars.length; i++) {
@@ -875,3 +887,72 @@ function resetGame(won) {
 }
 
 export default loadLevel;
+
+window.addEventListener('load', () => {
+    
+    const storyContainer = document.getElementById('story-container');
+    const storyElements = document.getElementsByClassName('story-page');
+    const nextScreenButton = document.getElementById('next-page-button');
+    const prevScreenButton = document.getElementById('prev-page-button');
+    const openPartyScreenButton = document.getElementById('open-party-interface');
+
+    function prevScreenAvailable() {
+        if (storyPage === 0) {
+            return false;
+        }
+        return true;
+    }
+
+    function nextScreenAvailable() {
+        if (storyPage === storyElements.length - 1) {
+            return false;
+        }
+        return true;
+    }
+
+    function setScreen(e) {
+        storyElements[storyPage].style.display = 'none';
+        // console.log(e.currentTarget);
+        if (e.currentTarget.id.substr(0, 1) === 'n') {
+            storyPage++;
+        } else {
+            storyPage--;
+        }
+        storyElements[storyPage].style.display = '';
+        if (prevScreenAvailable()) {
+            prevScreenButton.style.display = '';
+        } else {
+            prevScreenButton.style.display = 'none';
+        }
+        if (nextScreenAvailable()) {
+            nextScreenButton.style.display = '';
+        } else {
+            nextScreenButton.style.display = 'none';
+        }
+    }
+
+    nextScreenButton.addEventListener('click', (e) => { setScreen(e); })
+    prevScreenButton.addEventListener('click', (e) => { setScreen(e); })
+
+    const characterNameDisplays = document.getElementsByClassName('character-name-dispay');
+    const partySelectorNames = document.getElementsByClassName('party-selector-name');
+    openPartyScreenButton.addEventListener('click', () => {
+        for (let i = 0; i < characterNameDisplays.length; i++) {
+            if (characters[i]) {
+                characterNameDisplays[i].innerHTML = characters[i].klass;
+                characterNameDisplays[i].style.display = '';
+            } else {
+                characterNameDisplays[i].style.display = 'none';
+            }
+        }
+        for (let i = 0; i < partySelectorNames.length; i++) {
+            if (party[i]) {
+                partySelectorNames[i].innerHTML = party[i].klass;
+            }
+        }
+        storyContainer.style.display = 'none';
+        document.getElementById('party-selector-container').style.display = '';
+        document.getElementById('party-screen-description').style.display = '';
+        document.getElementById('first-description-shader').style.display = '';
+    })
+})

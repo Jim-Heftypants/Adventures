@@ -4,6 +4,9 @@ function slowFade(element, action = null) { let op = 80; let timerDown = setInte
     element.style.display = 'none'; if (action) { action(); } } element.style.opacity = op / 40; op -= 1;}, 50);}
 
 window.addEventListener('load', () => {
+    let dispLevelsScreenMessage = true;
+    let dispHeroesScreenMessage = true;
+    let dispPartyScreenMessage = true;
 
     const gameTag = document.getElementById('game-tag');
     gameTag.style.opacity = 0;
@@ -11,7 +14,8 @@ window.addEventListener('load', () => {
     
     const charsDisp = document.getElementById('title-screen-chars');
     const closeButton = document.getElementById('close-button');
-    const hButtons = document.getElementsByClassName('h-button');
+    const hButtons = document.getElementsByClassName('h-buttons')[0];
+    const hButton = document.getElementsByClassName('h-button');
     const keybindContainer = document.getElementById('full-keybind-container');
     const levelButtonContainer = document.getElementById('level-button-container');
     const levelButtonHeader = document.getElementById("level-button-container-header");
@@ -21,6 +25,16 @@ window.addEventListener('load', () => {
     const titleBackground = document.getElementById('title');
     const gameContainer = document.getElementById('game-container');
     const partySelectorContainer = document.getElementById('party-selector-container');
+    const storyContainer = document.getElementById('story-container');
+
+    const shader = document.getElementById('first-description-shader');
+    const screenDescriptions = document.getElementsByClassName('screen-description');
+    shader.addEventListener('click', () => {
+        for (let i = 0; i < screenDescriptions.length; i++) {
+            screenDescriptions[i].style.display = 'none';
+        }
+        shader.style.display = 'none';
+    })
 
     const keybindInputs = document.getElementsByClassName('keybind-input');
     for (let i = 0; i < keybindInputs.length; i++) {
@@ -43,7 +57,7 @@ window.addEventListener('load', () => {
         gTContainer.style.display = 'none';
         function closeAction() {
             // controlsContainer.style.display = 'none';
-            for (let i = 0; i < hButtons.length; i++) { hButtons[i].style.display = ''; }
+            hButtons.style.display = '';
             // controlsButton.style.display = '';
             levelButtonHeader.style.display = 'none';
             levelButtonContainer.style.display = 'none';
@@ -51,6 +65,7 @@ window.addEventListener('load', () => {
             statsContainer.style.display = 'none';
             closeButton.style.display = 'none';
             partySelectorContainer.style.display = 'none';
+            storyContainer.style.display = 'none';
             charsDisp.style.display = '';
             backgroundImage.src = titleBackground.src;
             backgroundImage.style.opacity = 100;
@@ -73,29 +88,47 @@ window.addEventListener('load', () => {
         levelButtons[0].style.cursor = 'pointer';
         closeButton.addEventListener('click', closeAction)
         let hButtonPartialAction = () => {
-            for (let i = 0; i < hButtons.length; i++) { hButtons[i].style.display = 'none'; }
+            hButtons.style.display = 'none';
             closeButton.style.display = '';
             charsDisp.style.display = 'none';
             backgroundImage.style.display = 'none';
         }
-        hButtons[0].addEventListener('click', () => {
+        hButton[0].addEventListener('click', () => {
             hButtonPartialAction();
-            levelButtonContainer.style.display = '';
-            levelButtonHeader.style.display = '';
+            if (hButton[3].style.display === '') {
+                storyContainer.style.display = '';
+            } else {
+                levelButtonContainer.style.display = '';
+                levelButtonHeader.style.display = '';
+            }
+            if (dispLevelsScreenMessage) {
+                document.getElementById('levels-screen-description').style.display = '';
+                shader.style.display = '';
+                dispLevelsScreenMessage = false;
+            }
         })
-        hButtons[1].addEventListener('click', () => {
+        hButton[1].addEventListener('click', () => {
             hButtonPartialAction();
             keybindContainer.style.display = '';
         })
-        hButtons[2].addEventListener('click', () => {
+        hButton[2].addEventListener('click', () => {
             hButtonPartialAction();
             statsContainer.style.display = '';
+            if (dispHeroesScreenMessage) {
+                document.getElementById('heroes-screen-description').style.display = '';
+                shader.style.display = '';
+                dispHeroesScreenMessage = false;
+            }
         })
-        hButtons[3].addEventListener('click', () => {
+        hButton[3].addEventListener('click', () => {
             hButtonPartialAction();
             partySelectorContainer.style.display = '';
+            // if (dispPartyScreenMessage) {
+            //     document.getElementById('party-screen-description').style.display = '';
+            //     shader.style.display = '';
+            //     dispPartyScreenMessage = false;
+            // }
         })
-
     }
     slowFade(gameTag, secondAction);
 })

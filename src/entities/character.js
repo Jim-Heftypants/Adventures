@@ -30,6 +30,17 @@ const specialAttackEffects = abilityList[1];
 const wizardAttackEffect = specialAttackEffects[0];
 
 /*
+Character names:
+Warrior: Jim
+Wizard: Hank
+Warlock: Stache
+Cleric: Gyros
+
+Bard: Larry
+
+*/
+
+/*
 className
 range
 maxHP

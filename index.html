@@ -28,13 +28,111 @@
             <img id='title' src='./assets/images/Backgrounds/title-screen-background.jpg' style="display: none;"/>
 
             <div id='game-tag-container'>
-                <p id='game-tag'>Adventures</p>
+                <p id='game-tag'>Adventurers</p>
             </div>
 
-            <h1 class="h-button" id="start-game-button" style="display: none;">Start Game!</h1>
-            <h1 class='h-button' id='keybindings-button' style="display: none;">Keybindings</h1>
-            <h1 class="h-button" id='heroes-button' style='display: none;'>Heroes</h1>
-            <h1 class="h-button" id="party-button" style="display: none;">Party</h1>
+            <div class="h-buttons" style="display: none;">
+                <h1 class="h-button" id="start-game-button">Play Game</h1>
+                <h1 class='h-button' id='keybindings-button'>Keybindings</h1>
+                <h1 class="h-button" id='heroes-button'>Heroes</h1>
+                <h1 class="h-button" id="party-button" style="display: none;">Party</h1>
+            </div>
+
+            <div id="story-container" style="display: none;">
+                <div class="story-pages">
+                    <div class="story-page">
+                        <div class="story-page-element">
+                            The city state of Aarondel was once a peaceful land centered on commerce. 
+                            It borders the Cobalt Ocean to the south, with rivers stemming in all directions from its center.
+                            Aarondel thrived through trade with the forest elves to the west and the dwarves and gnomes in the northern mountains.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            Exiled from the Underdark, a mind-flayer took refuge within the city.
+                            As it grew in strength leeching on the city's populace, people began to disappear.
+                            Soon, King Etheric's wife, Queen Elthamira, went missing.
+                            Etheric used every available resource to search for her.
+                            While searching, the mind-flayer's hideout was discovered.
+                            Etheric sent in his royal gaurd and, after a desperate battle, the blight was killed.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            Searching the cave revealed the source for the disappearances.
+                            Etheric saw his wife's lifeless body resting along the cave's back wall.
+                            In his despair, he swore to bring her back by any means.
+                            Etheric began researching the forbidden art of necromancy alone.
+                            For months he manically read and re-read every dark tome and scroll in the kingdom.
+                            Aarondel began to decline as he kept himself locked up in the palace study barely pausing even to eat and sleep.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            Finally, he began the ritual to bring back the dead.
+                            Etheric opened a dark gateway in the palace room and summoned Elthamira's spirit through it.
+                            Her spirit returned to her body and after a few moments, she suddenly awoke.
+                            He was indescribably shocked and euphoric as they embraced.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            Though his spell should have ended, the gateway remained open.
+                            Emerging from the abyss, a dark shadow surrounded them.
+                            This evil spirit flew into them and then suddenly disappeared, closing the portal with it.
+                            Wary, the King and Queen looked around to find everything was back to normal.
+                            Months passed.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            They were now finding it hard to shut out the voices in their heads.
+                            The dark spirit, origionally just a whisper in the back of their minds, was gaining control over them.
+                            Memories became a blur. Days would pass in a trance. Times became unaccountable.
+                        </div>
+                        <div class="story-page-element">
+                            A year passed.
+                            King Etheric and Queen Elthamira scourged the land they loved, bringing everything they had built to ruin.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            You represent a legendary band of Adventurers tasked by Etheric himself before his collapse to protect Aarondel
+                            against its greatest threats.
+                            Amongst your ranks are skilled fighters such as Paladins, Rangers, Wizards, and Clerics.
+                            Your choices will influence not only your own party but the very fate of Aarondel and its people.
+                            How will you respond to this evil?
+                        </div>
+                        <div id='open-party-interface' class="story-page-element story-page-button">
+                            Choose Party
+                        </div>
+                    </div>
+                </div>
+
+                <div id="next-page-button" class="arrow-button">
+                    <img src="./assets/images/arrow.jpg" class='arrow-button-image' />
+                </div>
+                <div id="prev-page-button" class="arrow-button" style="display: none;">
+                    <img src="./assets/images/arrow.jpg" class='arrow-button-image' />
+                </div>
+            </div>
+
+            <div id='first-description-shader' class="description-shader" style="display: none;"></div>
+            <div id='levels-screen-description' class="screen-description" style="display: none;">
+                <p>Click on a tutorial level to begin it. Complete all levels to begin the storymode.</p>
+                <p>Click anywhere to close this message.</p>
+            </div>
+            <div id='tutorial-levels-finished-description' class="screen-description" style="display: none;">
+                <p>Congrats you cleared the tutorial levels!</p>
+            </div>
+            <div id='heroes-screen-description' class="screen-description" style="display: none;">
+                <p>Click on a hero's name and then click one of the boxes to see their stats and available abilities.</p>
+                <p>Click anywhere to close this message.</p>
+            </div>
+            <div id='party-screen-description' class="screen-description" style="display: none;">
+                <p>Click on a hero's name from the list on top then click one of the names at the bottom in order to switch them into the party.</p>
+                <p>Click anywhere to close this message.</p>
+            </div>
 
             <div id='full-keybind-container' style="display: none;">
                 <div id='keybindings-rules'>
@@ -173,7 +271,7 @@
                 </div>
             </div>
 
-            <div class="ability-description-shader" style="display: none;"></div>
+            <div id='ability-description-shader' class="description-shader" style="display: none;"></div>
             <div id='Warrior-ability-1-description-div' class="ability-description-div" style="display: none;">
                 <h1 class="ability-description-title">
                     Concussive Blow
