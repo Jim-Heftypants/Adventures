@@ -63,8 +63,8 @@ window.addEventListener('load', () => {
                 // closeButton.removeEventListener('click', closeAction);
                 charsDisp.style.display = 'none';
                 backgroundImage.style.display = 'none';
-                document.getElementById('background-image').style.height = '88%';
                 gameContainer.style.height = '88%';
+                document.getElementById('background-image').style.height = gameContainer.offsetHeight + 'px';
                 document.getElementById('all-characters-ability-container').style.height = '12%';
                 loadLevel(i+1); 
             })

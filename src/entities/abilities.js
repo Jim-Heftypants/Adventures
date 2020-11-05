@@ -81,7 +81,7 @@ const holySword = (entity, tar) => {
         console.log(entity.klass, " has ab1 === ", entity.abilityShouldCast[1]);
         setTimeout(() => {
             entity.abilityShouldCast[1] = false;
-        }, 10000)
+        }, 7500)
         return 20;
     }
 }
@@ -274,11 +274,12 @@ const clericAbilities = [groupHeal, protection];
 const wizardAbilities = [meteor, freeze];
 const rogueAbilities = [poisonDagger, backstab];
 const paladinAbilities = [wordOfHealing, holySword];
+const berserkerAbilities = [];
 const bardAbilities = [];
 const rangerAbilities = [];
 const warlockAbilities = [];
 export const allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities,
-                                paladinAbilities, bardAbilities, rangerAbilities, warlockAbilities];
+                                paladinAbilities, berserkerAbilities, bardAbilities, rangerAbilities, warlockAbilities];
 
 
 function checkAbilityPossible(entity, abNum, target, infiniteRange=false) {

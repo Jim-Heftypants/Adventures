@@ -197,7 +197,7 @@ var holySword = function holySword(entity, tar) {
     console.log(entity.klass, " has ab1 === ", entity.abilityShouldCast[1]);
     setTimeout(function () {
       entity.abilityShouldCast[1] = false;
-    }, 10000);
+    }, 7500);
     return 20;
   }
 }; //                              Cleric Abilities
@@ -426,10 +426,11 @@ var clericAbilities = [groupHeal, protection];
 var wizardAbilities = [meteor, freeze];
 var rogueAbilities = [poisonDagger, backstab];
 var paladinAbilities = [wordOfHealing, holySword];
+var berserkerAbilities = [];
 var bardAbilities = [];
 var rangerAbilities = [];
 var warlockAbilities = [];
-var allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities, paladinAbilities, bardAbilities, rangerAbilities, warlockAbilities];
+var allAbilities = [warriorAbilities, clericAbilities, wizardAbilities, rogueAbilities, paladinAbilities, berserkerAbilities, bardAbilities, rangerAbilities, warlockAbilities];
 
 function checkAbilityPossible(entity, abNum, target) {
   var infiniteRange = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
@@ -639,11 +640,19 @@ var clericAbilities = charAbilities[1];
 var wizardAbilities = charAbilities[2];
 var rogueAbilities = charAbilities[3];
 var paladinAbilities = charAbilities[4];
+var berserkerAbilities = charAbilities[5];
+var bardAbilities = charAbilities[6];
+var rangerAbilities = charAbilities[7];
+var warlockAbilities = charAbilities[8];
 var waAbNames = ['Concussive Blow', 'Charge'];
-var cAbNames = ['Prayer of Healing', "Protection"];
+var clAbNames = ['Prayer of Healing', "Protection"];
 var wiAbNames = ['Fire Bomb', 'Freeze'];
-var rAbNames = ['Poison Shiv', 'Backstab'];
-var pAbNames = ['Word of Healing', 'Holy Sword'];
+var roAbNames = ['Poison Shiv', 'Backstab'];
+var paAbNames = ['Word of Healing', 'Holy Sword'];
+var beAbNames = [];
+var baAbNames = [];
+var raAbNames = [];
+var wlAbNames = [];
 var specialAttackEffects = abilityList[1];
 var wizardAttackEffect = specialAttackEffects[0];
 /*
@@ -664,13 +673,13 @@ abNames
 // tank
 
 var Warrior = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Warrior', 10, 100, 10, 1000, 10, true, [100, 400], 20, null, null, warriorAbilities, waAbNames);
-var Paladin = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Paladin', 10, 100, 10, 1000, 10, true, [100, 400], 20, null, null, paladinAbilities, pAbNames); // heals
+var Paladin = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Paladin', 10, 100, 10, 1000, 10, true, [100, 400], 20, null, null, paladinAbilities, paAbNames); // heals
 
-var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, [400, 100], 12, 2, null, clericAbilities, cAbNames); // rdps
+var Cleric = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Cleric', 'infinite', 100, 10, 1500, -8, true, [400, 100], 12, 2, null, clericAbilities, clAbNames); // rdps
 
 var Wizard = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]('Wizard', "infinite", 100, 10, 2000, 20, true, [100, 100], 14, null, wizardAttackEffect, wizardAbilities, wiAbNames); // mdps
 
-var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, [900, 500], 16, null, null, rogueAbilities, rAbNames);
+var Rogue = new _entity__WEBPACK_IMPORTED_MODULE_0__["default"]("Rogue", 10, 100, 10, 800, 10, true, [900, 500], 16, null, null, rogueAbilities, roAbNames);
 var charactersArr = [Warrior, Cleric, Wizard, Rogue, Paladin];
 /* harmony default export */ __webpack_exports__["default"] = (charactersArr);
 
@@ -1744,8 +1753,8 @@ window.addEventListener('load', function () {
 
         charsDisp.style.display = 'none';
         backgroundImage.style.display = 'none';
-        document.getElementById('background-image').style.height = '88%';
         gameContainer.style.height = '88%';
+        document.getElementById('background-image').style.height = gameContainer.offsetHeight + 'px';
         document.getElementById('all-characters-ability-container').style.height = '12%';
         Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(_i2 + 1);
       });
@@ -2468,6 +2477,9 @@ function beginCurrentLevel() {
 }
 
 function returnToSelectPage() {
+  document.getElementById('game-container').style.height = '100%';
+  document.getElementById('background-image').style.height = document.getElementById('game-container').offsetHeight + 'px';
+  document.getElementById('all-characters-ability-container').style.height = '0%';
   document.getElementById('return-button').style.display = 'none';
   document.getElementById('tutorial-message').style.display = 'none';
   document.getElementById("level-name-display").style.display = 'none';
@@ -3073,7 +3085,7 @@ function resetGame(won) {
   document.getElementById('level-button-container-header').style.display = '';
   document.getElementById('close-button').style.display = '';
   document.getElementById('game-container').style.height = '100%';
-  document.getElementById('background-image').style.height = '100%';
+  document.getElementById('background-image').style.height = document.getElementById('game-container').offsetHeight + 'px';
   document.getElementById('all-characters-ability-container').style.height = '0%';
   var levelButtons = document.getElementsByClassName('level-button');
 

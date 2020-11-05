@@ -340,6 +340,9 @@ function beginCurrentLevel() {
 }
 
 function returnToSelectPage() {
+    document.getElementById('game-container').style.height = '100%';
+    document.getElementById('background-image').style.height = document.getElementById('game-container').offsetHeight + 'px';
+    document.getElementById('all-characters-ability-container').style.height = '0%';
     document.getElementById('return-button').style.display = 'none';
     document.getElementById('tutorial-message').style.display = 'none';
     document.getElementById(`level-name-display`).style.display = 'none';
@@ -849,7 +852,7 @@ function resetGame(won) {
     document.getElementById('level-button-container-header').style.display = '';
     document.getElementById('close-button').style.display = '';
     document.getElementById('game-container').style.height = '100%';
-    document.getElementById('background-image').style.height = '100%';
+    document.getElementById('background-image').style.height = document.getElementById('game-container').offsetHeight + 'px';
     document.getElementById('all-characters-ability-container').style.height = '0%';
     const levelButtons = document.getElementsByClassName('level-button');
     if (won && maxLevelNumber === currentLevelNumber) {
