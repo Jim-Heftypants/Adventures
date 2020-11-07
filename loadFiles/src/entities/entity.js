@@ -139,13 +139,13 @@ class Entity { // this. is selectedChar
 
     setLevel(level) {
         this.level = level;
-        this.baseDefense = Math.floor(this.baseDefense + Math.ceil(this.trueBaseDefense * 0.05) * level);
+        this.baseDefense = Math.floor(this.baseDefense + Math.ceil(this.trueBaseDefense * 0.05) * (level - 1));
         if (this.baseDMG > 0) {
-            this.baseDMG = Math.floor(this.baseDMG + Math.ceil(this.trueBaseDMG * 0.1) * level);
+            this.baseDMG = Math.floor(this.baseDMG + Math.ceil(this.trueBaseDMG * 0.1) * (level - 1));
         } else {
-            this.baseDMG = Math.ceil(this.baseDMG + Math.floor(this.trueBaseDMG * 0.1) * level);
+            this.baseDMG = Math.ceil(this.baseDMG + Math.floor(this.trueBaseDMG * 0.1) * (level - 1));
         }
-        this.baseHP = Math.floor(this.baseHP + Math.ceil(this.trueBaseHp * 0.1) * level);
+        this.baseHP = Math.floor(this.baseHP + Math.ceil(this.trueBaseHp * 0.1) * (level - 1));
         // console.log(this.klass);
         // console.log(this.baseDMG);
         // console.log(this.level);

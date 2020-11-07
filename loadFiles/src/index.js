@@ -64,7 +64,8 @@ window.addEventListener('load', () => {
                 userDoc.get()
                     .then(object => {
                         const data = object.data();
-                        if (data.name) {
+                        // console.log('data: ', data);
+                        if (data && data.name) {
                             console.log('Save history found!');
                             saveData = data;
                             // console.log("Save Data: ", saveData);
