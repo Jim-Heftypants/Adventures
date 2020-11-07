@@ -27,8 +27,8 @@ class Entity { // this. is selectedChar
         }
 
         this.allAbilities = abilities;
-        this.abilities = abilities; // change on pushed ver
-        // this.abilities = [];
+        // this.abilities = abilities; // change on pushed ver
+        this.abilities = [];
         this.abilityNames = abilityNames;
         this.abilityAvailable = [true, true, true, true];
         this.abilityShouldCast = [false, false, false, false];
@@ -150,7 +150,7 @@ class Entity { // this. is selectedChar
         // console.log(this.baseDMG);
         // console.log(this.level);
         if (this.allied) {
-            this.nextLevelXP = Math.ceil(this.nextLevelXP + (this.nextLevelXP * 0.1) * level);
+            this.nextLevelXP = Math.ceil(this.nextLevelXP + (this.nextLevelXP * 0.1) * (level - 1));
             // this.nextLevelXP += (this.nextLevelXP * 0.1);
             if (this.level > 15) {
                 this.abilities = this.allAbilities;
@@ -163,7 +163,7 @@ class Entity { // this. is selectedChar
             }
         }
         if (this.allied && this.imgName) {
-            this.xp -= this.nextLevelXP;
+            this.xp = 1;
             const levelUpDisp = document.getElementById(this.imgName + '-level-up');
             levelUpDisp.style.display = '';
             fastFadeOut(levelUpDisp);

@@ -67,8 +67,10 @@ window.addEventListener('load', () => {
                         if (data.name) {
                             console.log('Save history found!');
                             saveData = data;
-                            console.log("Save Data: ", saveData);
-                            loadLevel(null, saveData, currentUserId);
+                            // console.log("Save Data: ", saveData);
+                            loadLevel(null, saveData, currentUserId, true);
+                            dispHeroesScreenMessage = false;
+                            dispLevelsScreenMessage = false;
                         } else {
                             console.log('No save data found -- creating new save');
                             userDoc.set({
@@ -124,7 +126,7 @@ window.addEventListener('load', () => {
                                             if (data.name) {
                                                 console.log('Save history found!');
                                                 saveData = data;
-                                                console.log("Save Data: ", saveData);
+                                                // console.log("Save Data: ", saveData);
                                                 loadLevel(null, saveData, currentUserId);
                                             }
                                         })

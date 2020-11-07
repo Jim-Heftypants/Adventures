@@ -854,10 +854,9 @@ var Entity = /*#__PURE__*/function () {
       this.xp = 0;
     }
 
-    this.allAbilities = abilities;
-    this.abilities = abilities; // change on pushed ver
-    // this.abilities = [];
+    this.allAbilities = abilities; // this.abilities = abilities; // change on pushed ver
 
+    this.abilities = [];
     this.abilityNames = abilityNames;
     this.abilityAvailable = [true, true, true, true];
     this.abilityShouldCast = [false, false, false, false];
@@ -987,7 +986,7 @@ var Entity = /*#__PURE__*/function () {
       // console.log(this.level);
 
       if (this.allied) {
-        this.nextLevelXP = Math.ceil(this.nextLevelXP + this.nextLevelXP * 0.1 * level); // this.nextLevelXP += (this.nextLevelXP * 0.1);
+        this.nextLevelXP = Math.ceil(this.nextLevelXP + this.nextLevelXP * 0.1 * (level - 1)); // this.nextLevelXP += (this.nextLevelXP * 0.1);
 
         if (this.level > 15) {
           this.abilities = this.allAbilities;
@@ -1001,7 +1000,7 @@ var Entity = /*#__PURE__*/function () {
       }
 
       if (this.allied && this.imgName) {
-        this.xp -= this.nextLevelXP;
+        this.xp = 1;
         var levelUpDisp = document.getElementById(this.imgName + '-level-up');
         levelUpDisp.style.display = '';
         fastFadeOut(levelUpDisp);
@@ -1730,9 +1729,11 @@ window.addEventListener('load', function () {
 
         if (data.name) {
           console.log('Save history found!');
-          saveData = data;
-          console.log("Save Data: ", saveData);
-          Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, saveData, currentUserId);
+          saveData = data; // console.log("Save Data: ", saveData);
+
+          Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, saveData, currentUserId, true);
+          dispHeroesScreenMessage = false;
+          dispLevelsScreenMessage = false;
         } else {
           console.log('No save data found -- creating new save');
           userDoc.set({
@@ -1786,8 +1787,8 @@ window.addEventListener('load', function () {
 
               if (data.name) {
                 console.log('Save history found!');
-                saveData = data;
-                console.log("Save Data: ", saveData);
+                saveData = data; // console.log("Save Data: ", saveData);
+
                 Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, saveData, currentUserId);
               }
             });
@@ -2215,7 +2216,7 @@ var levelOne = new Level('Warrior', 1, enemiesArr[0], "Click on the stick figure
 var levelTwo = new Level('Cleric', 2, enemiesArr[1], "The character with a staff is a cleric healer. Click on it and then on an allied unit or itself to begin healing them. De-select a character without making an action by clicking the Red button on the top right. Defeat all enemies to clear the level.", tutorialActions, false, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1]]);
 var levelThree = new Level('Wizard', 3, enemiesArr[2], "The character with the blue hat, the wizard, can attack enemies from any range. Click on it then on an enemy to begin attacking immediately. \nAttacking an enemy with the Warrior will cause them to focus their attacks on him.", tutorialActions, false, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2]]);
 var levelFour = new Level('Rogue', 4, enemiesArr[3], "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.", tutorialActions, false, [_entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][0], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][1], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][2], _entities_character__WEBPACK_IMPORTED_MODULE_0__["default"][3]]);
-var levelFive = new Level('Level Five', 5, enemiesArr[4], "The tutorial levels are over. Time for more of a challenge", actionFive);
+var levelFive = new Level('Level Five', 5, enemiesArr[4], "", actionFive);
 var levelSix = new Level('Magic', 6, enemiesArr[5], "Wizards and Clerics", actionSix);
 var levelSeven = new Level('Melee', 7, enemiesArr[6], "All melee", actionSeven);
 var levelEight = new Level('Doppel-ganger', 8, enemiesArr[7], "Fight copies of yourself", actionEight); // export const levelNine = new Level('Level Nine', 9, enemiesList.slice(1, 5), "", defaultAction, true);
@@ -2240,8 +2241,7 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 1;
-var maxLevelNumber = 1; // change on pushed ver
-
+var maxLevelNumber = 1;
 var characters = levels[0].characterList.slice();
 var partyIndexes = [0, 1, 2, 3];
 var party = levels[4].characterList.slice();
@@ -2442,7 +2442,10 @@ window.addEventListener('load', function () {
       characterNameDisplays[partyCharIdx].style.border = '2px solid black';
       partyCharIdx = null;
       partyCharSelected = null;
-      updatePartySave();
+
+      if (currentUserId) {
+        updatePartySave();
+      }
     });
   };
 
@@ -2835,42 +2838,116 @@ function updatePartySave() {
   }
 }
 
-function loadSaveData(saveData, userId) {
+function updateUserScreen() {
+  var userDoc = db.collection('users').doc(currentUserId);
+  userDoc.update({
+    storyPage: storyPage
+  });
+}
+
+function createCharSaveObj() {
+  var charsObj = {};
+
+  for (var i = 0; i < characters.length; i++) {
+    charsObj[characters[i].klass] = {};
+    charsObj[characters[i].klass]["level"] = characters[i].level;
+    charsObj[characters[i].klass]["xp"] = characters[i].xp;
+  }
+
+  return charsObj;
+}
+
+function updateCharObjects() {
+  var userDoc = db.collection('users').doc(currentUserId);
+  var charsObj = createCharSaveObj(); // console.log('generated chars obj: ', charsObj);
+
   try {
-    currentUserId = userId;
-    console.log('User ID: ', currentUserId);
-    console.log('Loading save data: ', saveData);
-    maxLevelNumber = saveData["maxLevelNumber"];
-    var levelButtons = document.getElementsByClassName('level-button');
-
-    for (var i = 1; i < maxLevelNumber; i++) {
-      levelButtons[i].style.opacity = 100 + '%';
-      levelButtons[i].style.cursor = 'pointer';
-    }
-
-    storyPage = saveData["storyPage"];
-
-    for (var _i10 = 0; _i10 < characters.length; _i10++) {
-      characters[_i10].level = saveData["characters"][characters[_i10].klass]["level"];
-      characters[_i10].xp = saveData["characters"][characters[_i10].klass]["xp"];
-
-      characters[_i10].setLevel(characters[_i10].level);
-    }
-
-    if (saveData["party"].length === 0) {
-      updatePartySave();
-    }
+    userDoc.update({
+      characters: charsObj
+    });
   } catch (err) {
-    console.log('failed to attach save data to game state with err: ', err);
+    console.log('Char Object update failed with error: ', err);
+  }
+}
+
+function showStoryParts() {
+  document.getElementById('level-button-container').style.display = 'none';
+  document.getElementById('level-button-container-header').style.display = 'none';
+  document.getElementById('story-container').style.display = '';
+  document.getElementById('party-button').style.display = '';
+}
+
+function updateMaxLevel() {
+  if (maxLevelNumber > 8) {
+    showStoryParts();
+    document.getElementById('first-description-shader').style.display = '';
+    document.getElementById('tutorial-levels-finished-description').style.display = '';
+  }
+
+  try {
+    db.collection('users').doc(currentUserId).update({
+      maxLevelNumber: maxLevelNumber
+    });
+  } catch (err) {
+    console.log('Failed to update max level: ', err);
+  }
+}
+
+function setPartyByIndexes() {
+  for (var i = 0; i < partyIndexes.length; i++) {
+    party[i] = characters[partyIndexes[i]];
+  } // console.log('party set to: ', party);
+
+}
+
+function loadSaveData(saveData, userId, shouldInitWithPresets) {
+  currentUserId = userId; // console.log('User ID: ', currentUserId);
+
+  if (shouldInitWithPresets) {
+    try {
+      // console.log('Merging save data: ', saveData);
+      maxLevelNumber = saveData["maxLevelNumber"];
+
+      if (maxLevelNumber > 8) {
+        showStoryParts();
+      } else {
+        var levelButtons = document.getElementsByClassName('level-button');
+
+        for (var i = 1; i < maxLevelNumber; i++) {
+          levelButtons[i].style.opacity = 100 + '%';
+          levelButtons[i].style.cursor = 'pointer';
+        }
+      }
+
+      storyPage = saveData["storyPage"];
+
+      for (var _i10 = 0; _i10 < characters.length; _i10++) {
+        characters[_i10].xp = saveData["characters"][characters[_i10].klass]["xp"];
+
+        characters[_i10].setLevel(saveData["characters"][characters[_i10].klass]["level"]);
+      }
+
+      partyIndexes = saveData["party"].slice();
+      setPartyByIndexes();
+    } catch (err) {
+      console.log('failed to attach save data to game state with err: ', err);
+    }
+  } else {
+    // console.log('Initializing save data to game state');
+    updateCharObjects();
+    updateMaxLevel();
+    updatePartySave();
+    updateUserScreen();
   }
 }
 
 function loadLevel(levelNumber) {
   var saveData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   var userId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var shouldInitWithPresets = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
   if (saveData) {
-    loadSaveData(saveData, userId);
+    loadSaveData(saveData, userId, shouldInitWithPresets);
     return;
   }
 
@@ -3252,6 +3329,10 @@ function addCharXP() {
         Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i16].container);
       }
 
+      if (currentUserId) {
+        updateCharObjects();
+      }
+
       var backgroundImg = document.getElementById('background-image');
       Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
     }
@@ -3319,10 +3400,6 @@ function fadeOutGame(won) {
 }
 
 function resetGame(won) {
-  if (won && currentUserId) {
-    updateGameSaveState();
-  }
-
   livingChars = {};
   livingEnemies = {};
   document.getElementById('level-button-container').style.display = '';
@@ -3340,15 +3417,10 @@ function resetGame(won) {
     }
 
     maxLevelNumber++;
-  }
 
-  if (maxLevelNumber > 8) {
-    document.getElementById('level-button-container').style.display = 'none';
-    document.getElementById('level-button-container-header').style.display = 'none';
-    document.getElementById('first-description-shader').style.display = '';
-    document.getElementById('tutorial-levels-finished-description').style.display = '';
-    document.getElementById('story-container').style.display = '';
-    document.getElementById('party-button').style.display = '';
+    if (currentUserId) {
+      updateMaxLevel();
+    }
   }
 
   var levChars = levels[currentLevelNumber].characterList;
@@ -3364,33 +3436,6 @@ function resetGame(won) {
 
   levelXPGain = 0;
   boxEntities = [];
-}
-
-function createCharSaveObj() {
-  var charsObj = {};
-
-  for (var i = 0; i < characters.length; i++) {
-    charsObj[characters[i].klass] = {};
-    charsObj[characters[i].klass]["level"] = characters[i].level;
-    charsObj[characters[i].klass]["xp"] = characters[i].xp;
-  }
-
-  return charsObj;
-}
-
-function updateGameSaveState() {
-  var userDoc = db.collection('users').doc(currentUserId);
-  var charsObj = createCharSaveObj();
-  console.log('generated chars obj: ', charsObj);
-
-  try {
-    userDoc.update({
-      maxLevelNumber: maxLevelNumber,
-      characters: charsObj
-    });
-  } catch (err) {
-    console.log('Data update failed with error: ', err);
-  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (loadLevel);
@@ -3417,13 +3462,6 @@ window.addEventListener('load', function () {
     return true;
   }
 
-  function updateUserScreen() {
-    var userDoc = db.collection('users').doc(currentUserId);
-    userDoc.update({
-      storyPage: storyPage
-    });
-  }
-
   function setScreen(e) {
     storyElements[storyPage].style.display = 'none'; // console.log(e.currentTarget);
 
@@ -3433,7 +3471,9 @@ window.addEventListener('load', function () {
       storyPage--;
     }
 
-    if (currentUserId) {}
+    if (currentUserId) {
+      updateUserScreen();
+    }
 
     storyElements[storyPage].style.display = '';
 

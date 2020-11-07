@@ -210,7 +210,7 @@ export const levelFour = new Level('Rogue', 4, enemiesArr[3],
     "The newest character addition is the rogue with the daggers. Each character has a unique role. The Warrior is the best tank, the rogue the fastest attacker, the wizard the most versitile damage dealer, and the cleric the healer.",
     tutorialActions, false, [charactersArr[0], charactersArr[1], charactersArr[2], charactersArr[3]]);
 export const levelFive = new Level('Level Five', 5, enemiesArr[4],
-    "The tutorial levels are over. Time for more of a challenge",
+    "",
     actionFive);
 export const levelSix = new Level('Magic', 6, enemiesArr[5], "Wizards and Clerics", actionSix);
 export const levelSeven = new Level('Melee', 7, enemiesArr[6], "All melee", actionSeven);

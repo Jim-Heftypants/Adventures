@@ -6,7 +6,7 @@ let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 1;
-let maxLevelNumber = 1; // change on pushed ver
+let maxLevelNumber = 1;
 const characters = levels[0].characterList.slice();
 let partyIndexes = [0, 1, 2, 3];
 let party = levels[4].characterList.slice();
@@ -169,7 +169,9 @@ window.addEventListener('load', () => {
             characterNameDisplays[partyCharIdx].style.border = '2px solid black';
             partyCharIdx = null;
             partyCharSelected = null;
-            updatePartySave();
+            if (currentUserId) {
+                updatePartySave();
+            }
         })
     }
 
@@ -468,7 +470,7 @@ function initializeGameOpening() {
     deSelectButton.addEventListener('click', deSelect);
 
     const beginLevel = document.getElementById('begin-level-button');
-    beginLevel.addEventListener('click', beginCurrentLevel)
+    beginLevel.addEventListener('click', beginCurrentLevel);
 
     // end click position
     const gameContainer = document.getElementById('game-container');
@@ -505,36 +507,106 @@ function updatePartySave() {
     }
 }
 
-function loadSaveData(saveData, userId) {
+function updateUserScreen() {
+    const userDoc = db.collection('users').doc(currentUserId);
+    userDoc.update({
+        storyPage: storyPage,
+    })
+}
+
+function createCharSaveObj() {
+    const charsObj = {};
+    for (let i = 0; i < characters.length; i++) {
+        charsObj[characters[i].klass] = {};
+        charsObj[characters[i].klass]["level"] = characters[i].level;
+        charsObj[characters[i].klass]["xp"] = characters[i].xp;
+    }
+    return charsObj;
+}
+function updateCharObjects() {
+    const userDoc = db.collection('users').doc(currentUserId);
+    const charsObj = createCharSaveObj();
+    // console.log('generated chars obj: ', charsObj);
     try {
-        currentUserId = userId;
-        console.log('User ID: ', currentUserId);
-        console.log('Loading save data: ', saveData);
-        maxLevelNumber = saveData["maxLevelNumber"];
-        const levelButtons = document.getElementsByClassName('level-button');
-        for (let i = 1; i < maxLevelNumber; i++) {
-            levelButtons[i].style.opacity = 100 + '%';
-            levelButtons[i].style.cursor = 'pointer';
-        }
-        storyPage = saveData["storyPage"];
-        for (let i = 0; i < characters.length; i++) {
-            characters[i].level = saveData["characters"][characters[i].klass]["level"];
-            characters[i].xp = saveData["characters"][characters[i].klass]["xp"];
-            characters[i].setLevel(characters[i].level);
-        }
-        if (saveData["party"].length === 0) {
-            updatePartySave();
-        }
+        userDoc.update({
+            characters: charsObj,
+        })
     } catch (err) {
-        console.log('failed to attach save data to game state with err: ', err);
+        console.log('Char Object update failed with error: ', err);
+    }
+}
+
+function showStoryParts() {
+    document.getElementById('level-button-container').style.display = 'none';
+    document.getElementById('level-button-container-header').style.display = 'none';
+    document.getElementById('story-container').style.display = '';
+    document.getElementById('party-button').style.display = '';
+}
+
+function updateMaxLevel() {
+    if (maxLevelNumber > 8) {
+        showStoryParts();
+        document.getElementById('first-description-shader').style.display = '';
+        document.getElementById('tutorial-levels-finished-description').style.display = '';
+    }
+    try {
+        db.collection('users').doc(currentUserId).update({
+            maxLevelNumber: maxLevelNumber,
+        })
+    } catch (err) {
+        console.log('Failed to update max level: ', err);
+    }
+}
+
+function setPartyByIndexes() {
+    for (let i = 0; i < partyIndexes.length; i++) {
+        party[i] = characters[partyIndexes[i]];
+    }
+    // console.log('party set to: ', party);
+}
+
+function loadSaveData(saveData, userId, shouldInitWithPresets) {
+    currentUserId = userId;
+    // console.log('User ID: ', currentUserId);
+    if (shouldInitWithPresets) {
+        try {
+            // console.log('Merging save data: ', saveData);
+            maxLevelNumber = saveData["maxLevelNumber"];
+            if (maxLevelNumber > 8) {
+                showStoryParts();
+            } else {
+                const levelButtons = document.getElementsByClassName('level-button');
+                for (let i = 1; i < maxLevelNumber; i++) {
+                    levelButtons[i].style.opacity = 100 + '%';
+                    levelButtons[i].style.cursor = 'pointer';
+                }
+            }
+            storyPage = saveData["storyPage"];
+            for (let i = 0; i < characters.length; i++) {
+                characters[i].xp = saveData["characters"][characters[i].klass]["xp"];
+                characters[i].setLevel(saveData["characters"][characters[i].klass]["level"]);
+            }
+            partyIndexes = saveData["party"].slice();
+            setPartyByIndexes();
+        } catch (err) {
+            console.log('failed to attach save data to game state with err: ', err);
+        }
+    } else {
+        // console.log('Initializing save data to game state');
+        updateCharObjects();
+        updateMaxLevel();
+        updatePartySave();
+        updateUserScreen();
     }
 }
 
 
 
-function loadLevel(levelNumber, saveData=null, userId=null) {
+
+
+function loadLevel(levelNumber, saveData=null, userId=null, shouldInitWithPresets=false) {
     if (saveData) {
-        loadSaveData(saveData, userId);
+        loadSaveData(saveData, userId, shouldInitWithPresets);
         return;
     }
     if (!hasBeenLoaded) {
@@ -851,6 +923,9 @@ function addCharXP() {
                 c[i].container.style.border = 'none';
                 fadeOut(c[i].container);
             }
+            if (currentUserId) {
+                updateCharObjects();
+            }
             const backgroundImg = document.getElementById('background-image');
             fadeOut(backgroundImg);
         }
@@ -897,9 +972,6 @@ function fadeOutGame(won) {
 }
 
 function resetGame(won) {
-    if (won && currentUserId) {
-        updateGameSaveState();
-    }
     livingChars = {};
     livingEnemies = {};
     document.getElementById('level-button-container').style.display = '';
@@ -915,14 +987,9 @@ function resetGame(won) {
             levelButtons[maxLevelNumber].style.cursor = 'pointer';
         }
         maxLevelNumber++;
-    }
-    if (maxLevelNumber > 8) {
-        document.getElementById('level-button-container').style.display = 'none';
-        document.getElementById('level-button-container-header').style.display = 'none';
-        document.getElementById('first-description-shader').style.display = '';
-        document.getElementById('tutorial-levels-finished-description').style.display = '';
-        document.getElementById('story-container').style.display = '';
-        document.getElementById('party-button').style.display = '';
+        if (currentUserId) {
+            updateMaxLevel();
+        }
     }
     const levChars = levels[currentLevelNumber].characterList;
     const levEnems = levels[currentLevelNumber].enemyList;
@@ -934,30 +1001,6 @@ function resetGame(won) {
     }
     levelXPGain = 0;
     boxEntities = [];
-}
-
-function createCharSaveObj() {
-    const charsObj = {};
-    for (let i = 0; i < characters.length; i++) {
-        charsObj[characters[i].klass] = {};
-        charsObj[characters[i].klass]["level"] = characters[i].level;
-        charsObj[characters[i].klass]["xp"] = characters[i].xp;
-    }
-    return charsObj;
-}
-
-function updateGameSaveState() {
-    const userDoc = db.collection('users').doc(currentUserId);
-    const charsObj = createCharSaveObj();
-    console.log('generated chars obj: ', charsObj);
-    try {
-        userDoc.update({
-            maxLevelNumber: maxLevelNumber,
-            characters: charsObj,
-        })
-    } catch (err) {
-        console.log('Data update failed with error: ', err);
-    }
 }
 
 export default loadLevel;
@@ -984,13 +1027,6 @@ window.addEventListener('load', () => {
         return true;
     }
 
-    function updateUserScreen() {
-        const userDoc = db.collection('users').doc(currentUserId);
-        userDoc.update({
-            storyPage: storyPage,
-        })
-    }
-
     function setScreen(e) {
         storyElements[storyPage].style.display = 'none';
         // console.log(e.currentTarget);
@@ -1000,7 +1036,7 @@ window.addEventListener('load', () => {
             storyPage--;
         }
         if (currentUserId) {
-
+            updateUserScreen();
         }
         storyElements[storyPage].style.display = '';
         if (prevScreenAvailable()) {
