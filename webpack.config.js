@@ -2,9 +2,9 @@ const path = require('path');
 
 module.exports = {
     context: __dirname,
-    entry: './src/index.js',
+    entry: './loadFiles/src/index.js',
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, './loadFiles/dist'),
         filename: 'main.js'
     },
     module: {

@@ -1,26 +1,8 @@
 {
-  "name": "Adventures",
+  "name": "firebaseAdventurers",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --mode=development --watch"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Jim-Heftypants/Adventures.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Jim-Heftypants/Adventures/issues"
-  },
-  "homepage": "https://github.com/Jim-Heftypants/Adventures#readme",
+  "main": "webpack.config.js",
   "dependencies": {
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
@@ -28,5 +10,12 @@
     "babel-loader": "^8.1.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
-  }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack --mode=development --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

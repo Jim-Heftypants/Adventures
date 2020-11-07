@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' href="./assets/css/css.css">
+    <link rel='shortcut icon' href="./assets/images/favicon.ico" >
+    <title>Adventures</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/8.0.1/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/8.0.1/firebase-auth.js"></script>
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-database.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-firestore.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-functions.js"></script>
+        <script defer src="/__/firebase/8.0.1/firebase-messaging.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-storage.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-analytics.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-remote-config.js"></script>
+        <script defer src="/__/firebase/8.0.1/firebase-performance.js"></script> -->
+    <!-- 
+            initialize the SDK after all desired features are loaded, set useEmulator to false
+            to avoid connecting the SDK to running emulators.
+        -->
+    <!-- <script defer src="/__/firebase/init.js?useEmulator=true"></script> -->
+
+</head>
+<body class="body">
+    <script src="./dist/main.js"></script>
+    <div id='full-container'>
+        <div id='game-container'>
+
+            <img id='background-image' src='./assets/images/Backgrounds/title-screen-background.jpg' alt='background-image'/>
+            <img id='forest' src='./assets/images/Backgrounds/forest.png' style="display: none;" />
+            <img id='snowy' src='./assets/images/Backgrounds/snowy.png' style="display: none;" />
+            <img id='dungeon' src="./assets/images/Backgrounds/dungeon.png" style="display: none;" />
+            <img id='title' src='./assets/images/Backgrounds/title-screen-background.jpg' style="display: none;"/>
+
+            <div id='game-tag-container'>
+                <p id='game-tag'>Adventurers</p>
+            </div>
+
+            <div class="h-buttons" style="display: none;">
+                <h1 class="h-button" id="start-game-button">Play Game</h1>
+                <h1 class='h-button' id='keybindings-button'>Keybindings</h1>
+                <h1 class="h-button" id='heroes-button'>Heroes</h1>
+                <h1 class="h-button" id="party-button" style="display: none;">Party</h1>
+            </div>
+
+            <div id="auth-shader" class="description-shader" style="display: none;"></div>
+            <div id="full-auth-container" style="display: none;">
+                <div id="auth-signedin-container" style="display: none;">
+                    <p id='username-display'></p>
+                </div>
+                <div id="auth-container">
+                    <div id="login-button" class="auth-button">
+                        Login
+                    </div>
+                    <div id="signup-button" class="auth-button">
+                        Signup
+                    </div>
+                    <div id="google-button" class="auth-button">
+                        Google
+                    </div>
+                </div>
+            </div>
+            <form action="" method="post" id="auth-input-container" style="display: none;">
+                <div id="form-name" class="auth-form-element"></div>
+                <div id="username-form" class="auth-form-element">
+                    <label for="uname"><b>Email</b></label>
+                    <input class="auth-form-input" type="text" placeholder="Enter Email" name="uname" required>
+                </div>
+                <div id="password-form" class="auth-form-element">
+                    <label for="psw"><b>Password</b></label>
+                    <input class="auth-form-input" type="password" placeholder="Enter Password" name="psw" required>
+                </div>
+                <button id='auth-form-submit' class="auth-form-element" type="submit">Submit</button>
+            </form>
+
+            <div id="story-container" style="display: none;">
+                <div class="story-pages">
+                    <div class="story-page">
+                        <div class="story-page-element">
+                            The city state of Aarondel was once a peaceful land centered on commerce. 
+                            It borders the Cobalt Ocean to the south, with rivers stemming in all directions from its center.
+                            Aarondel thrived through trade with the forest elves to the west and the dwarves and gnomes in the northern mountains.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            Exiled from the Underdark, a mind-flayer took refuge within the city.
+                            As it grew in strength leeching on the city's populace, people began to disappear.
+                            Soon, King Etheric's wife, Queen Elthamira, went missing.
+                            Etheric used every available resource to search for her.
+                            While searching, the mind-flayer's hideout was discovered.
+                            Etheric sent in his royal guard and, after a desperate battle, the blight was killed.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            Searching the cave revealed the source for the disappearances.
+                            Etheric saw his wife's lifeless body resting along the cave's back wall.
+                            In his despair, he swore to bring her back by any means.
+                            Etheric began researching the forbidden art of necromancy alone.
+                            For months he manically read and re-read every dark tome and scroll in the kingdom.
+                            Aarondel began to decline as he kept himself locked up in the palace study barely pausing even to eat and sleep.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            Finally, he began the ritual to bring back the dead.
+                            Etheric opened a dark gateway in the palace room and summoned Elthamira's spirit through it.
+                            Her spirit returned to her body and after a few moments, she suddenly awoke.
+                            He was indescribably shocked and euphoric as they embraced.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            Though his spell should have ended, the gateway remained open.
+                            Emerging from the abyss, a dark shadow surrounded them.
+                            This evil spirit flew into them and then suddenly disappeared, closing the portal with it.
+                            Wary, the King and Queen looked around to find everything was back to normal.
+                            Months passed.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            They were now finding it hard to shut out the voices in their heads.
+                            The dark spirit, originally just a whisper in the back of their minds, was gaining control over them.
+                            Memories became a blur. Days would pass in a trance. Times became unaccountable.
+                        </div>
+                        <div class="story-page-element">
+                            A year passed.
+                            King Etheric and Queen Elthamira scourged the land they loved, bringing everything they had built to ruin.
+                        </div>
+                    </div>
+                    <div class="story-page" style="display: none;">
+                        <div class="story-page-element">
+                            You represent a legendary band of Adventurers tasked by Etheric himself before his collapse to protect Aarondel
+                            against its greatest threats.
+                            Amongst your ranks are skilled fighters such as Paladins, Rangers, Wizards, and Clerics.
+                            Your choices will influence not only your own party but the very fate of Aarondel and its people.
+                            How will you respond to this evil?
+                        </div>
+                        <div id='open-party-interface' class="story-page-element story-page-button">
+                            Choose Party
+                        </div>
+                    </div>
+                </div>
+
+                <div id="next-page-button" class="arrow-button">
+                    <img src="./assets/images/arrow.jpg" class='arrow-button-image' />
+                </div>
+                <div id="prev-page-button" class="arrow-button" style="display: none;">
+                    <img src="./assets/images/arrow.jpg" class='arrow-button-image' />
+                </div>
+            </div>
+
+            <div id='first-description-shader' class="description-shader" style="display: none;"></div>
+            <div id='levels-screen-description' class="screen-description" style="display: none;">
+                <p>Click on a tutorial level to begin it. Complete all levels to begin the storymode.</p>
+                <p>Click anywhere to close this message.</p>
+            </div>
+            <div id='tutorial-levels-finished-description' class="screen-description" style="display: none;">
+                <p>Congrats you cleared the tutorial levels!</p>
+            </div>
+            <div id='heroes-screen-description' class="screen-description" style="display: none;">
+                <p>Click on a hero's name and then click one of the boxes to see their stats and available abilities.</p>
+                <p>Click anywhere to close this message.</p>
+            </div>
+            <div id='party-screen-description' class="screen-description" style="display: none;">
+                <p>Click on a hero's name from the list on top then click one of the names at the bottom in order to switch them into the party.</p>
+                <p>Click anywhere to close this message.</p>
+            </div>
+
+            <div id='full-keybind-container' style="display: none;">
+                <div id='keybindings-rules'>
+                    <p>Keybinds must be a single character and must not be duplicates of other keybindings.</p>
+                </div>
+                <div id='keybindings-container'>
+                    <div id='ability-keybinds'>
+                        <div class='keybind-div'>
+                            <p>Ability One:&nbsp</p><input type="text" value="q" id='ab1-keybind' class='keybind-input'></input>
+                        </div>
+                        <div class='keybind-div'>
+                            <p>Ability Two:&nbsp</p><input type="text" value="w" id='ab2-keybind' class='keybind-input'></input>
+                        </div>
+                        <div class='keybind-div'>
+                            <p>Ability Three:&nbsp</p><input type="text" value="e" id='ab3-keybind' class='keybind-input'></input>
+                        </div>
+                        <div class='keybind-div'>
+                            <p>Ability Four:&nbsp</p><input type="text" value="r" id='ab4-keybind' class='keybind-input'></input>
+                        </div>
+                    </div>
+                    <div id='ally-keybinds'>
+                        <div class='keybind-div'><p>Hero One:&nbsp</p><input type='text' value="1" id='a1-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Hero Two:&nbsp</p><input type="text" value="2" id='a2-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Hero Three:&nbsp</p><input type="text" value="3" id='a3-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Hero Four:&nbsp</p><input type="text" value="4" id='a4-keybind' class='keybind-input'></input></div>
+                    </div>
+                    <div id='enemy-keybinds'>
+                        <div class='keybind-div'><p>Enemy One:&nbsp</p><input type="text" value="5" id='e1-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Enemy Two:&nbsp</p><input type="text" value="6" id='e2-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Enemy Three:&nbsp</p><input type="text" value="7" id='e3-keybind' class='keybind-input'></input></div>
+                        <div class='keybind-div'><p>Enemy Four:&nbsp</p><input type="text" value="8" id='e4-keybind' class='keybind-input'></input></div>
+                    </div>
+                </div>
+            </div>
+
+            <h1 class='level-name' id='game-over-display' style="display: none;">Defeat</h1>
+            <h1 class="level-name" id='game-won-display' style="display: none;">Victory</h1>
+
+            <h1 id='level-name-display' class="level-name" style="display: none;">Some Filler Text</h1>
+
+            <div id='tutorial-container'>
+                <p style="display: none;" id="tutorial-message"></p>
+            </div>
+            
+            <div id='begin-level-container'>
+                <p id='begin-level-button' style="display: none;">Start Level</p>
+            </div>
+
+            <div id='level-button-container-header' class="level-button-container-header" style="display: none;">
+                Select Tutorial Level
+            </div>
+            <div id='level-button-container' class="level-button-container" style="display: none;">
+                <!-- <button id='level-1-button' class="level-button">Warrior</button>
+                <button id='level-2-button' class="level-button">Cleric</button>
+                <button id='level-3-button' class="level-button">Wizard</button>
+                <button id='level-4-button' class="level-button">Rogue</button>
+                <button id='level-5-button' class="level-button">Test</button>
+                <button id='level-6-button' class="level-button">Magic</button>
+                <button id='level-7-button' class="level-button">Melee</button>
+                <button id='level-8-button' class="level-button">Doppel-ganger</button> -->
+            </div>
+
+            <div id='heroes-stats-full-container' style="display: none;">
+                <div id="heroes-stats-ability-container">
+                    <div id='hero-stats-ability-container-1'>
+                        <div id='stat-ability-1-1' class="stat-ability-div-1" style="display: none;"></div>
+                        <div id='stat-ability-1-2' class="stat-ability-div-1" style="display: none;"></div>
+                        <div id='stat-ability-1-3' class="stat-ability-div-1" style="display: none;"></div>
+                        <div id='stat-ability-1-4' class="stat-ability-div-1" style="display: none;"></div>
+                    </div>
+                    <div id='hero-stats-ability-container-2'>
+                        <div id='stat-ability-2-1' class="stat-ability-div-2" style="display: none;"></div>
+                        <div id='stat-ability-2-2' class="stat-ability-div-2" style="display: none;"></div>
+                        <div id='stat-ability-2-3' class="stat-ability-div-2" style="display: none;"></div>
+                        <div id='stat-ability-2-4' class="stat-ability-div-2" style="display: none;"></div>
+                    </div>
+                </div>
+                <div id='heroes-stats-container'>
+                    <div id='hero-stats-1' class="hero-stats">
+                        <div id='stats-img-div-1' class="stats-img-div">
+                            <img src="" alt="No Character Selected" id='stats-img-1' class="stats-img" style="display: none;" />
+                        </div>
+                        <div id='stats-container-1' class="stats-container">
+                            <p id='stats-name-1' class="hero-stat"></p>
+                            <p id='stats-level-1' class="hero-stat"></p>
+                            <p id='stats-hp-1' class="hero-stat"></p>
+                            <p id='stats-dmg-1' class="hero-stat"></p>
+                            <p id='stats-defense-1' class="hero-stat"></p>
+                        </div>
+                    </div>
+                    <div id='hero-stats-2' class="hero-stats">
+                        <div id='stats-img-div-2' class="stats-img-div">
+                            <img src="" alt="No Character Selected" id='stats-img-2' class="stats-img" style="display: none;" />
+                        </div>
+                        <div id='stats-container-2' class="stats-container">
+                            <p id='stats-name-2' class="hero-stat"></p>
+                            <p id='stats-level-2' class="hero-stat"></p>
+                            <p id='stats-hp-2' class="hero-stat"></p>
+                            <p id='stats-dmg-2' class="hero-stat"></p>
+                            <p id='stats-defense-2' class="hero-stat"></p>
+                        </div>
+                    </div>
+                </div>
+                <div id='stats-selectors'>
+                    <div id='a1-stat-selector' class='stat-selector'><p id='stat-selector-name-1' class="stat-selector-name"></p></div>
+                    <div id='a2-stat-selector' class='stat-selector'><p id='stat-selector-name-2' class="stat-selector-name"></p></div>
+                    <div id='a3-stat-selector' class='stat-selector'><p id='stat-selector-name-3' class="stat-selector-name"></p></div>
+                    <div id='a4-stat-selector' class='stat-selector'><p id='stat-selector-name-4' class="stat-selector-name"></p></div>
+                </div>
+            </div>
+
+            <div id="party-selector-container" style="display: none;">
+                <div id='all-characters-display'>
+                    <div id='character-display-1' class="character-name-dispay"></div>
+                    <div id='character-display-2' class="character-name-dispay"></div>
+                    <div id='character-display-3' class="character-name-dispay"></div>
+                    <div id='character-display-4' class="character-name-dispay"></div>
+                    <div id='character-display-5' class="character-name-dispay"></div>
+                    <div id='character-display-6' class="character-name-dispay"></div>
+                    <div id='character-display-7' class="character-name-dispay"></div>
+                    <div id='character-display-8' class="character-name-dispay"></div>
+                </div>
+                <div id='party-display'>
+                    <div id='a1-party-selector' class='party-selector'>
+                        <p id='party-selector-name-1' class="party-selector-name"></p>
+                    </div>
+                    <div id='a2-party-selector' class='party-selector'>
+                        <p id='party-selector-name-2' class="party-selector-name"></p>
+                    </div>
+                    <div id='a3-party-selector' class='party-selector'>
+                        <p id='party-selector-name-3' class="party-selector-name"></p>
+                    </div>
+                    <div id='a4-party-selector' class='party-selector'>
+                        <p id='party-selector-name-4' class="party-selector-name"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id='ability-description-shader' class="description-shader" style="display: none;"></div>
+            <div id='Warrior-ability-1-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Concussive Blow
+                </h1>
+                <p class="ability-description">
+                    Strike your Target with the pommel of your sword, stunning them for 2 seconds
+                </p>
+                <p class="ability-description">
+                    Deals Ability damage equal to your Power x 1.5
+                </p>
+            </div>
+            <div id='Warrior-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Charge
+                </h1>
+                <p class="ability-description">
+                    Dash at your Target and force them to Target you
+                </p>
+                <p class="ability-description">
+                    
+                </p>
+            </div>
+            <div id='Cleric-ability-1-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Prayer of Healing
+                </h1>
+                <p class="ability-description">
+                    Call upon the god Analor to mend the wounds of all heroes
+                </p>
+                <p class="ability-description">
+                    Heals equal to your Power x 2.0
+                </p>
+            </div>
+            <div id='Cleric-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Protection
+                </h1>
+                <p class="ability-description">
+                    Bless your Target, warding them against incoming damage
+                </p>
+                <p class="ability-description">
+                    Grants a Shield and Armor equal to your Power
+                </p>
+            </div>
+            <div id='Wizard-ability-1-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Fire Bomb
+                </h1>
+                <p class="ability-description">
+                    Conjure a powerful orb of fire and launch it at your Target which explodes damaing all enemies in the area
+                </p>
+                <p class="ability-description">
+                    Deals Ability damage equal to your Power x 1.5
+                </p>
+            </div>
+            <div id='Wizard-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Freeze
+                </h1>
+                <p class="ability-description">
+                    Launch blasts of frost at all Enemies, binding their feet
+                </p>
+                <p class="ability-description">
+                    Root all Enemies for 2 seconds then Slow them for 4 seconds
+                </p>
+            </div>
+            <div id='Rogue-ability-1-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Poison Shiv
+                </h1>
+                <p class="ability-description">
+                    Stab your Target with a poisoned dagger inflicting damage over time and Slowing them by 50%
+                </p>
+                <p class="ability-description">
+                    Deals Ability damage equal to your Power x 3.0 over 3 seconds
+                </p>
+            </div>
+            <div id='Rogue-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Backstab
+                </h1>
+                <p class="ability-description">
+                    Attempt to gouge your Target's back, dealing increased damage if used behind them
+                </p>
+                <p class="ability-description">
+                    Deals Ability damage equal to your Power x 2.0 or Power x 6.0
+                </p>
+            </div>
+            <div id='Paladin-ability-1-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Word of Healing
+                </h1>
+                <p class="ability-description">
+                    Bless the most wounded party member and mend their wounds
+                </p>
+                <p class="ability-description">
+                    Heals equal to your Power x 2.5
+                </p>
+            </div>
+            <div id='Paladin-ability-2-description-div' class="ability-description-div" style="display: none;">
+                <h1 class="ability-description-title">
+                    Holy Sword
+                </h1>
+                <p class="ability-description">
+                    Embue your sword with light dealing additional holy damage with every hit
+                </p>
+                <p class="ability-description">
+                    Your attacks bounce to hit additional enemies
+                </p>
+            </div>
+
+            <a href="#" id='close-button' class="close" style="display: none;"></a>
+            <a href="#" id="return-button" style="display: none;">Select Screen</a>
+            <p id='test' style="display: none;"></p>
+
+            <p id='a1-level-up' class="level-up" style="display: none;">Level Up!</p>
+            <p id='a2-level-up' class="level-up" style="display: none;">Level Up!</p>
+            <p id='a3-level-up' class="level-up" style="display: none;">Level Up!</p>
+            <p id='a4-level-up' class="level-up" style="display: none;">Level Up!</p>
+
+            <div id='firebomb-div' class="projectile" style="display: none;">
+                <!-- <img src='' alt='fireblast' id='fireblast-img'> -->
+            </div>
+            <div id='title-screen-chars' style="display: none;">
+                <div id='title-screen-chars-left' class="title-screen-chars-inner">
+                    <img src="./assets/images/Rogue/Rogue.png" id='rogue-base-img' class="title-screen-char" />
+                    <img src="./assets/images/Wizard/Wizard.png" id='wizard-base-img' class="title-screen-char" />
+                </div>
+                <div id='title-screen-chars-right' class="title-screen-chars-inner">
+                    <img src="./assets/images/Cleric/Cleric.png" id='cleric-base-img' class="title-screen-char"  />
+                    <img src="./assets/images/Warrior/Warrior.png" id='warrior-base-img' class="title-screen-char" />
+                </div>
+            </div>
+
+            <img src="./assets/images/Wizard/Wizard.png" alt="Wizard" class="Wizard" style="display: none;" />
+            <img src="assets/images/Wizard/Wizard-attack-1.png" alt="Wizard" class="Wizard" style="display: none;" />
+            <img src="assets/images/Wizard/Wizard-attack-2.png" alt="Wizard" class="Wizard" style="display: none;" />
+            <img src="assets/images/Wizard/Wizard-attack-3.png" alt="Wizard" class="Wizard" style="display: none;" />
+            
+            <img src="./assets/images/Rogue/Rogue.png" alt="Rogue" class="Rogue" style="display: none;"/>
+            <img src="./assets/images/Rogue/Rogue-attack-1.png" alt="Rogue" class="Rogue" style="display: none;" />
+            <img src="./assets/images/Rogue/Rogue-attack-2.png" alt="Rogue" class="Rogue" style="display: none;" />
+            <img src="./assets/images/Rogue/Rogue-attack-3.png" alt="Rogue" class="Rogue" style="display: none;" />
+
+            <img src="./assets/images/Warrior/Warrior.png" alt="Warrior" class="Warrior" style="display: none;" />
+            <img src="./assets/images/Warrior/Warrior-attack-1.png" alt="Warrior" class="Warrior" style="display: none;" />
+            <img src="./assets/images/Warrior/Warrior-attack-2.png" alt="Warrior" class="Warrior" style="display: none;" />
+            <img src="./assets/images/Warrior/Warrior-attack-3.png" alt="Warrior" class="Warrior" style="display: none;" />
+            
+            <img src="./assets/images/Cleric/Cleric.png" alt="Cleric" class="Cleric" style="display: none;" />
+            <img src="./assets/images/Cleric/Cleric-attack-1.png" alt="Cleric" class="Cleric" style="display: none;" />
+            <img src="./assets/images/Cleric/Cleric-attack-2.png" alt="Cleric" class="Cleric" style="display: none;" />
+            <img src="./assets/images/Cleric/Cleric-attack-3.png" alt="Cleric" class="Cleric" style="display: none;" />
+            
+            <img src="./assets/images/Paladin/Paladin.png" alt="Paladin" class="Paladin" style="display: none;" />
+            <img src="./assets/images/Paladin/Paladin-attack-1.png" alt="Paladin" class="Paladin" style="display: none;" />
+            <img src="./assets/images/Paladin/Paladin-attack-2.png" alt="Paladin" class="Paladin" style="display: none;" />
+            <img src="./assets/images/Paladin/Paladin-attack-3.png" alt="Paladin" class="Paladin" style="display: none;" />
+
+            <img src="./assets/images/EWizard/Wizard.png" alt="Wizard" class="EWizard" style="display: none;" />
+            <img src="assets/images/EWizard/Wizard-attack-1.png" alt="Wizard" class="EWizard" style="display: none;" />
+            <img src="assets/images/EWizard/Wizard-attack-2.png" alt="Wizard" class="EWizard" style="display: none;" />
+            <img src="assets/images/EWizard/Wizard-attack-3.png" alt="Wizard" class="EWizard" style="display: none;" />
+            
+            <img src="./assets/images/ERogue/Rogue.png" alt="Rogue" class="ERogue" style="display: none;" />
+            <img src="./assets/images/ERogue/Rogue-attack-1.png" alt="Rogue" class="ERogue" style="display: none;" />
+            <img src="./assets/images/ERogue/Rogue-attack-2.png" alt="Rogue" class="ERogue" style="display: none;" />
+            <img src="./assets/images/ERogue/Rogue-attack-3.png" alt="Rogue" class="ERogue" style="display: none;" />
+            
+            <img src="./assets/images/EWarrior/Warrior.png" alt="Warrior" class="EWarrior" style="display: none;" />
+            <img src="./assets/images/EWarrior/Warrior-attack-1.png" alt="Warrior" class="EWarrior" style="display: none;" />
+            <img src="./assets/images/EWarrior/Warrior-attack-2.png" alt="Warrior" class="EWarrior" style="display: none;" />
+            <img src="./assets/images/EWarrior/Warrior-attack-3.png" alt="Warrior" class="EWarrior" style="display: none;" />
+            
+            <img src="./assets/images/ECleric/Cleric.png" alt="Cleric" class="ECleric" style="display: none;" />
+            <img src="./assets/images/ECleric/Cleric-attack-1.png" alt="Cleric" class="ECleric" style="display: none;" />
+            <img src="./assets/images/ECleric/Cleric-attack-2.png" alt="Cleric" class="ECleric" style="display: none;" />
+            <img src="./assets/images/ECleric/Cleric-attack-3.png" alt="Cleric" class="ECleric" style="display: none;" />
+
+            <img src="./assets/images/EPaladin/Paladin.png" alt="Paladin" class="EPaladin" style="display: none;" />
+            <img src="./assets/images/EPaladin/Paladin-attack-1.png" alt="Paladin" class="EPaladin" style="display: none;" />
+            <img src="./assets/images/EPaladin/Paladin-attack-2.png" alt="Paladin" class="EPaladin" style="display: none;" />
+            <img src="./assets/images/EPaladin/Paladin-attack-3.png" alt="Paladin" class="EPaladin" style="display: none;" />
+            
+        </div>
+        <div id='all-characters-ability-container'>
+            <div id='a1-ability-full-container' class="ability-full-container" style="display: none;">
+                <h1 id='a1-class-name' class="class-names"></h1>
+                <div id='a1-ability-container' class="ability-container">
+                    <div id='a1-ability-1-box' class="a1-ability-boxes"><p id='a1-ability-1-label' class='a1-ability-labels'>1</p></div>
+                    <div id='a1-inner-ability-1' class="a1-inner-ability-divs"></div>
+                    <div id='a1-ability-2-box' class="a1-ability-boxes"><p id='a1-ability-2-label' class='a1-ability-labels'>2</p></div>
+                    <div id='a1-inner-ability-2' class="a1-inner-ability-divs"></div>
+                    <div id='a1-ability-3-box' class="a1-ability-boxes"><p id='a1-ability-3-label' class='a1-ability-labels'>3</p></div>
+                    <div id='a1-inner-ability-3' class="a1-inner-ability-divs"></div>
+                    <div id='a1-ability-4-box' class="a1-ability-boxes"><p id='a1-ability-4-label' class='a1-ability-labels'>4</p></div>
+                    <div id='a1-inner-ability-4' class="a1-inner-ability-divs"></div>
+                </div>
+            </div>
+            <div id='a2-ability-full-container' class="ability-full-container" style="display: none;">
+                <h1 id='a2-class-name' class="class-names"></h1>
+                <div id='a2-ability-container' class="ability-container">
+                    <div id='a2-ability-1-box' class="a2-ability-boxes"><p id='a2-ability-1-label' class='a2-ability-labels'>1</p></div>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                    <div id='a2-ability-2-box' class="a2-ability-boxes"><p id='a2-ability-2-label' class='a2-ability-labels'>2</p></div>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                    <div id='a2-ability-3-box' class="a2-ability-boxes"><p id='a2-ability-3-label' class='a2-ability-labels'>3</p></div>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                    <div id='a2-ability-4-box' class="a2-ability-boxes"><p id='a2-ability-4-label' class='a2-ability-labels'>4</p></div>
+                    <div id='a2-inner-ability' class="a2-inner-ability-divs"></div>
+                </div>
+            </div>
+            <div id='a3-ability-full-container' class="ability-full-container" style="display: none;">
+                <h1 id='a3-class-name' class="class-names"></h1>
+                <div id='a3-ability-container' class="ability-container">
+                    <div id='a3-ability-1-box' class="a3-ability-boxes"><p id='a3-ability-1-label' class='a3-ability-labels'>1</p></div>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                    <div id='a3-ability-2-box' class="a3-ability-boxes"><p id='a3-ability-2-label' class='a3-ability-labels'>2</p></div>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                    <div id='a3-ability-3-box' class="a3-ability-boxes"><p id='a3-ability-3-label' class='a3-ability-labels'>3</p></div>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                    <div id='a3-ability-4-box' class="a3-ability-boxes"><p id='a3-ability-4-label' class='a3-ability-labels'>4</p></div>
+                    <div id='a3-inner-ability' class="a3-inner-ability-divs"></div>
+                </div>
+            </div>
+            <div id='a4-ability-full-container' class="ability-full-container" style="display: none;">
+                <h1 id='a4-class-name' class="class-names"></h1>
+                <div id='a4-ability-container' class="ability-container">
+                    <div id='a4-ability-1-box' class="a4-ability-boxes"><p id='a4-ability-1-label' class='a4-ability-labels'>1</p></div>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                    <div id='a4-ability-2-box' class="a4-ability-boxes"><p id='a4-ability-2-label' class='a4-ability-labels'>2</p></div>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                    <div id='a4-ability-3-box' class="a4-ability-boxes"><p id='a4-ability-3-label' class='a4-ability-labels'>3</p></div>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                    <div id='a4-ability-4-box' class="a4-ability-boxes"><p id='a4-ability-4-label' class='a4-ability-labels'>4</p></div>
+                    <div id='a4-inner-ability' class="a4-inner-ability-divs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a class='links' id='github' rel='hub' target='_blank' href='https://github.com/Jim-Heftypants/Adventures' >Github</a>
+    <a class='links' id='linkedin' rel='in' target='_blank' href='https://www.linkedin.com/in/nick-sercel-4402261a0/' >LinkedIn</a>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/8.0.1/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/8.0.1/firebase-auth.js"></script>
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-database.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-firestore.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-functions.js"></script>
+        <script defer src="/__/firebase/8.0.1/firebase-messaging.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-storage.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-analytics.js"></script> -->
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-remote-config.js"></script>
+        <script defer src="/__/firebase/8.0.1/firebase-performance.js"></script> -->
+    <!-- 
+          initialize the SDK after all desired features are loaded, set useEmulator to false
+          to avoid connecting the SDK to running emulators.
+        -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+</body>
+</html>
