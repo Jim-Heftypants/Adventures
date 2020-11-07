@@ -22,8 +22,8 @@ class Entity { // this. is selectedChar
         this.defense = this.baseDefense;
         this.level = 1;
         if (this.allied) {
-            this.xp = 0;
             this.nextLevelXP = 100;
+            this.xp = 0;
         }
 
         this.allAbilities = abilities;
@@ -150,34 +150,23 @@ class Entity { // this. is selectedChar
         // console.log(this.baseDMG);
         // console.log(this.level);
         if (this.allied) {
+            this.nextLevelXP = Math.ceil(this.nextLevelXP + (this.nextLevelXP * 0.1) * level);
+            // this.nextLevelXP += (this.nextLevelXP * 0.1);
+            if (this.level > 15) {
+                this.abilities = this.allAbilities;
+            } else if (this.level > 11) {
+                this.abilities = [this.allAbilities[0], this.allAbilities[1], this.allAbilities[2]];
+            } else if (this.level > 7) {
+                this.abilities = [this.allAbilities[0], this.allAbilities[1]];
+            } else if (this.level > 3) {
+                this.abilities = [this.allAbilities[0]];
+            }
+        }
+        if (this.allied && this.imgName) {
+            this.xp -= this.nextLevelXP;
             const levelUpDisp = document.getElementById(this.imgName + '-level-up');
-            // console.log('levelUpDisp: ', levelUpDisp);
             levelUpDisp.style.display = '';
             fastFadeOut(levelUpDisp);
-            this.xp -= this.nextLevelXP;
-            this.nextLevelXP += (this.nextLevelXP * 0.1);
-            switch (this.level) {
-                case (4):
-                    if (this.allAbilities[0]) {
-                        this.abilities.push(this.allAbilities[0]);
-                    }
-                    break;
-                case (8):
-                    if (this.allAbilities[1]) {
-                        this.abilities.push(this.allAbilities[1]);
-                    }
-                    break;
-                case (12):
-                    if (this.allAbilities[2]) {
-                        this.abilities.push(this.allAbilities[2]);
-                    }
-                    break;
-                case (16):
-                    if (this.allAbilities[3]) {
-                        this.abilities.push(this.allAbilities[3]);
-                    }
-                    break;
-            }
         }
     }
 

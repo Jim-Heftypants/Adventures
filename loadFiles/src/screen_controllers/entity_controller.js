@@ -6,8 +6,9 @@ let levelHasEnded = false;
 
 const levels = Object.values(levelsObj);
 let currentLevelNumber = 1;
-let maxLevelNumber = 10; // change on pushed ver
+let maxLevelNumber = 1; // change on pushed ver
 const characters = levels[0].characterList.slice();
+let partyIndexes = [0, 1, 2, 3];
 let party = levels[4].characterList.slice();
 
 let levelXPGain = 0;
@@ -26,7 +27,11 @@ let hotkeys = {};
 
 let storyPage = 0;
 
+let db;
+let currentUserId;
+
 window.addEventListener('load', () => {
+    db = firebase.firestore();
     let statChar1;
     let statChar2;
     let currentShowingAbilityDescription;
@@ -148,6 +153,7 @@ window.addEventListener('load', () => {
             partySelectorNames[i].style.border = 'none';
             for (let j = 0; j < party.length; j++) {
                 if (party[j].klass === partyCharSelected.klass) {
+                    partyIndexes[j] = partyIndexes[i];
                     party[j] = party[i];
                     partySelectorNames[j].innerHTML = party[j].klass;
                     party[j].imgName = 'a' + (j+1);
@@ -156,12 +162,14 @@ window.addEventListener('load', () => {
                 }
             }
             partySelectorNames[i].innerHTML = partyCharSelected.klass;
+            partyIndexes[i] = partyCharIdx;
             party[i] = partyCharSelected;
             party[i].imgName = 'a' + (i+1);
             // party[i].addInlineStyle();
             characterNameDisplays[partyCharIdx].style.border = '2px solid black';
             partyCharIdx = null;
             partyCharSelected = null;
+            updatePartySave();
         })
     }
 
@@ -487,9 +495,48 @@ function initializeGameOpening() {
     hasBeenLoaded = true;
 }
 
+function updatePartySave() {
+    try {
+        db.collection('users').doc(currentUserId).update({
+            party: partyIndexes,
+        })
+    } catch (err) {
+        console.log('Failed to update party save: ', err);
+    }
+}
+
+function loadSaveData(saveData, userId) {
+    try {
+        currentUserId = userId;
+        console.log('User ID: ', currentUserId);
+        console.log('Loading save data: ', saveData);
+        maxLevelNumber = saveData["maxLevelNumber"];
+        const levelButtons = document.getElementsByClassName('level-button');
+        for (let i = 1; i < maxLevelNumber; i++) {
+            levelButtons[i].style.opacity = 100 + '%';
+            levelButtons[i].style.cursor = 'pointer';
+        }
+        storyPage = saveData["storyPage"];
+        for (let i = 0; i < characters.length; i++) {
+            characters[i].level = saveData["characters"][characters[i].klass]["level"];
+            characters[i].xp = saveData["characters"][characters[i].klass]["xp"];
+            characters[i].setLevel(characters[i].level);
+        }
+        if (saveData["party"].length === 0) {
+            updatePartySave();
+        }
+    } catch (err) {
+        console.log('failed to attach save data to game state with err: ', err);
+    }
+}
 
 
-function loadLevel(levelNumber) {
+
+function loadLevel(levelNumber, saveData=null, userId=null) {
+    if (saveData) {
+        loadSaveData(saveData, userId);
+        return;
+    }
     if (!hasBeenLoaded) {
         initializeGameOpening();
     }
@@ -850,6 +897,9 @@ function fadeOutGame(won) {
 }
 
 function resetGame(won) {
+    if (won && currentUserId) {
+        updateGameSaveState();
+    }
     livingChars = {};
     livingEnemies = {};
     document.getElementById('level-button-container').style.display = '';
@@ -886,6 +936,30 @@ function resetGame(won) {
     boxEntities = [];
 }
 
+function createCharSaveObj() {
+    const charsObj = {};
+    for (let i = 0; i < characters.length; i++) {
+        charsObj[characters[i].klass] = {};
+        charsObj[characters[i].klass]["level"] = characters[i].level;
+        charsObj[characters[i].klass]["xp"] = characters[i].xp;
+    }
+    return charsObj;
+}
+
+function updateGameSaveState() {
+    const userDoc = db.collection('users').doc(currentUserId);
+    const charsObj = createCharSaveObj();
+    console.log('generated chars obj: ', charsObj);
+    try {
+        userDoc.update({
+            maxLevelNumber: maxLevelNumber,
+            characters: charsObj,
+        })
+    } catch (err) {
+        console.log('Data update failed with error: ', err);
+    }
+}
+
 export default loadLevel;
 
 window.addEventListener('load', () => {
@@ -910,6 +984,13 @@ window.addEventListener('load', () => {
         return true;
     }
 
+    function updateUserScreen() {
+        const userDoc = db.collection('users').doc(currentUserId);
+        userDoc.update({
+            storyPage: storyPage,
+        })
+    }
+
     function setScreen(e) {
         storyElements[storyPage].style.display = 'none';
         // console.log(e.currentTarget);
@@ -917,6 +998,9 @@ window.addEventListener('load', () => {
             storyPage++;
         } else {
             storyPage--;
+        }
+        if (currentUserId) {
+
         }
         storyElements[storyPage].style.display = '';
         if (prevScreenAvailable()) {

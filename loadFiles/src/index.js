@@ -1,9 +1,12 @@
 import loadLevel from './screen_controllers/entity_controller';
 
 let app;
+let db;
+let saveData;
 document.addEventListener('DOMContentLoaded', (event) => {
     app = firebase.app();
-    console.log(app);
+    // console.log(app);
+    db = firebase.firestore();
 })
 
 
@@ -13,7 +16,7 @@ function slowFade(element, action = null) { let op = 80; let timerDown = setInte
 window.addEventListener('load', () => {
     let dispLevelsScreenMessage = true;
     let dispHeroesScreenMessage = true;
-    let dispPartyScreenMessage = true;
+    // let dispPartyScreenMessage = true;
 
     const gameTag = document.getElementById('game-tag');
     gameTag.style.opacity = 0;
@@ -44,7 +47,7 @@ window.addEventListener('load', () => {
     const authInputs = document.getElementsByClassName('auth-form-input');
     const signedInDisplay = document.getElementById('auth-signedin-container');
 
-    let signedIn = false;
+    let currentUserId = null;
 
     document.getElementById('google-button').addEventListener('click', () => {
         const provider = new firebase.auth.GoogleAuthProvider();
@@ -56,9 +59,86 @@ window.addEventListener('load', () => {
                 authShader.style.display = 'none';
                 document.getElementById('username-display').innerHTML = user.displayName;
                 signedInDisplay.style.display = '';
-                console.log(user);
+                currentUserId = user.uid;
+                const userDoc = db.collection('users').doc(currentUserId);
+                userDoc.get()
+                    .then(object => {
+                        const data = object.data();
+                        if (data.name) {
+                            console.log('Save history found!');
+                            saveData = data;
+                            console.log("Save Data: ", saveData);
+                            loadLevel(null, saveData, currentUserId);
+                        } else {
+                            console.log('No save data found -- creating new save');
+                            userDoc.set({
+                                name: user.displayName,
+                                characters: {
+                                    "Warrior": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    },
+                                    "Cleric": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    },
+                                    "Wizard": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    },
+                                    "Rogue": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    },
+                                    "Paladin": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    },
+                                    "Berserker": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    },
+                                    "Bard": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    },
+                                    "Ranger": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    },
+                                    "Warlock": {
+                                        "level": 1,
+                                        "xp": 0,
+                                    }
+                                },
+                                party: [],
+                                maxLevelNumber: 1,
+                                storyPage: 0
+                            })
+                                .then(function() {
+                                    saveData = data;
+                                    console.log("Document successfully written!");
+                                    userDoc.get()
+                                        .then(object => {
+                                            const data = object.data();
+                                            if (data.name) {
+                                                console.log('Save history found!');
+                                                saveData = data;
+                                                console.log("Save Data: ", saveData);
+                                                loadLevel(null, saveData, currentUserId);
+                                            }
+                                        })
+                                })
+                                .catch(function (error) {
+                                    console.error("Error finding document: ", error);
+                                });
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
             })
-            .catch(console.log)
+            .catch(err => {console.log(err)})
     })
 
     authSubmitButton.addEventListener('click', (e) => {
@@ -163,7 +243,7 @@ window.addEventListener('load', () => {
                 gameContainer.style.height = '88%';
                 document.getElementById('background-image').style.height = gameContainer.offsetHeight + 'px';
                 document.getElementById('all-characters-ability-container').style.height = '12%';
-                loadLevel(i+1); 
+                loadLevel(i+1);
             })
         }
         levelButtons[0].style.opacity = 100;

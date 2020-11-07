@@ -850,8 +850,8 @@ var Entity = /*#__PURE__*/function () {
     this.level = 1;
 
     if (this.allied) {
-      this.xp = 0;
       this.nextLevelXP = 100;
+      this.xp = 0;
     }
 
     this.allAbilities = abilities;
@@ -987,42 +987,24 @@ var Entity = /*#__PURE__*/function () {
       // console.log(this.level);
 
       if (this.allied) {
-        var levelUpDisp = document.getElementById(this.imgName + '-level-up'); // console.log('levelUpDisp: ', levelUpDisp);
+        this.nextLevelXP = Math.ceil(this.nextLevelXP + this.nextLevelXP * 0.1 * level); // this.nextLevelXP += (this.nextLevelXP * 0.1);
 
+        if (this.level > 15) {
+          this.abilities = this.allAbilities;
+        } else if (this.level > 11) {
+          this.abilities = [this.allAbilities[0], this.allAbilities[1], this.allAbilities[2]];
+        } else if (this.level > 7) {
+          this.abilities = [this.allAbilities[0], this.allAbilities[1]];
+        } else if (this.level > 3) {
+          this.abilities = [this.allAbilities[0]];
+        }
+      }
+
+      if (this.allied && this.imgName) {
+        this.xp -= this.nextLevelXP;
+        var levelUpDisp = document.getElementById(this.imgName + '-level-up');
         levelUpDisp.style.display = '';
         fastFadeOut(levelUpDisp);
-        this.xp -= this.nextLevelXP;
-        this.nextLevelXP += this.nextLevelXP * 0.1;
-
-        switch (this.level) {
-          case 4:
-            if (this.allAbilities[0]) {
-              this.abilities.push(this.allAbilities[0]);
-            }
-
-            break;
-
-          case 8:
-            if (this.allAbilities[1]) {
-              this.abilities.push(this.allAbilities[1]);
-            }
-
-            break;
-
-          case 12:
-            if (this.allAbilities[2]) {
-              this.abilities.push(this.allAbilities[2]);
-            }
-
-            break;
-
-          case 16:
-            if (this.allAbilities[3]) {
-              this.abilities.push(this.allAbilities[3]);
-            }
-
-            break;
-        }
       }
     }
   }, {
@@ -1675,9 +1657,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./screen_controllers/entity_controller */ "./loadFiles/src/screen_controllers/entity_controller.js");
 
 var app;
+var db;
+var saveData;
 document.addEventListener('DOMContentLoaded', function (event) {
-  app = firebase.app();
-  console.log(app);
+  app = firebase.app(); // console.log(app);
+
+  db = firebase.firestore();
 });
 
 function slowFade(element) {
@@ -1700,8 +1685,8 @@ function slowFade(element) {
 
 window.addEventListener('load', function () {
   var dispLevelsScreenMessage = true;
-  var dispHeroesScreenMessage = true;
-  var dispPartyScreenMessage = true;
+  var dispHeroesScreenMessage = true; // let dispPartyScreenMessage = true;
+
   var gameTag = document.getElementById('game-tag');
   gameTag.style.opacity = 0;
   gameTag.style.display = '';
@@ -1728,7 +1713,7 @@ window.addEventListener('load', function () {
   var authSubmitButton = document.getElementById('auth-form-submit');
   var authInputs = document.getElementsByClassName('auth-form-input');
   var signedInDisplay = document.getElementById('auth-signedin-container');
-  var signedIn = false;
+  var currentUserId = null;
   document.getElementById('google-button').addEventListener('click', function () {
     var provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider).then(function (result) {
@@ -1738,8 +1723,84 @@ window.addEventListener('load', function () {
       authShader.style.display = 'none';
       document.getElementById('username-display').innerHTML = user.displayName;
       signedInDisplay.style.display = '';
-      console.log(user);
-    })["catch"](console.log);
+      currentUserId = user.uid;
+      var userDoc = db.collection('users').doc(currentUserId);
+      userDoc.get().then(function (object) {
+        var data = object.data();
+
+        if (data.name) {
+          console.log('Save history found!');
+          saveData = data;
+          console.log("Save Data: ", saveData);
+          Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, saveData, currentUserId);
+        } else {
+          console.log('No save data found -- creating new save');
+          userDoc.set({
+            name: user.displayName,
+            characters: {
+              "Warrior": {
+                "level": 1,
+                "xp": 0
+              },
+              "Cleric": {
+                "level": 1,
+                "xp": 0
+              },
+              "Wizard": {
+                "level": 1,
+                "xp": 0
+              },
+              "Rogue": {
+                "level": 1,
+                "xp": 0
+              },
+              "Paladin": {
+                "level": 1,
+                "xp": 0
+              },
+              "Berserker": {
+                "level": 1,
+                "xp": 0
+              },
+              "Bard": {
+                "level": 1,
+                "xp": 0
+              },
+              "Ranger": {
+                "level": 1,
+                "xp": 0
+              },
+              "Warlock": {
+                "level": 1,
+                "xp": 0
+              }
+            },
+            party: [],
+            maxLevelNumber: 1,
+            storyPage: 0
+          }).then(function () {
+            saveData = data;
+            console.log("Document successfully written!");
+            userDoc.get().then(function (object) {
+              var data = object.data();
+
+              if (data.name) {
+                console.log('Save history found!');
+                saveData = data;
+                console.log("Save Data: ", saveData);
+                Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, saveData, currentUserId);
+              }
+            });
+          })["catch"](function (error) {
+            console.error("Error finding document: ", error);
+          });
+        }
+      })["catch"](function (err) {
+        console.log(err);
+      });
+    })["catch"](function (err) {
+      console.log(err);
+    });
   });
   authSubmitButton.addEventListener('click', function (e) {
     e.preventDefault();
@@ -2179,9 +2240,10 @@ var hasBeenLoaded = false;
 var levelHasEnded = false;
 var levels = Object.values(_levels_level__WEBPACK_IMPORTED_MODULE_0__);
 var currentLevelNumber = 1;
-var maxLevelNumber = 10; // change on pushed ver
+var maxLevelNumber = 1; // change on pushed ver
 
 var characters = levels[0].characterList.slice();
+var partyIndexes = [0, 1, 2, 3];
 var party = levels[4].characterList.slice();
 var levelXPGain = 0;
 var selectedChar;
@@ -2192,7 +2254,10 @@ var livingChars = {};
 var currentAbilityBoxes;
 var hotkeys = {};
 var storyPage = 0;
+var db;
+var currentUserId;
 window.addEventListener('load', function () {
+  db = firebase.firestore();
   var statChar1;
   var statChar2;
   var currentShowingAbilityDescription;
@@ -2361,6 +2426,7 @@ window.addEventListener('load', function () {
 
       for (var _j3 = 0; _j3 < party.length; _j3++) {
         if (party[_j3].klass === partyCharSelected.klass) {
+          partyIndexes[_j3] = partyIndexes[_i7];
           party[_j3] = party[_i7];
           partySelectorNames[_j3].innerHTML = party[_j3].klass;
           party[_j3].imgName = 'a' + (_j3 + 1); // party[j].addInlineStyle();
@@ -2369,12 +2435,14 @@ window.addEventListener('load', function () {
       }
 
       partySelectorNames[_i7].innerHTML = partyCharSelected.klass;
+      partyIndexes[_i7] = partyCharIdx;
       party[_i7] = partyCharSelected;
       party[_i7].imgName = 'a' + (_i7 + 1); // party[i].addInlineStyle();
 
       characterNameDisplays[partyCharIdx].style.border = '2px solid black';
       partyCharIdx = null;
       partyCharSelected = null;
+      updatePartySave();
     });
   };
 
@@ -2757,7 +2825,55 @@ function initializeGameOpening() {
   hasBeenLoaded = true;
 }
 
+function updatePartySave() {
+  try {
+    db.collection('users').doc(currentUserId).update({
+      party: partyIndexes
+    });
+  } catch (err) {
+    console.log('Failed to update party save: ', err);
+  }
+}
+
+function loadSaveData(saveData, userId) {
+  try {
+    currentUserId = userId;
+    console.log('User ID: ', currentUserId);
+    console.log('Loading save data: ', saveData);
+    maxLevelNumber = saveData["maxLevelNumber"];
+    var levelButtons = document.getElementsByClassName('level-button');
+
+    for (var i = 1; i < maxLevelNumber; i++) {
+      levelButtons[i].style.opacity = 100 + '%';
+      levelButtons[i].style.cursor = 'pointer';
+    }
+
+    storyPage = saveData["storyPage"];
+
+    for (var _i10 = 0; _i10 < characters.length; _i10++) {
+      characters[_i10].level = saveData["characters"][characters[_i10].klass]["level"];
+      characters[_i10].xp = saveData["characters"][characters[_i10].klass]["xp"];
+
+      characters[_i10].setLevel(characters[_i10].level);
+    }
+
+    if (saveData["party"].length === 0) {
+      updatePartySave();
+    }
+  } catch (err) {
+    console.log('failed to attach save data to game state with err: ', err);
+  }
+}
+
 function loadLevel(levelNumber) {
+  var saveData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var userId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  if (saveData) {
+    loadSaveData(saveData, userId);
+    return;
+  }
+
   if (!hasBeenLoaded) {
     initializeGameOpening();
   }
@@ -2998,13 +3114,13 @@ function loadInCharacters(charactersArr, enemiesArr, levelNumber) {
   reZeroStats(charactersArr);
   reZeroStats(enemiesArr);
 
-  for (var _i10 = 0; _i10 < charactersArr.length; _i10++) {
-    loadInEntity(charactersArr[_i10], _i10 + 1, charactersArr, enemiesArr);
+  for (var _i11 = 0; _i11 < charactersArr.length; _i11++) {
+    loadInEntity(charactersArr[_i11], _i11 + 1, charactersArr, enemiesArr);
   } // console.log(enemiesArr);
 
 
-  for (var _i11 = 0; _i11 < enemiesArr.length; _i11++) {
-    loadInEntity(enemiesArr[_i11], _i11 + 1, enemiesArr, charactersArr);
+  for (var _i12 = 0; _i12 < enemiesArr.length; _i12++) {
+    loadInEntity(enemiesArr[_i12], _i12 + 1, enemiesArr, charactersArr);
   } // console.log("hotkeys: ", hotkeys);
 
 }
@@ -3039,26 +3155,26 @@ function endGame(charsList, enemyList) {
   var allCharsList = levels[currentLevelNumber].characterList;
   var allEnemyList = levels[currentLevelNumber].enemyList;
 
-  for (var _i12 = 0; _i12 < allCharsList.length; _i12++) {
-    allCharsList[_i12].observer.disconnect();
+  for (var _i13 = 0; _i13 < allCharsList.length; _i13++) {
+    allCharsList[_i13].observer.disconnect();
 
-    clearInterval(allCharsList[_i12].currentAction);
-    clearInterval(allCharsList[_i12].currentAnimation);
+    clearInterval(allCharsList[_i13].currentAction);
+    clearInterval(allCharsList[_i13].currentAnimation);
 
-    allCharsList[_i12].container.removeEventListener('click', clickEvents);
+    allCharsList[_i13].container.removeEventListener('click', clickEvents);
 
-    allCharsList[_i12].img.src = allCharsList[_i12].baseImg.src;
+    allCharsList[_i13].img.src = allCharsList[_i13].baseImg.src;
   }
 
-  for (var _i13 = 0; _i13 < allEnemyList.length; _i13++) {
-    allEnemyList[_i13].observer.disconnect();
+  for (var _i14 = 0; _i14 < allEnemyList.length; _i14++) {
+    allEnemyList[_i14].observer.disconnect();
 
-    clearInterval(allEnemyList[_i13].currentAction);
-    clearInterval(allEnemyList[_i13].currentAnimation);
+    clearInterval(allEnemyList[_i14].currentAction);
+    clearInterval(allEnemyList[_i14].currentAnimation);
 
-    allEnemyList[_i13].container.removeEventListener('click', clickEvents);
+    allEnemyList[_i14].container.removeEventListener('click', clickEvents);
 
-    allEnemyList[_i13].img.src = allEnemyList[_i13].baseImg.src;
+    allEnemyList[_i14].img.src = allEnemyList[_i14].baseImg.src;
   }
 
   if (charsList.length > 0) {
@@ -3067,8 +3183,8 @@ function endGame(charsList, enemyList) {
     var backgroundImg = document.getElementById('background-image');
     Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
 
-    for (var _i14 = 0; _i14 < enemyList.length; _i14++) {
-      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i14].container);
+    for (var _i15 = 0; _i15 < enemyList.length; _i15++) {
+      Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(enemyList[_i15].container);
     }
 
     fadeOutGame(false);
@@ -3129,32 +3245,32 @@ function addCharXP() {
     if (timeCount === 60) {
       clearInterval(xpInterval);
 
-      for (var _i15 = 0; _i15 < c.length; _i15++) {
-        c[_i15].xp = Math.ceil(c[_i15].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
+      for (var _i16 = 0; _i16 < c.length; _i16++) {
+        c[_i16].xp = Math.ceil(c[_i16].xp); // console.log('xp: ', c[i].xp, ' level: ', c[i].level);
 
-        c[_i15].container.style.border = 'none';
-        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i15].container);
+        c[_i16].container.style.border = 'none';
+        Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(c[_i16].container);
       }
 
       var backgroundImg = document.getElementById('background-image');
       Object(_fades__WEBPACK_IMPORTED_MODULE_1__["fadeOut"])(backgroundImg);
     }
 
-    for (var _i16 = 0; _i16 < c.length; _i16++) {
-      c[_i16].xp += xpPerInterval;
+    for (var _i17 = 0; _i17 < c.length; _i17++) {
+      c[_i17].xp += xpPerInterval;
 
-      if (c[_i16].xp > c[_i16].nextLevelXP) {
-        c[_i16].setLevel(c[_i16].level + 1);
+      if (c[_i17].xp > c[_i17].nextLevelXP) {
+        c[_i17].setLevel(c[_i17].level + 1);
 
-        var _expWords = document.getElementById(c[_i16].imgName + '-exp-words');
+        var _expWords = document.getElementById(c[_i17].imgName + '-exp-words');
 
-        _expWords.innerHTML = 'Level: ' + c[_i16].level;
+        _expWords.innerHTML = 'Level: ' + c[_i17].level;
       }
 
-      var _xpPercent = Math.floor(c[_i16].xp / c[_i16].nextLevelXP * 100);
+      var _xpPercent = Math.floor(c[_i17].xp / c[_i17].nextLevelXP * 100);
 
-      c[_i16].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
-      c[_i16].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
+      c[_i17].hpContainerLeft.style.width = "".concat(_xpPercent, "%");
+      c[_i17].hpContainerRight.style.width = "".concat(100 - _xpPercent, "%");
     }
 
     timeCount++;
@@ -3203,6 +3319,10 @@ function fadeOutGame(won) {
 }
 
 function resetGame(won) {
+  if (won && currentUserId) {
+    updateGameSaveState();
+  }
+
   livingChars = {};
   livingEnemies = {};
   document.getElementById('level-button-container').style.display = '';
@@ -3238,12 +3358,39 @@ function resetGame(won) {
     levChars[i].container.remove();
   }
 
-  for (var _i17 = 0; _i17 < levEnems.length; _i17++) {
-    levEnems[_i17].container.remove();
+  for (var _i18 = 0; _i18 < levEnems.length; _i18++) {
+    levEnems[_i18].container.remove();
   }
 
   levelXPGain = 0;
   boxEntities = [];
+}
+
+function createCharSaveObj() {
+  var charsObj = {};
+
+  for (var i = 0; i < characters.length; i++) {
+    charsObj[characters[i].klass] = {};
+    charsObj[characters[i].klass]["level"] = characters[i].level;
+    charsObj[characters[i].klass]["xp"] = characters[i].xp;
+  }
+
+  return charsObj;
+}
+
+function updateGameSaveState() {
+  var userDoc = db.collection('users').doc(currentUserId);
+  var charsObj = createCharSaveObj();
+  console.log('generated chars obj: ', charsObj);
+
+  try {
+    userDoc.update({
+      maxLevelNumber: maxLevelNumber,
+      characters: charsObj
+    });
+  } catch (err) {
+    console.log('Data update failed with error: ', err);
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (loadLevel);
@@ -3270,6 +3417,13 @@ window.addEventListener('load', function () {
     return true;
   }
 
+  function updateUserScreen() {
+    var userDoc = db.collection('users').doc(currentUserId);
+    userDoc.update({
+      storyPage: storyPage
+    });
+  }
+
   function setScreen(e) {
     storyElements[storyPage].style.display = 'none'; // console.log(e.currentTarget);
 
@@ -3278,6 +3432,8 @@ window.addEventListener('load', function () {
     } else {
       storyPage--;
     }
+
+    if (currentUserId) {}
 
     storyElements[storyPage].style.display = '';
 
@@ -3312,9 +3468,9 @@ window.addEventListener('load', function () {
       }
     }
 
-    for (var _i18 = 0; _i18 < partySelectorNames.length; _i18++) {
-      if (party[_i18]) {
-        partySelectorNames[_i18].innerHTML = party[_i18].klass;
+    for (var _i19 = 0; _i19 < partySelectorNames.length; _i19++) {
+      if (party[_i19]) {
+        partySelectorNames[_i19].innerHTML = party[_i19].klass;
       }
     }
 
