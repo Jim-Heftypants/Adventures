@@ -759,6 +759,12 @@ body {
     font-size: 3vw;
 }
 
+#form-bad-input-disp {
+    color: blue;
+    font-size: 4vh;
+    text-align: center;
+}
+
 .auth-button {
     padding: 0.5vw;
     margin-left: 1vw;

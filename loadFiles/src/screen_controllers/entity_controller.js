@@ -52,6 +52,7 @@ window.addEventListener('load', () => {
         button.classList.add("level-button");
         button.id = `level-${i}-button`;
         button.innerHTML = levels[i].name;
+        button.style.display = 'none';
         document.getElementById("level-button-container").appendChild(button);
     }
     abDescShader.addEventListener('click', () => {
@@ -566,6 +567,12 @@ function setPartyByIndexes() {
 }
 
 function loadSaveData(saveData, userId, shouldInitWithPresets) {
+    document.getElementById('auth-container').style.display = 'none';
+    document.getElementById('auth-input-container').style.display = 'none';
+    document.getElementById('auth-shader').style.display = 'none';
+    document.getElementById('username-display').innerHTML = saveData.name;
+    document.getElementById('auth-signedin-container').style.display = '';
+    document.getElementById('form-bad-input-disp').style.display = 'none';
     currentUserId = userId;
     // console.log('User ID: ', currentUserId);
     if (shouldInitWithPresets) {
@@ -577,6 +584,7 @@ function loadSaveData(saveData, userId, shouldInitWithPresets) {
             } else {
                 const levelButtons = document.getElementsByClassName('level-button');
                 for (let i = 1; i < maxLevelNumber; i++) {
+                    levelButtons[i].style.display = '';
                     levelButtons[i].style.opacity = 100 + '%';
                     levelButtons[i].style.cursor = 'pointer';
                 }
@@ -983,12 +991,19 @@ function resetGame(won) {
     const levelButtons = document.getElementsByClassName('level-button');
     if (won && maxLevelNumber === currentLevelNumber) {
         if (levelButtons[maxLevelNumber]) {
+            levelButtons[maxLevelNumber].style.display = '';
             levelButtons[maxLevelNumber].style.opacity = 100 + '%';
             levelButtons[maxLevelNumber].style.cursor = 'pointer';
         }
         maxLevelNumber++;
         if (currentUserId) {
             updateMaxLevel();
+        } else {
+            if (maxLevelNumber > 8) {
+                showStoryParts();
+                document.getElementById('first-description-shader').style.display = '';
+                document.getElementById('tutorial-levels-finished-description').style.display = '';
+            }
         }
     }
     const levChars = levels[currentLevelNumber].characterList;

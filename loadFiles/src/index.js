@@ -1,11 +1,7 @@
 import loadLevel from './screen_controllers/entity_controller';
 
-let app;
 let db;
-let saveData;
 document.addEventListener('DOMContentLoaded', (event) => {
-    app = firebase.app();
-    // console.log(app);
     db = firebase.firestore();
 })
 
@@ -47,94 +43,89 @@ window.addEventListener('load', () => {
     const authInputs = document.getElementsByClassName('auth-form-input');
     const signedInDisplay = document.getElementById('auth-signedin-container');
 
-    let currentUserId = null;
+    function setDefaultSaveProfile(userId, dispName) {
+        const userDoc = db.collection('users').doc(userId);
+        userDoc.set({
+            name: dispName,
+            characters: {
+                "Warrior": {
+                    "level": 1,
+                    "xp": 0,
+                },
+                "Cleric": {
+                    "level": 1,
+                    "xp": 0,
+                },
+                "Wizard": {
+                    "level": 1,
+                    "xp": 0,
+                },
+                "Rogue": {
+                    "level": 1,
+                    "xp": 0,
+                },
+                "Paladin": {
+                    "level": 1,
+                    "xp": 0,
+                },
+                "Berserker": {
+                    "level": 1,
+                    "xp": 0,
+                },
+                "Bard": {
+                    "level": 1,
+                    "xp": 0,
+                },
+                "Ranger": {
+                    "level": 1,
+                    "xp": 0,
+                },
+                "Warlock": {
+                    "level": 1,
+                    "xp": 0,
+                }
+            },
+            party: [0, 1, 2, 3],
+            maxLevelNumber: 1,
+            storyPage: 0,
+            password: "",
+        })
+            .then(function() {
+                console.log("Document successfully written!");
+                userDoc.get()
+                    .then(object => {
+                        const data = object.data();
+                        if (data && data.name) {
+                            console.log('Save history found!');
+                            // console.log("Save Data: ", data);
+                            loadLevel(null, data, userId);
+                        }
+                    })
+        })
+        .catch(function (error) {
+            console.error("Error finding document: ", error);
+        });
+    }
 
     document.getElementById('google-button').addEventListener('click', () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(provider)
             .then(result => {
                 const user = result.user;
-                authButtonsContainer.style.display = 'none';
-                authInputContainer.style.display = 'none';
-                authShader.style.display = 'none';
-                document.getElementById('username-display').innerHTML = user.displayName;
-                signedInDisplay.style.display = '';
-                currentUserId = user.uid;
-                const userDoc = db.collection('users').doc(currentUserId);
+                const userDoc = db.collection('users').doc(user.uid);
                 userDoc.get()
                     .then(object => {
                         const data = object.data();
                         // console.log('data: ', data);
                         if (data && data.name) {
                             console.log('Save history found!');
-                            saveData = data;
-                            // console.log("Save Data: ", saveData);
-                            loadLevel(null, saveData, currentUserId, true);
+                            // console.log("Save Data: ", data);
+                            loadLevel(null, data, user.uid, true);
                             dispHeroesScreenMessage = false;
                             dispLevelsScreenMessage = false;
                         } else {
                             console.log('No save data found -- creating new save');
-                            userDoc.set({
-                                name: user.displayName,
-                                characters: {
-                                    "Warrior": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    },
-                                    "Cleric": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    },
-                                    "Wizard": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    },
-                                    "Rogue": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    },
-                                    "Paladin": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    },
-                                    "Berserker": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    },
-                                    "Bard": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    },
-                                    "Ranger": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    },
-                                    "Warlock": {
-                                        "level": 1,
-                                        "xp": 0,
-                                    }
-                                },
-                                party: [],
-                                maxLevelNumber: 1,
-                                storyPage: 0
-                            })
-                                .then(function() {
-                                    saveData = data;
-                                    console.log("Document successfully written!");
-                                    userDoc.get()
-                                        .then(object => {
-                                            const data = object.data();
-                                            if (data.name) {
-                                                console.log('Save history found!');
-                                                saveData = data;
-                                                // console.log("Save Data: ", saveData);
-                                                loadLevel(null, saveData, currentUserId);
-                                            }
-                                        })
-                                })
-                                .catch(function (error) {
-                                    console.error("Error finding document: ", error);
-                                });
+                            setDefaultSaveProfile(user.uid, user.displayName);
                         }
                     })
                     .catch(err => {
@@ -144,28 +135,122 @@ window.addEventListener('load', () => {
             .catch(err => {console.log(err)})
     })
 
+    function defaultsForAuth(username, length) {
+        if (username.length < length) { console.log('defaults failed'); return false; }
+        for (let i = 0; i < username.length; i++) {
+            if (username[i] === ' ') {
+                console.log('defaults failed');
+                return false;
+            }
+        }
+        return true;
+    }
+ 
+    function validSignup(username, password) {
+        const userDoc = db.collection('users').doc(username);
+            userDoc.get()
+                .then(object => {
+                    const data = object.data();
+                    if (data) {
+                        authFailedDisp("username-taken");
+                    } else {
+                        setDefaultSaveProfile(username, username);
+                        try {
+                            db.collection('users').doc(username).update({
+                                password: password
+                            })
+                        } catch {
+                            console.log('failed to set password to new account');
+                        }
+                    }
+                })
+                .catch (err => {
+                    console.log("something went wrong");
+                    authFailedDisp("invalid-login");
+                })
+    }
+
+    function validDefaults(username, password) {
+        if (!defaultsForAuth(username, 4)) {
+            authFailedDisp("invalid-username");
+            return false;
+        }
+        if (!defaultsForAuth(password, 6)) {
+            authFailedDisp("invalid-password");
+            return false;
+        }
+        return true;
+    }
+
+    function validLogin(username, password) {
+        const userDoc = db.collection('users').doc(username);
+        userDoc.get()
+            .then(object => {
+                const data = object.data();
+                // console.log('data name: ', data.name);
+                if (data && data.name === username && data.password === password) {
+                    loadLevel(null, data, username, true);
+                    dispHeroesScreenMessage = false;
+                    dispLevelsScreenMessage = false;
+                } else {
+                    authFailedDisp("invalid-login");
+                }
+            })
+            .catch(err => {
+                authFailedDisp("invalid-login");
+                console.log('something went wrong');
+            })
+    }
+
+    function authFailedDisp(checker) {
+        const badInputDisp = document.getElementById('form-bad-input-disp');
+        if (checker === "invalid-username") {
+            badInputDisp.innerHTML = "Username must be at least 4 characters long";
+        } else if (checker === "invalid-password") {
+            badInputDisp.innerHTML = "Password must be at least 6 characters long";
+        } else if (checker === "username-taken") {
+            badInputDisp.innerHTML = "Username has already been taken";
+        } else if (checker === "invalid-login") {
+            badInputDisp.innerHTML = "Invalid Username or Password";
+        }
+        badInputDisp.style.display = '';
+    }
+
+    function loginAction(username, password) {
+        console.log('login attempted');
+        if (validDefaults(username, password)) {
+            validLogin(username, password);
+        }
+    }
+
+    function signupAction(username, password) {
+        console.log('signup attempted');
+        if (validDefaults(username, password)) {
+            validSignup(username, password);
+        }
+    }
+
     authSubmitButton.addEventListener('click', (e) => {
         e.preventDefault();
-        const email = authInputs[0].value.slice();
+        document.getElementById('form-bad-input-disp').style.display = 'none';
+        const username = authInputs[0].value.slice();
         authInputs[0].value = '';
         const password = authInputs[1].value.slice();
         authInputs[1].value = '';
 
-        authButtonsContainer.style.display = 'none';
-        authInputContainer.style.display = 'none';
-        authShader.style.display = 'none';
-        document.getElementById('username-display').innerHTML = email;
-        signedInDisplay.style.display = '';
-
-        console.log(email);
-        console.log(password);
-
+        const formType = document.getElementById('form-name').innerHTML;
+        if (formType === 'Login') {
+            loginAction(username, password);
+        } else {
+            signupAction(username, password);
+        }
     })
 
     authShader.addEventListener('click', () => {
         authShader.style.display = 'none';
         authShader.style.opacity = '0%';
         authInputContainer.style.display = 'none';
+        document.getElementById('form-bad-input-disp').style.display = 'none';
     })
     function animateShader(loadElement) {
         let op = 0;
@@ -249,6 +334,7 @@ window.addEventListener('load', () => {
                 loadLevel(i+1);
             })
         }
+        levelButtons[0].style.display = '';
         levelButtons[0].style.opacity = 100;
         levelButtons[0].style.cursor = 'pointer';
         closeButton.addEventListener('click', closeAction)

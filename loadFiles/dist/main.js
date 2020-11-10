@@ -1655,12 +1655,8 @@ function fastFadeIn(element) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./screen_controllers/entity_controller */ "./loadFiles/src/screen_controllers/entity_controller.js");
 
-var app;
 var db;
-var saveData;
 document.addEventListener('DOMContentLoaded', function (event) {
-  app = firebase.app(); // console.log(app);
-
   db = firebase.firestore();
 });
 
@@ -1712,89 +1708,86 @@ window.addEventListener('load', function () {
   var authSubmitButton = document.getElementById('auth-form-submit');
   var authInputs = document.getElementsByClassName('auth-form-input');
   var signedInDisplay = document.getElementById('auth-signedin-container');
-  var currentUserId = null;
+
+  function setDefaultSaveProfile(userId, dispName) {
+    var userDoc = db.collection('users').doc(userId);
+    userDoc.set({
+      name: dispName,
+      characters: {
+        "Warrior": {
+          "level": 1,
+          "xp": 0
+        },
+        "Cleric": {
+          "level": 1,
+          "xp": 0
+        },
+        "Wizard": {
+          "level": 1,
+          "xp": 0
+        },
+        "Rogue": {
+          "level": 1,
+          "xp": 0
+        },
+        "Paladin": {
+          "level": 1,
+          "xp": 0
+        },
+        "Berserker": {
+          "level": 1,
+          "xp": 0
+        },
+        "Bard": {
+          "level": 1,
+          "xp": 0
+        },
+        "Ranger": {
+          "level": 1,
+          "xp": 0
+        },
+        "Warlock": {
+          "level": 1,
+          "xp": 0
+        }
+      },
+      party: [0, 1, 2, 3],
+      maxLevelNumber: 1,
+      storyPage: 0,
+      password: ""
+    }).then(function () {
+      console.log("Document successfully written!");
+      userDoc.get().then(function (object) {
+        var data = object.data();
+
+        if (data && data.name) {
+          console.log('Save history found!'); // console.log("Save Data: ", data);
+
+          Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, data, userId);
+        }
+      });
+    })["catch"](function (error) {
+      console.error("Error finding document: ", error);
+    });
+  }
+
   document.getElementById('google-button').addEventListener('click', function () {
     var provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider).then(function (result) {
       var user = result.user;
-      authButtonsContainer.style.display = 'none';
-      authInputContainer.style.display = 'none';
-      authShader.style.display = 'none';
-      document.getElementById('username-display').innerHTML = user.displayName;
-      signedInDisplay.style.display = '';
-      currentUserId = user.uid;
-      var userDoc = db.collection('users').doc(currentUserId);
+      var userDoc = db.collection('users').doc(user.uid);
       userDoc.get().then(function (object) {
         var data = object.data(); // console.log('data: ', data);
 
         if (data && data.name) {
-          console.log('Save history found!');
-          saveData = data; // console.log("Save Data: ", saveData);
+          console.log('Save history found!'); // console.log("Save Data: ", data);
 
-          Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, saveData, currentUserId, true);
+          Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, data, user.uid, true);
           dispHeroesScreenMessage = false;
           dispLevelsScreenMessage = false;
         } else {
           console.log('No save data found -- creating new save');
-          userDoc.set({
-            name: user.displayName,
-            characters: {
-              "Warrior": {
-                "level": 1,
-                "xp": 0
-              },
-              "Cleric": {
-                "level": 1,
-                "xp": 0
-              },
-              "Wizard": {
-                "level": 1,
-                "xp": 0
-              },
-              "Rogue": {
-                "level": 1,
-                "xp": 0
-              },
-              "Paladin": {
-                "level": 1,
-                "xp": 0
-              },
-              "Berserker": {
-                "level": 1,
-                "xp": 0
-              },
-              "Bard": {
-                "level": 1,
-                "xp": 0
-              },
-              "Ranger": {
-                "level": 1,
-                "xp": 0
-              },
-              "Warlock": {
-                "level": 1,
-                "xp": 0
-              }
-            },
-            party: [],
-            maxLevelNumber: 1,
-            storyPage: 0
-          }).then(function () {
-            saveData = data;
-            console.log("Document successfully written!");
-            userDoc.get().then(function (object) {
-              var data = object.data();
-
-              if (data.name) {
-                console.log('Save history found!');
-                saveData = data; // console.log("Save Data: ", saveData);
-
-                Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, saveData, currentUserId);
-              }
-            });
-          })["catch"](function (error) {
-            console.error("Error finding document: ", error);
-          });
+          setDefaultSaveProfile(user.uid, user.displayName);
         }
       })["catch"](function (err) {
         console.log(err);
@@ -1803,24 +1796,131 @@ window.addEventListener('load', function () {
       console.log(err);
     });
   });
+
+  function defaultsForAuth(username, length) {
+    if (username.length < length) {
+      console.log('defaults failed');
+      return false;
+    }
+
+    for (var i = 0; i < username.length; i++) {
+      if (username[i] === ' ') {
+        console.log('defaults failed');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function validSignup(username, password) {
+    var userDoc = db.collection('users').doc(username);
+    userDoc.get().then(function (object) {
+      var data = object.data();
+
+      if (data) {
+        authFailedDisp("username-taken");
+      } else {
+        setDefaultSaveProfile(username, username);
+
+        try {
+          db.collection('users').doc(username).update({
+            password: password
+          });
+        } catch (_unused) {
+          console.log('failed to set password to new account');
+        }
+      }
+    })["catch"](function (err) {
+      console.log("something went wrong");
+      authFailedDisp("invalid-login");
+    });
+  }
+
+  function validDefaults(username, password) {
+    if (!defaultsForAuth(username, 4)) {
+      authFailedDisp("invalid-username");
+      return false;
+    }
+
+    if (!defaultsForAuth(password, 6)) {
+      authFailedDisp("invalid-password");
+      return false;
+    }
+
+    return true;
+  }
+
+  function validLogin(username, password) {
+    var userDoc = db.collection('users').doc(username);
+    userDoc.get().then(function (object) {
+      var data = object.data(); // console.log('data name: ', data.name);
+
+      if (data && data.name === username && data.password === password) {
+        Object(_screen_controllers_entity_controller__WEBPACK_IMPORTED_MODULE_0__["default"])(null, data, username, true);
+        dispHeroesScreenMessage = false;
+        dispLevelsScreenMessage = false;
+      } else {
+        authFailedDisp("invalid-login");
+      }
+    })["catch"](function (err) {
+      authFailedDisp("invalid-login");
+      console.log('something went wrong');
+    });
+  }
+
+  function authFailedDisp(checker) {
+    var badInputDisp = document.getElementById('form-bad-input-disp');
+
+    if (checker === "invalid-username") {
+      badInputDisp.innerHTML = "Username must be at least 4 characters long";
+    } else if (checker === "invalid-password") {
+      badInputDisp.innerHTML = "Password must be at least 6 characters long";
+    } else if (checker === "username-taken") {
+      badInputDisp.innerHTML = "Username has already been taken";
+    } else if (checker === "invalid-login") {
+      badInputDisp.innerHTML = "Invalid Username or Password";
+    }
+
+    badInputDisp.style.display = '';
+  }
+
+  function loginAction(username, password) {
+    console.log('login attempted');
+
+    if (validDefaults(username, password)) {
+      validLogin(username, password);
+    }
+  }
+
+  function signupAction(username, password) {
+    console.log('signup attempted');
+
+    if (validDefaults(username, password)) {
+      validSignup(username, password);
+    }
+  }
+
   authSubmitButton.addEventListener('click', function (e) {
     e.preventDefault();
-    var email = authInputs[0].value.slice();
+    document.getElementById('form-bad-input-disp').style.display = 'none';
+    var username = authInputs[0].value.slice();
     authInputs[0].value = '';
     var password = authInputs[1].value.slice();
     authInputs[1].value = '';
-    authButtonsContainer.style.display = 'none';
-    authInputContainer.style.display = 'none';
-    authShader.style.display = 'none';
-    document.getElementById('username-display').innerHTML = email;
-    signedInDisplay.style.display = '';
-    console.log(email);
-    console.log(password);
+    var formType = document.getElementById('form-name').innerHTML;
+
+    if (formType === 'Login') {
+      loginAction(username, password);
+    } else {
+      signupAction(username, password);
+    }
   });
   authShader.addEventListener('click', function () {
     authShader.style.display = 'none';
     authShader.style.opacity = '0%';
     authInputContainer.style.display = 'none';
+    document.getElementById('form-bad-input-disp').style.display = 'none';
   });
 
   function animateShader(loadElement) {
@@ -1927,6 +2027,7 @@ window.addEventListener('load', function () {
       _loop2(_i);
     }
 
+    levelButtons[0].style.display = '';
     levelButtons[0].style.opacity = 100;
     levelButtons[0].style.cursor = 'pointer';
     closeButton.addEventListener('click', closeAction);
@@ -2279,6 +2380,7 @@ window.addEventListener('load', function () {
     button.classList.add("level-button");
     button.id = "level-".concat(i, "-button");
     button.innerHTML = levels[i].name;
+    button.style.display = 'none';
     document.getElementById("level-button-container").appendChild(button);
   }
 
@@ -2901,6 +3003,12 @@ function setPartyByIndexes() {
 }
 
 function loadSaveData(saveData, userId, shouldInitWithPresets) {
+  document.getElementById('auth-container').style.display = 'none';
+  document.getElementById('auth-input-container').style.display = 'none';
+  document.getElementById('auth-shader').style.display = 'none';
+  document.getElementById('username-display').innerHTML = saveData.name;
+  document.getElementById('auth-signedin-container').style.display = '';
+  document.getElementById('form-bad-input-disp').style.display = 'none';
   currentUserId = userId; // console.log('User ID: ', currentUserId);
 
   if (shouldInitWithPresets) {
@@ -2914,6 +3022,7 @@ function loadSaveData(saveData, userId, shouldInitWithPresets) {
         var levelButtons = document.getElementsByClassName('level-button');
 
         for (var i = 1; i < maxLevelNumber; i++) {
+          levelButtons[i].style.display = '';
           levelButtons[i].style.opacity = 100 + '%';
           levelButtons[i].style.cursor = 'pointer';
         }
@@ -3412,6 +3521,7 @@ function resetGame(won) {
 
   if (won && maxLevelNumber === currentLevelNumber) {
     if (levelButtons[maxLevelNumber]) {
+      levelButtons[maxLevelNumber].style.display = '';
       levelButtons[maxLevelNumber].style.opacity = 100 + '%';
       levelButtons[maxLevelNumber].style.cursor = 'pointer';
     }
@@ -3420,6 +3530,12 @@ function resetGame(won) {
 
     if (currentUserId) {
       updateMaxLevel();
+    } else {
+      if (maxLevelNumber > 8) {
+        showStoryParts();
+        document.getElementById('first-description-shader').style.display = '';
+        document.getElementById('tutorial-levels-finished-description').style.display = '';
+      }
     }
   }
 
