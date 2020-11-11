@@ -2004,6 +2004,7 @@ window.addEventListener('load', function () {
       charsDisp.style.display = '';
       backgroundImage.src = titleBackground.src;
       backgroundImage.style.opacity = 100;
+      backgroundImage.style.height = '100vh';
       backgroundImage.style.display = '';
       topRightAuthContainer.style.display = '';
     }
@@ -2973,15 +2974,20 @@ function updateCharObjects() {
 }
 
 function showStoryParts() {
-  document.getElementById('level-button-container').style.display = 'none';
-  document.getElementById('level-button-container-header').style.display = 'none';
-  document.getElementById('story-container').style.display = '';
-  document.getElementById('party-button').style.display = '';
+  if (maxLevelNumber > 8) {
+    document.getElementById('level-button-container').style.display = 'none';
+    document.getElementById('level-button-container-header').style.display = 'none';
+    document.getElementById('story-container').style.display = '';
+    document.getElementById('party-button').style.display = '';
+  }
+
+  setScreen(false);
 }
 
 function updateMaxLevel() {
+  showStoryParts();
+
   if (maxLevelNumber > 8) {
-    showStoryParts();
     document.getElementById('first-description-shader').style.display = '';
     document.getElementById('tutorial-levels-finished-description').style.display = '';
   }
@@ -3015,20 +3021,17 @@ function loadSaveData(saveData, userId, shouldInitWithPresets) {
     try {
       // console.log('Merging save data: ', saveData);
       maxLevelNumber = saveData["maxLevelNumber"];
+      storyPage = saveData["storyPage"];
+      showStoryParts();
+      var levelButtons = document.getElementsByClassName('level-button');
 
-      if (maxLevelNumber > 8) {
-        showStoryParts();
-      } else {
-        var levelButtons = document.getElementsByClassName('level-button');
-
-        for (var i = 1; i < maxLevelNumber; i++) {
+      for (var i = 1; i < maxLevelNumber; i++) {
+        if (i < levelButtons.length) {
           levelButtons[i].style.display = '';
           levelButtons[i].style.opacity = 100 + '%';
           levelButtons[i].style.cursor = 'pointer';
         }
       }
-
-      storyPage = saveData["storyPage"];
 
       for (var _i10 = 0; _i10 < characters.length; _i10++) {
         characters[_i10].xp = saveData["characters"][characters[_i10].klass]["xp"];
@@ -3524,6 +3527,8 @@ function resetGame(won) {
       levelButtons[maxLevelNumber].style.display = '';
       levelButtons[maxLevelNumber].style.opacity = 100 + '%';
       levelButtons[maxLevelNumber].style.cursor = 'pointer';
+      document.getElementById('level-button-container').style.display = 'none';
+      document.getElementById('story-container').style.display = '';
     }
 
     maxLevelNumber++;
@@ -3531,8 +3536,9 @@ function resetGame(won) {
     if (currentUserId) {
       updateMaxLevel();
     } else {
+      showStoryParts();
+
       if (maxLevelNumber > 8) {
-        showStoryParts();
         document.getElementById('first-description-shader').style.display = '';
         document.getElementById('tutorial-levels-finished-description').style.display = '';
       }
@@ -3555,31 +3561,36 @@ function resetGame(won) {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (loadLevel);
-window.addEventListener('load', function () {
-  var storyContainer = document.getElementById('story-container');
+
+function prevScreenAvailable() {
+  if (storyPage === 0) {
+    return false;
+  }
+
+  return true;
+}
+
+function nextScreenAvailable() {
+  var storyElements = document.getElementsByClassName('story-page');
+
+  if (storyPage === storyElements.length - 1) {
+    return false;
+  }
+
+  return true;
+}
+
+function setScreen(e) {
+  // console.log(e.currentTarget);
   var storyElements = document.getElementsByClassName('story-page');
   var nextScreenButton = document.getElementById('next-page-button');
   var prevScreenButton = document.getElementById('prev-page-button');
-  var openPartyScreenButton = document.getElementById('open-party-interface');
+  var storyContainer = document.getElementById('story-container');
+  var levelButtonContainer = document.getElementById('level-button-container');
+  var levelButtonHeader = document.getElementById('level-button-container-header');
 
-  function prevScreenAvailable() {
-    if (storyPage === 0) {
-      return false;
-    }
-
-    return true;
-  }
-
-  function nextScreenAvailable() {
-    if (storyPage === storyElements.length - 1) {
-      return false;
-    }
-
-    return true;
-  }
-
-  function setScreen(e) {
-    storyElements[storyPage].style.display = 'none'; // console.log(e.currentTarget);
+  if (e) {
+    storyElements[storyPage].style.display = 'none';
 
     if (e.currentTarget.id.substr(0, 1) === 'n') {
       storyPage++;
@@ -3590,22 +3601,36 @@ window.addEventListener('load', function () {
     if (currentUserId) {
       updateUserScreen();
     }
+  }
 
-    storyElements[storyPage].style.display = '';
+  storyElements[storyPage].style.display = '';
 
-    if (prevScreenAvailable()) {
-      prevScreenButton.style.display = '';
-    } else {
-      prevScreenButton.style.display = 'none';
-    }
-
-    if (nextScreenAvailable()) {
-      nextScreenButton.style.display = '';
-    } else {
-      nextScreenButton.style.display = 'none';
+  if (document.getElementById('party-selector-container').style.display === 'none') {
+    if (currentLevelNumber === storyPage) {
+      storyContainer.style.display = 'none';
+      levelButtonContainer.style.display = '';
+      levelButtonHeader.style.display = '';
     }
   }
 
+  if (prevScreenAvailable()) {
+    prevScreenButton.style.display = '';
+  } else {
+    prevScreenButton.style.display = 'none';
+  }
+
+  if (nextScreenAvailable()) {
+    nextScreenButton.style.display = '';
+  } else {
+    nextScreenButton.style.display = 'none';
+  }
+}
+
+window.addEventListener('load', function () {
+  var storyContainer = document.getElementById('story-container');
+  var nextScreenButton = document.getElementById('next-page-button');
+  var prevScreenButton = document.getElementById('prev-page-button');
+  var openPartyScreenButton = document.getElementById('open-party-interface');
   nextScreenButton.addEventListener('click', function (e) {
     setScreen(e);
   });

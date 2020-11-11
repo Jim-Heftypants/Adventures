@@ -318,6 +318,7 @@ window.addEventListener('load', () => {
             charsDisp.style.display = '';
             backgroundImage.src = titleBackground.src;
             backgroundImage.style.opacity = 100;
+            backgroundImage.style.height = '100vh';
             backgroundImage.style.display = '';
             topRightAuthContainer.style.display = '';
         }
