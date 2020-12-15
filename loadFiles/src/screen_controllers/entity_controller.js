@@ -52,7 +52,7 @@ window.addEventListener('load', () => {
         button.classList.add("level-button");
         button.id = `level-${i}-button`;
         button.innerHTML = levels[i].name;
-        button.style.display = 'none';
+        // button.style.display = 'none';
         document.getElementById("level-button-container").appendChild(button);
     }
     abDescShader.addEventListener('click', () => {
