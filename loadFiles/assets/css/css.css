@@ -33,7 +33,7 @@ body {
     /* position: relative; */
     height: 100%;
     width: 100%;
-    background-color: lawngreen;
+    background-color: rgb(37, 141, 37);
     /* border-left: 2px solid black; */
     z-index: 4;
 }
@@ -241,7 +241,7 @@ body {
     text-align: center;
     font-size: 40px;
     font-size: 3vw;
-    color: red;
+    color: black;
     z-index: 5;
     cursor: default;
 }
@@ -325,7 +325,7 @@ body {
     align-content: space-between;
     width: 100%;
     height: 80%;
-    color: red;
+    color: black;
     /* font-size: 60px; */
 }
 
@@ -343,6 +343,10 @@ body {
     margin: auto;
 }
 
+.keybind-div:hover {
+    color: aquamarine;
+}
+
 .keybind-input {
     width: 3.5vw;
     height: 4vw;
@@ -354,7 +358,7 @@ body {
     margin: auto;
     width: 90%;
     height: 20%;
-    color: red;
+    color: aquamarine;
     text-align: center;
     border-bottom: 5px solid black;
 }

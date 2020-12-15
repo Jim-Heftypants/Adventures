@@ -2380,8 +2380,8 @@ window.addEventListener('load', function () {
     var button = document.createElement("button");
     button.classList.add("level-button");
     button.id = "level-".concat(i, "-button");
-    button.innerHTML = levels[i].name; // button.style.display = 'none';
-
+    button.innerHTML = levels[i].name;
+    button.style.display = 'none';
     document.getElementById("level-button-container").appendChild(button);
   }
 
